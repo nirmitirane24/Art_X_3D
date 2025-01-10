@@ -1,0 +1,40 @@
+/* src/styles/hierarchyPanel.css */
+.hierarchy-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 30px 20px 30px 20px ; /* Add margin */
+    width: 300px;
+    background-color: rgba(40, 40, 40, 0.8); /* Semi-transparent dark background */
+    color: #eee; /* Light text color */
+    border: 1px solid rgba(68, 68, 68, 0.5); /* Subtle semi-transparent border */
+    border-radius: 10px; /* Rounded corners */
+    overflow-y: auto;
+    z-index: 10;
+    height: calc(100% - 150px); /* Adjust height to account for margin and toolbar */
+    padding: 20px; /* Adjust padding */
+    border-bottom-left-radius: 10px; /* Match border-radius */
+    font-family: 'Arial', sans-serif; /* Spline's font */
+  }
+  
+  .hierarchy-panel ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .hierarchy-panel li {
+    cursor: pointer;
+    padding: 5px;
+    border-bottom: 1px solid rgba(68, 68, 68, 0.5); /* Subtle divider */
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  .hierarchy-panel li.selected {
+    background-color: rgba(74, 74, 74, 0.8); /* Slightly lighter background for selected items */
+  }
+  
+  .hierarchy-panel li:hover {
+    background-color: rgba(58, 58, 58, 0.8); /* Hover effect */
+  }

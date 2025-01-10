@@ -1,0 +1,43 @@
+/* src/styles/toolbar.css */
+.toolbar {
+  position: absolute;
+  bottom: 0; /* Align to the bottom of the viewport */
+  left: 50%; /* Center horizontally */
+  transform: translateX(-50%); /* Adjust for centering */
+  display: flex;
+  flex-direction: row; /* Horizontal toolbar */
+  align-items: center;
+  background-color: rgba(224, 224, 224, 0.8); /* Semi-transparent background */
+  padding: 10px;
+  width: auto; /* Toolbar width adjusts to content */
+  max-width: 80%; /* Limit maximum width */
+  z-index: 20; /* Ensure toolbar is on top */
+  border-radius: 5px; /* Rounded corners */
+  gap: 10px; /* Space between toolbar items */
+  font-family: 'Arial', sans-serif; /* Spline's font */
+  margin-bottom: 20px;
+}
+
+.toolbar-button {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  width: 30px; /* Adjust button size as needed */
+  height: 30px; /* Adjust button size as needed */
+}
+
+.toolbar-button:hover {
+  background-color: #c0c0c0;
+}
+
+.toolbar-button svg {
+  width: 24px;
+  height: 24px;
+}
+
+.toolbar-button span {
+  display: none;
+}

@@ -1,0 +1,29 @@
+/* src/styles/editorManager.css */
+
+.editor-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.main-area {
+  display: flex;
+  flex: 1;
+  position: relative; /* Important: make this a positioning context */
+}
+
+.viewport {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Ensure canvas is not hidden and takes up space */
+.viewport canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

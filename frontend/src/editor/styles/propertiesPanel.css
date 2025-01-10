@@ -1,0 +1,35 @@
+/* src/styles/propertiesPanel.css */
+.properties-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 30px 20px 30px 20px ; /* Add margin */
+    width: 300px;
+    background-color: rgba(40, 40, 40, 0.8); /* Semi-transparent dark background */
+    color: #eee; /* Light text color */
+    border: 1px solid rgba(68, 68, 68, 0.5); /* Subtle semi-transparent border */
+    border-radius: 10px; /* Rounded corners */
+    overflow-y: auto;
+    z-index: 10;
+    height: calc(100% - 150px); /* Adjust height to account for margin and toolbar */
+    padding: 20px; /* Adjust padding */
+    border-bottom-right-radius: 10px; /* Match border-radius */
+    font-family: 'Arial', sans-serif; /* Spline's font */
+  }
+  
+  .properties-panel h4 {
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  
+  .properties-panel input[type="number"] {
+    width: 50px;
+    margin-right: 5px;
+    padding: 3px;
+    border: 1px solid #666;
+    background-color: #333;
+    color: #eee;
+    border-radius: 3px;
+  }
