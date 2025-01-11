@@ -44,52 +44,51 @@ const materials = {
     // Add more materials with different properties here
 };
 
-const Model = ({ object, isSelected, setCameraEnabled, onSelect }) => {
+const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject }) => {
     const transformRef = useRef();
     const meshRef = useRef();
 
     useEffect(() => {
-        if (meshRef.current) {
-            // Dispose of old geometry and material
-            if (meshRef.current.geometry) meshRef.current.geometry.dispose();
-            if (meshRef.current.material) meshRef.current.material.dispose();
-
-            // Assign new geometry and material
-            meshRef.current.geometry = geometries[object.type];
-            meshRef.current.material = materials[object.material];
-        }
-
-        return () => {
-            // Cleanup when component unmounts or object changes
-            if (meshRef.current) {
-                if (meshRef.current.geometry) meshRef.current.geometry.dispose();
-                if (meshRef.current.material) meshRef.current.material.dispose();
+        const handleTransformChange = () => {
+            if (meshRef.current && transformRef.current && transformRef.current.dragging) {
+                const { position, rotation, scale } = meshRef.current;
+                onUpdateObject(object.id, {
+                    position: position.toArray(),
+                    rotation: [rotation.x, rotation.y, rotation.z],
+                    scale: scale.toArray()
+                });
             }
         };
-    }, [object.type, object.material]);
 
-    useEffect(() => {
-        const handleTransformChange = () => {
-            if (meshRef.current && transformRef.current && transformRef.current.dragging === false) {
+        const handleTransformDragEnd = () => {
+            if (meshRef.current) {
                 const { position, rotation, scale } = meshRef.current;
                 onSelect([object.id]); // Update properties when dragging stops
+                onUpdateObject(object.id, {
+                    position: position.toArray(),
+                    rotation: [rotation.x, rotation.y, rotation.z],
+                    scale: scale.toArray()
+                });
             }
         };
 
         if (isSelected && transformRef.current) {
             transformRef.current.attach(meshRef.current);
-            transformRef.current.addEventListener('dragging-changed', handleTransformChange);
+            transformRef.current.addEventListener('objectChange', handleTransformChange);
+            transformRef.current.addEventListener('dragging-changed', handleTransformDragEnd);
         } else if (transformRef.current) {
             transformRef.current.detach();
-            transformRef.current.removeEventListener('dragging-changed', handleTransformChange);
+            transformRef.current.removeEventListener('objectChange', handleTransformChange);
+            transformRef.current.removeEventListener('dragging-changed', handleTransformDragEnd);
         }
 
         return () => {
             if (transformRef.current) {
-                transformRef.current.removeEventListener('dragging-changed', handleTransformChange);
+                transformRef.current.removeEventListener('objectChange', handleTransformChange);
+                transformRef.current.removeEventListener('dragging-changed', handleTransformDragEnd);
             }
         };
-    }, [isSelected, object, onSelect]);
+    }, [isSelected, object, onSelect, onUpdateObject]);
 
     const handlePointerDown = (event) => {
         event.stopPropagation();
@@ -159,7 +158,6 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect }) => {
                 scale={object.scale}
                 onPointerDown={handlePointerDown}
             >
-                {/* Create the geometry element dynamically */}
                 {createGeometryElement(object.type)}
                 <meshStandardMaterial color={'gray'} />
             </mesh>

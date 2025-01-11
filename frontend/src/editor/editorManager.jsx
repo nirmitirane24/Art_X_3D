@@ -83,7 +83,7 @@ const EditorManager = () => {
         if (event.key === 'q') {
             setSelectedObjects([]);
             setCameraEnabled(true);
-        } else if (event.type === 'click' && (event.target === event.currentTarget || event.target.closest('.sidebar') || event.target.closest('.properties-panel'))) {
+        } else if (event.type === 'click' && ( event.target.closest('.hierarchy-panel'))) {
             // Check if the event is a click and the target is the canvas or a panel
             setSelectedObjects([]);
             setCameraEnabled(true);
@@ -111,7 +111,7 @@ const EditorManager = () => {
                     <Canvas
                         camera={{ position: [0, 5, 10], fov: 45 }}
                         onCreated={({ gl }) => {
-                            gl.setClearColor('white');
+                            gl.setClearColor('#2D2E32');
                         }}
                     >
                         <ambientLight intensity={0.5} />
@@ -126,6 +126,7 @@ const EditorManager = () => {
                                     isSelected={selectedObjects.includes(object.id)}
                                     setCameraEnabled={setCameraEnabled}
                                     onSelect={handleObjectSelect}
+                                    onUpdateObject={updateObject} // Pass the callback
                                 />
                             ))}
                         </group>

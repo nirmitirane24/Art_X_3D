@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/propertiesPanel.css'; // Import the CSS
+import '../styles/propertiesPanel.css';
 
 const PropertiesPanel = ({ selectedObjects, sceneObjects, updateObject }) => {
     const selectedObject = selectedObjects.length === 1
@@ -58,7 +58,66 @@ const PropertiesPanel = ({ selectedObjects, sceneObjects, updateObject }) => {
                     ])}
                 />
             </div>
-            {/* Add more properties like rotation, scale, material, etc. */}
+            <div>
+                <h4>Rotation</h4>
+                <input
+                    type="number"
+                    value={selectedObject.rotation[0]}
+                    onChange={(e) => handlePropertyChange('rotation', [
+                        parseFloat(e.target.value),
+                        selectedObject.rotation[1],
+                        selectedObject.rotation[2],
+                    ])}
+                />
+                <input
+                    type="number"
+                    value={selectedObject.rotation[1]}
+                    onChange={(e) => handlePropertyChange('rotation', [
+                        selectedObject.rotation[0],
+                        parseFloat(e.target.value),
+                        selectedObject.rotation[2],
+                    ])}
+                />
+                <input
+                    type="number"
+                    value={selectedObject.rotation[2]}
+                    onChange={(e) => handlePropertyChange('rotation', [
+                        selectedObject.rotation[0],
+                        selectedObject.rotation[1],
+                        parseFloat(e.target.value),
+                    ])}
+                />
+            </div>
+            <div>
+                <h4>Scale</h4>
+                <input
+                    type="number"
+                    value={selectedObject.scale[0]}
+                    onChange={(e) => handlePropertyChange('scale', [
+                        parseFloat(e.target.value),
+                        selectedObject.scale[1],
+                        selectedObject.scale[2],
+                    ])}
+                />
+                <input
+                    type="number"
+                    value={selectedObject.scale[1]}
+                    onChange={(e) => handlePropertyChange('scale', [
+                        selectedObject.scale[0],
+                        parseFloat(e.target.value),
+                        selectedObject.scale[2],
+                    ])}
+                />
+                <input
+                    type="number"
+                    value={selectedObject.scale[2]}
+                    onChange={(e) => handlePropertyChange('scale', [
+                        selectedObject.scale[0],
+                        selectedObject.scale[1],
+                        parseFloat(e.target.value),
+                    ])}
+                />
+            </div>
         </div>
     );
 };
