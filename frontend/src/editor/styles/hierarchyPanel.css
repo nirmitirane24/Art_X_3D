@@ -1,40 +1,108 @@
 /* src/styles/hierarchyPanel.css */
 .hierarchy-panel {
+  
     position: absolute;
     top: 0;
     left: 0;
-    margin: 30px 20px 30px 20px ; /* Add margin */
+    margin: 20px ; /* Add margin */
     width: 200px;
     background-color: #16161acc; /* Semi-transparent dark background */
-    color: #eee; /* Light text color */
+    color: #cbcbcb; /* Light text color */
     border: 1px solid rgba(68, 68, 68, 0.5); /* Subtle semi-transparent border */
     border-radius: 20px; /* Rounded corners */
     overflow-y: auto;
     z-index: 10;
-    height: calc(100% - 150px); /* Adjust height to account for margin and toolbar */
+    height: calc(100% - 125px);  /* Adjust height to account for margin and toolbar */
     padding: 20px; /* Adjust padding */
     border-bottom-left-radius: 10px; /* Match border-radius */
-    font-family: 'Arial', sans-serif; /* Spline's font */
+    font-family: Futura, "Trebuchet MS", Arial, sans-serif;
   }
   
-  .hierarchy-panel ul {
+  .hierarchy-panel h3 {
+    margin-top: 0; /* Reduce top margin */
+    font-size: 16px; /* Slightly larger font size */
+    font-weight: 600; /* Bold font weight */
+    padding-bottom: 5px; /* Add padding below the title */
+    border-bottom: 1px solid rgba(68, 68, 68, 0.5); /* Add a divider below the title */
+}
+
+.hierarchy-panel ul {
     list-style: none;
     padding: 0;
-    margin: 0;
-  }
-  
-  .hierarchy-panel li {
+    margin: 10px 0; /* Add margin above and below the list */
+}
+
+.hierarchy-panel li {
     cursor: pointer;
-    padding: 5px;
-    border-bottom: 1px solid rgba(68, 68, 68, 0.5); /* Subtle divider */
+    padding: 8px 10px; /* Increase padding */
+    border-bottom: 1px solid rgba(68, 68, 68, 0.5);
     font-size: 14px;
     line-height: 1.5;
-  }
-  
-  .hierarchy-panel li.selected {
-    background-color: rgba(74, 74, 74, 0.8); /* Slightly lighter background for selected items */
-  }
-  
-  .hierarchy-panel li:hover {
-    background-color: rgba(58, 58, 58, 0.8); /* Hover effect */
-  }
+    display: flex; /* Use flexbox to align icon and text */
+    align-items: center; /* Vertically align items */
+    transition: background-color 0.2s; /* Add a transition effect */
+}
+
+.hierarchy-panel li.selected {
+    background-color: rgba(74, 74, 74, 0.8);
+}
+
+.hierarchy-panel li:hover {
+    background-color: rgba(58, 58, 58, 0.8);
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.header-section h3 {
+  margin-top: 0;
+  font-size: 16px;
+  font-weight: 600;
+  padding-bottom: 5px;
+}
+
+
+.buttons-section {
+  padding: 10px;
+  border-top: 1px solid rgba(68, 68, 68, 0.5);
+  display: flex;
+  justify-content: space-around;
+}
+
+.panel-button {
+  background-color: rgba(74, 74, 74, 0.8);
+  border: none;
+  color: #eee;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.panel-button:hover {
+  background-color: rgba(90, 90, 90, 0.8);
+}
+
+
+
+/* Search section */
+.search-section {
+  padding: 10px;
+  border-bottom: 1px solid rgba(68, 68, 68, 0.5);
+}
+
+.search-input {
+  outline: none;
+  width: 100%;
+  padding: 5px;
+  border: 1px solid rgba(68, 68, 68, 0.5);
+  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #eee;
+  font-size: 14px;
+}

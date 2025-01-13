@@ -12,7 +12,7 @@ const EditorManager = () => {
     const [sceneObjects, setSceneObjects] = useState([]);
     const [selectedObjects, setSelectedObjects] = useState([]);
     const [cameraEnabled, setCameraEnabled] = useState(true);
-    const sceneRef = useRef(); // Ref for the scene group
+    const sceneRef = useRef(); 
 
     const deleteSelectedObjects = () => {
         setSceneObjects((prevObjects) =>
@@ -50,7 +50,22 @@ const EditorManager = () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
     }, [selectedObjects, deleteSelectedObjects]); // Include deleteSelectedObjects in the dependency array
+
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.key === 'q') {
+                setSelectedObjects([]);
+                setCameraEnabled(true);
+            }
+        };
     
+        window.addEventListener('keydown', handleKeyDown);
+    
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []); 
 
     const addModel = (type) => {
         const newObject = {
@@ -79,12 +94,7 @@ const EditorManager = () => {
     };
 
     const deselectAllObjects = (event) => {
-        // Check if the event is a key press and the key is 'q'
-        if (event.key === 'q') {
-            setSelectedObjects([]);
-            setCameraEnabled(true);
-        } else if (event.type === 'click' && ( event.target.closest('.hierarchy-panel'))) {
-            // Check if the event is a click and the target is the canvas or a panel
+        if (event.type === 'click' && ( event.target.closest('.edit-mode-button') || event.target.closest('.hierarchy-panel'))) {
             setSelectedObjects([]);
             setCameraEnabled(true);
         }
@@ -93,7 +103,7 @@ const EditorManager = () => {
 
     return (
         <div className="editor-container" onClick={deselectAllObjects}>
-            <Toolbar onAddModel={addModel} />
+            <Toolbar onAddModel={addModel} selectedObjects={selectedObjects} />
             <div className="main-area">
                 <div className="sidebar">
                     <HierarchyPanel
@@ -135,6 +145,7 @@ const EditorManager = () => {
                             selectedObjects={selectedObjects}
                         />
                     </Canvas>
+                    
                 </div>
             </div>
         </div>

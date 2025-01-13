@@ -3,7 +3,7 @@
     position: absolute;
     top: 0;
     right: 0;
-    margin: 30px 20px 30px 20px ; /* Add margin */
+    margin: 20px ; /* Add margin */
     width: 200px;
     background-color:#16161acc; /* Semi-transparent dark background */
     color: #eee; /* Light text color */
@@ -11,17 +11,16 @@
     border-radius: 20px; /* Rounded corners */
     overflow-y: auto;
     z-index: 10;
-    height: calc(100% - 150px); /* Adjust height to account for margin and toolbar */
+    height: calc(100% - 125px); /* Adjust height to account for margin and toolbar */
     padding: 20px; /* Adjust padding */
     border-bottom-right-radius: 10px; /* Match border-radius */
-    font-family: 'Arial', sans-serif; /* Spline's font */
+    font-family: Futura, "Trebuchet MS", Arial, sans-serif;
   }
   
   .properties-panel h4 {
     margin-top: 15px;
     margin-bottom: 5px;
     font-size: 14px;
-    font-weight: 600;
   }
   
   .properties-panel input[type="number"] {
