@@ -1,34 +1,84 @@
 /* src/styles/propertiesPanel.css */
 .properties-panel {
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: 20px ; /* Add margin */
-    width: 200px;
-    background-color:#16161acc; /* Semi-transparent dark background */
-    color: #eee; /* Light text color */
-    border: 1px solid rgba(68, 68, 68, 0.5); /* Subtle semi-transparent border */
-    border-radius: 20px; /* Rounded corners */
-    overflow-y: auto;
-    z-index: 10;
-    height: calc(100% - 125px); /* Adjust height to account for margin and toolbar */
-    padding: 20px; /* Adjust padding */
-    border-bottom-right-radius: 10px; /* Match border-radius */
-    font-family: Futura, "Trebuchet MS", Arial, sans-serif;
-  }
-  
-  .properties-panel h4 {
-    margin-top: 15px;
-    margin-bottom: 5px;
-    font-size: 14px;
-  }
-  
-  .properties-panel input[type="number"] {
-    width: 50px;
-    margin-right: 5px;
-    padding: 3px;
-    border: 1px solid #666;
-    background-color: #333;
-    color: #eee;
-    border-radius: 3px;
-  }
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 20px ; /* Add margin */
+  width: 200px;
+  background-color:#16161acc; /* Semi-transparent dark background */
+  color: #eee; /* Light text color */
+  border: 1px solid rgba(68, 68, 68, 0.5); /* Subtle semi-transparent border */
+  border-radius: 20px; /* Rounded corners */
+  overflow-y: auto;
+  z-index: 10;
+  height: calc(100% - 125px); /* Adjust height to account for margin and toolbar */
+  padding: 20px; /* Adjust padding */
+  border-bottom-right-radius: 10px; /* Match border-radius */
+  font-family: Futura, "Trebuchet MS", Arial, sans-serif;
+}
+
+.properties-panel h4 {
+  margin-top: 15px;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.properties-panel input[type="number"] {
+  width: 50px;
+  margin-right: 5px;
+  padding: 3px;
+  border: 1px solid #666;
+  background-color: #333;
+  color: #eee;
+  border-radius: 3px;
+}
+
+/* Material Editor Button styles */
+.material-editor-button {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background: #53585b;
+    outline: none;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.material-editor-button:hover {
+  background: #53585b;
+  outline: none;
+}
+
+/* Horizontal Slider styles */
+.slider-group h4{
+  margin-bottom: 5px;
+}
+
+.slider-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.slider-input-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+.number-input {
+  width: 40px;
+   padding: 5px;
+   background-color: #444;
+   color: white;
+   border: 1px solid #555;
+   border-radius: 3px;
+    margin-bottom: 2px;
+}
+
+.horizontal-slider {
+    height: 10px;
+    background: #16161a00;
+    border-radius: 5px;
+    cursor: ew-resize;
+}
