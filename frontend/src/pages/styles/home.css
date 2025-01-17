@@ -1,0 +1,335 @@
+/* General */
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #ffffff;
+    background-color: #1a192d;
+}
+
+body::-webkit-scrollbar {
+    width: 12px;
+}
+
+body::-webkit-scrollbar-track {
+    background: #1a192d;
+    border-radius: 10px;
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: #1a192d;
+    border-radius: 10px;
+    border: 3px solid #1a192d;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+    background-color: #1a192d;
+}
+
+body::-webkit-scrollbar-corner {
+    background-color: #1a192d;
+}
+
+.home-container {
+    display: flex;
+}
+
+.top-bar{
+    color: #91b595;
+}
+/* Sidebar */
+.sidebar {
+    min-height: 140vh;
+    width: 240px;
+    background-color: #222;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.profile-section {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.profile-icon {
+    width: 40px;
+    height: 40px;
+    background-color: #444;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.menu {
+    flex-grow: 1;
+}
+
+.menu-item {
+    color: #aaa;
+    text-decoration: none;
+    display: block;
+    padding: 10px 0;
+    margin: 5px 0;
+    font-weight: bold;
+}
+
+.menu-item.active,
+.menu-item:hover {
+    color: #fff;
+}
+
+.new-tag {
+    background-color: rgb(255, 56, 86);
+    color: #fff;
+    border-radius: 2px;
+    padding: 2px;
+    font-size: 10px;
+}
+
+/* Upgrade Section */
+.upgrade-section {
+    margin-top: 10px;
+}
+
+.upgrade-button {
+    background-color: #6966a490;;
+    border: none;
+    color: #fff;
+    padding: 10px;
+    width: 100%;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.upgrade-button:focus{
+    outline: none;
+}
+
+/* Main Content */
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+.import-button,
+.generate-button,
+.new-file-button {
+    font-family: inherit;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    margin: 10px; /* Adds space around each button */
+    background-color: #6966a490;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none; /* Removes the outline */
+}
+
+.import-button:hover,
+.generate-button:hover,
+.new-file-button:hover {
+    background-color: rgb(201, 46, 70);
+}
+
+.import-button:active,
+.generate-button:active,
+.new-file-button:active {
+    outline: none;
+}
+
+.import-button:focus,
+.generate-button:focus,
+.new-file-button:focus {
+    outline: none;
+}
+
+/* Optional: Add display: flex to the container holding these buttons */
+.button-container {
+    display: flex;
+    gap: 20px; /* Space between buttons */
+}
+
+
+/* Projects Section */
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.project-card {
+    background-color: #333;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+}
+
+.project-thumbnail {
+    height: 100px;
+    background-color: #444;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.project-thumbnail.pink {
+    background-color: #91b595;
+}
+
+.project-title {
+    color: #fff;
+    font-weight: bold;
+}
+
+.project-date {
+    color: #aaa;
+    font-size: 14px;
+}
+
+/* Tutorials Section */
+.tutorials-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.tutorial-card {
+    background-color: #333;
+    border-radius: 10px;
+    text-align: center;
+    padding: 10px;
+}
+
+.tutorial-card img {
+    max-width: 100%;
+    border-radius: 5px;
+}
+
+.tutorial-card p {
+    color: #fff;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+/* Features Section */
+.features {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    list-style-type: none;
+    overflow: hidden;
+    color: #aaa;
+    opacity: 0.6;
+    gap: 10px;
+    margin-right: 20px;
+    margin-top: 80px;
+}
+
+.features li {
+    align-items: center;
+    justify-content: center;
+    padding: 9px 9px;
+    border-radius: 12px;
+}
+
+.features li:hover {
+    background-color: #1a192d;
+    color: rgb(136, 224, 121);
+}
+
+/* Centering the Import and Generate Panels */
+.import-panel, .generate-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centers the panel */
+    width: 450px;
+    background: #1e1e2f;
+    border-radius: 10px;
+    padding: 20px;
+    color: #fff;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.527);
+    z-index: 1000; /* Ensure it stays on top of other elements */
+  }
+  
+  /* Optional: Styling for the panels to have similar look */
+  .import-panel-header, .generate-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .import-panel h2 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+  
+  .import-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .import-option {
+    background: #2a2a40;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .import-option:hover {
+    background: #3a3a5b;
+  }
+  
+  .generate-section {
+    text-align: center;
+  }
+  
+  .generate-section h3 {
+    margin-bottom: 10px;
+  }
+  .import-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .close-icon {
+    font-size: 1.5rem;
+    color: #fff;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  
+  .close-icon:hover {
+    color: #f05454;
+  }
+  
+  /* New File Card */
+.project-card.new-file {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #c5c5f5;
+    background-color: #1a192d;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+  
+  .project-card.new-file:hover {
+    background-color: #3a3a5b;
+    border-color: #ffffff;
+  }
+  

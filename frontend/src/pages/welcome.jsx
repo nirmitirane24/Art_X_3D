@@ -2,24 +2,145 @@ import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { FBXLoader } from 'three-stdlib'; // Import FBXLoader from three-stdlib
-import './styles/HomePage.css';
+import './styles/welcomepage.css';
 import { useNavigate, Link } from 'react-router-dom';
+import { FaInstagram, FaTwitter, FaFacebook, FaTiktok, FaDiscord } from "react-icons/fa";
 
-// Navbar Component
+// Navbar Component with Dropdown
 const Navbar = () => {
   const navigate = useNavigate();
+  const [hoveredItem, setHoveredItem] = React.useState(null);
+
+  const handleMouseEnter = (item) => setHoveredItem(item);
+  const handleMouseLeave = () => setHoveredItem(null);
+
+  const dropdownStyle = {
+    position: 'absolute',
+    top: '50px',
+    left: '0',
+    backgroundColor: '#1b1b1b',
+    color: '#fff',
+    padding: '10px 20px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
+    display: 'flex',
+    gap: '30px',
+    zIndex: 1000,
+  };
+
+  const linkStyle = {
+    textDecoration: 'none',
+    color: '#fff',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+  };
+
   return (
-    <nav className="navbar" style={{marginTop: '-30px'}}>
-      <Link to={'/'}><img src="/cube2.svg"style={{height: '30px', justifyContent: 'center', alignContent: 'center', alignItems: 'center', marginTop: '5px'}}></img></Link>
+    <nav className="navbar" style={{ marginTop: '-30px', position: 'relative' }}>
+      <Link to={'/'}>
+        <img
+          src="/cube2.svg"
+          style={{
+            height: '35px',
+            justifyContent: 'center',
+            alignContent: 'center',
+            alignItems: 'center',
+            marginTop: '5px',
+          }}
+        ></img>
+      </Link>
       <ul className="navbar-menu">
-        <li className="navbar-item">About</li>
-        <li className="navbar-item">AI Tools</li>
+      <li
+          className="navbar-item"
+          onMouseEnter={() => handleMouseEnter('product')}
+          onMouseLeave={handleMouseLeave}
+        >
+          Product
+          {hoveredItem === 'product' && (
+            <div style={dropdownStyle}>
+              <Link to="/features" style={linkStyle}>
+                Features
+              </Link>
+              <Link to="/3dembeds" style={linkStyle}>
+                3d Embeds
+              </Link>
+              <Link to="/x3d mirroring" style={linkStyle}>
+                X3D mirroring
+              </Link>
+            </div>
+          )}
+        </li>
+        <li
+          className="navbar-item"
+          onMouseEnter={() => handleMouseEnter('about')}
+          onMouseLeave={handleMouseLeave}
+        >
+          About
+          {hoveredItem === 'about' && (
+            <div style={dropdownStyle}>
+              <Link to="/resources" style={linkStyle}>
+                Download
+              </Link>
+              <Link to="/tutorials" style={linkStyle}>
+                Tutorials
+              </Link>
+              <Link to="/docs" style={linkStyle}>
+                Docs
+              </Link>
+              <Link to="/examples" style={linkStyle}>
+                Examples
+              </Link>
+            </div>
+          )}
+        </li>
+        <li
+          className="navbar-item"
+          onMouseEnter={() => handleMouseEnter('community')}
+          onMouseLeave={handleMouseLeave}
+        >
+          Community
+          {hoveredItem === 'community' && (
+            <div style={dropdownStyle}>
+              <Link to="/forums" style={linkStyle}>
+                Forums
+              </Link>
+              <Link to="/events" style={linkStyle}>
+                Events
+              </Link>
+              <Link to="/groups" style={linkStyle}>
+                Groups
+              </Link>
+            </div>
+          )}
+        </li>
+        <li
+          className="navbar-item"
+          onMouseEnter={() => handleMouseEnter('resources')}
+          onMouseLeave={handleMouseLeave}
+        >
+          Resources
+          {hoveredItem === 'resources' && (
+            <div style={dropdownStyle}>
+              <Link to="/downloads" style={linkStyle}>
+                Downloads
+              </Link>
+              <Link to="/tutorials" style={linkStyle}>
+                Tutorials
+              </Link>
+              <Link to="/viewer" style={linkStyle}>
+                Viewer
+              </Link>
+            </div>
+          )}
+        </li>
+        <li  style={{backgroundColor: 'hsla(0, 0%, 100%, .05)', borderRadius: '15px'}} className="navbar-item" onClick={() => navigate('/login')}>
+          Log In
+        </li>
+        <li style={{backgroundColor: 'hsla(0, 0%, 100%, .2)', borderRadius: '15px'}} className="navbar-item" onClick={() => navigate('/home')}>
+          Get Started
+        </li>
       </ul>
-      <div className="navbar-right">
-        <button className="navbar-login" onClick={() => navigate('/profile')}>Profile</button>
-        <button className="navbar-login" onClick={() => navigate('/login')}>Log In</button>
-        <button className="navbar-get-started" onClick={() => navigate('/register')}>Get Started</button>
-      </div>
     </nav>
   );
 };
@@ -69,7 +190,7 @@ const WelcomePage = () => {
       <Navbar />
 
       {/* Content */}
-      <div className='features' style={{marginTop: '90px'}}>
+      <div className='features' style={{ marginTop: '90px' }}>
         <li>✓ web-based</li>
         <li>✓ real-time</li>
         <li>✓ interactive 3D</li>
@@ -79,8 +200,8 @@ const WelcomePage = () => {
         {/* Overlay Text */}
         <div className="overlay" style={{ flex: 1, padding: '50px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <h1 style={{ fontSize: "78px", letterSpacing: '1.8px' }}>Explore the World of 3D</h1>
-          <p style={{ fontSize: "25px", opacity: "70%", fontFamily: "sans-serif", marginTop: '-50px'}}>Start the journey here...</p>
-          <button className="welcomeBTN" style={{ fontSize: "30px", marginTop: '2px', padding: '10px 20px' }} onClick={() => navigate('/editor')}>Start Here → </button>
+          <p style={{ fontSize: "20px", opacity: "70%", fontFamily: "cursive", marginTop: '-50px' }}>ArtX3d, a place to design and generate 3D models.</p>
+          <button className="welcomeBTN" style={{ fontSize: "30px", marginTop: '2px', padding: '10px 20px' }} onClick={() => navigate('/home')}>Start Here → </button>
         </div>
 
         {/* Canvas for 3D Model */}
@@ -111,7 +232,94 @@ const WelcomePage = () => {
           </Canvas>
         </div>
       </div>
+      <Footer />
     </div>
+  );
+};
+
+const Footer = () => {
+  const footerStyle = {
+    backgroundColor: "#1a192d",
+    color: "white",
+    padding: "20px 50px",
+    textAlign: "center",
+    marginTop: "auto",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+  };
+
+  const linkStyle = {
+    color: "#B3BFFF",
+    textDecoration: "none",
+    margin: "0 10px",
+    fontSize: "24px", // Adjust size for icons
+  };
+
+  const footerLinksStyle = {
+    marginBottom: "10px",
+    display: "flex",
+    justifyContent: "center",
+    gap: "15px",
+  };
+
+  return (
+    <footer style={footerStyle}>
+      <div style={footerLinksStyle}>
+        <a href="/privacy" style={linkStyle}>
+          Privacy Policy
+        </a>
+        <a href="/terms" style={linkStyle}>
+          Terms of Service
+        </a>
+        <a href="/contact" style={linkStyle}>
+          Contact Us
+        </a>
+      </div>
+      <p style={{ fontSize: "14px", opacity: "0.7", margin: "10px 0" }}>
+        &copy; {new Date().getFullYear()} ArtX3D. All rights reserved.
+      </p>
+      <div style={footerLinksStyle}>
+        <a
+          href="https://instagram.com"
+          style={linkStyle}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <FaInstagram />
+        </a>
+        <a
+          href="https://twitter.com"
+          style={linkStyle}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <FaTwitter />
+        </a>
+        <a
+          href="https://facebook.com"
+          style={linkStyle}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <FaFacebook />
+        </a>
+        <a
+          href="https://tiktok.com"
+          style={linkStyle}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <FaTiktok />
+        </a>
+        <a
+          href="https://discord.com"
+          style={linkStyle}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <FaDiscord />
+        </a>
+      </div>
+    </footer>
   );
 };
 
