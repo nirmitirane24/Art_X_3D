@@ -1,0 +1,154 @@
+/* src/components/PropertiesComponents/sceneEditor.css */
+
+.scene-editor h3 {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.scene-editor h4 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.scene-editor > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.scene-editor select {
+    padding: 5px;
+    background-color: #444;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 3px;
+    outline: none;
+}
+
+.arrow-icon {
+    margin-left: auto;
+    color: #777;
+}
+
+/* Custom Switch styles */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 35px;
+    height: 18px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #444;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #eee;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #007acc;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(17px);
+    -ms-transform: translateX(17px);
+    transform: translateX(17px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 18px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* Color Picker Styling */
+.bg-color-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.color-picker-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.color-preview {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #555;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.color-picker-popout {
+    position: absolute;
+    z-index: 1001;
+    top: 100%;
+    left: 0;
+    background-color: #333;
+    border: none;
+    border-radius: 5px;
+    padding: 0px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+
+.sketch-picker {
+    background-color: #333 !important;
+    border-radius: 5px !important;
+    padding: 5px !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.sketch-picker input[type="text"] {
+    background-color: #444 !important;
+    color: white !important;
+    border: 1px solid #555 !important;
+    border-radius: 3px !important;
+    padding: 5px !important;
+}
+
+.sketch-picker > div > div:nth-child(1) > div > div {
+    border-radius: 3px !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.sketch-picker > div > div:nth-child(2) > div > div {
+    border-radius: 3px !important;
+    box-shadow: none !important;
+    border: none !important;
+}

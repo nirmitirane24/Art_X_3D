@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import '../styles/propertiesPanel.css';
 import MaterialEditor from './PropertiesComponents/MaterialEditor';
+import SceneEditor from './PropertiesComponents/SceneEditor';
 
 const PropertiesPanel = ({ selectedObjects, sceneObjects, updateObject }) => {
     const [isMaterialEditorOpen, setMaterialEditorOpen] = useState(false);
@@ -93,6 +94,7 @@ const PropertiesPanel = ({ selectedObjects, sceneObjects, updateObject }) => {
         return (
             <div className="properties-panel">
                 <h3>Properties</h3>
+                 <SceneEditor sceneObjects={sceneObjects} updateObject={updateObject} />
                 <p>No object selected</p>
             </div>
         );
