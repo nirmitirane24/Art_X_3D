@@ -124,8 +124,8 @@ const EditorManager = () => {
                             gl.setClearColor('#2D2E32');
                         }}
                     >
-                        <ambientLight intensity={0.5} />
-                        <pointLight position={[10, 10, 10]} />
+                        <ambientLight intensity={0} />
+                        <pointLight position={[0, 0, 0]} intensity={50}/>
                         <gridHelper args={[10, 10]} />
                         <GroundPlane />
                         <group ref={sceneRef}>

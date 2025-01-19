@@ -101,14 +101,13 @@ const PropertiesPanel = ({ selectedObjects, sceneObjects, updateObject }) => {
     return (
         <>
         <div className="properties-panel">
-            <h3>Properties</h3>
+        <h3>Properties</h3>
             <div>
-                <h4>Type</h4>
-                <p>{selectedObject.type}</p>
+                <h4>Selected : {selectedObject.type} </h4>
             </div>
              <div className="slider-group">
-                <h4>Position</h4>
                 <div className="slider-row">
+                <h4>Position</h4>
                 {selectedObject.position.map((value, index) => (
                  <div key={`position-${index}`} className="slider-input-group">
                         <div
@@ -128,8 +127,8 @@ const PropertiesPanel = ({ selectedObjects, sceneObjects, updateObject }) => {
                 </div>
             </div>
              <div className="slider-group">
-                <h4>Rotation</h4>
                 <div className="slider-row">
+                <h4>Rotation</h4>
                 {selectedObject.rotation.map((value, index) => (
                   <div key={`rotation-${index}`} className="slider-input-group">
                         <div
@@ -149,8 +148,8 @@ const PropertiesPanel = ({ selectedObjects, sceneObjects, updateObject }) => {
                  </div>
             </div>
             <div className="slider-group">
-                 <h4>Scale</h4>
                  <div className="slider-row">
+                 <h4>Scale</h4>
                 {selectedObject.scale.map((value, index) => (
                    <div key={`scale-${index}`} className="slider-input-group">
                        <div

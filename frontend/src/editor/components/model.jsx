@@ -47,6 +47,7 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
     const meshRef = useRef();
     const [material, setMaterial] = useState(null);
     const [texture, setTexture] = useState(null);
+     const [normalMap, setNormalMap] = useState(null);
 
     const handlePointerDown = (event) => {
         event.stopPropagation();
@@ -57,11 +58,36 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
 
   useEffect(() => {
         if (object.material) {
-            const newMaterial = new THREE.MeshStandardMaterial({
+              let newSide;
+             if (object.material.side === 'front') {
+                newSide = THREE.FrontSide;
+             } else if (object.material.side === 'back') {
+                 newSide = THREE.BackSide;
+              } else if (object.material.side === 'double') {
+               newSide = THREE.DoubleSide;
+             } else {
+               newSide = THREE.FrontSide;
+             }
+
+            const newMaterial = new THREE.MeshPhysicalMaterial({
                 color: object.material.color || '#ffffff',
+                emissive: object.material.emissive || '#000000',
                 metalness: object.material.metalness || 0,
                 roughness: object.material.roughness || 0.5,
                  map: texture,
+                normalMap: normalMap,
+                 opacity: object.material.opacity === undefined ? 1 : object.material.opacity,
+                 transparent: object.material.opacity < 1,
+                side: newSide,
+                reflectivity: object.material.reflectivity === undefined ? 0 : object.material.reflectivity,
+                shininess: object.material.shininess === undefined ? 30 : object.material.shininess,
+                ior: object.material.ior === undefined ? 1.5 : object.material.ior,
+                transmission: object.material.transmission === undefined ? 0 : object.material.transmission,
+                 clearcoat: object.material.clearcoat === undefined ? 0 : object.material.clearcoat,
+                clearcoatRoughness: object.material.clearcoatRoughness === undefined ? 0 : object.material.clearcoatRoughness,
+                sheen: object.material.sheen === undefined ? 0 : object.material.sheen,
+                 sheenRoughness: object.material.sheenRoughness === undefined ? 0 : object.material.sheenRoughness,
+                 thickness: object.material.thickness === undefined ? 0 : object.material.thickness,
             });
 
             setMaterial(newMaterial);
@@ -72,7 +98,19 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
             }
         }
         
-    },[object.material, texture]);
+    },[object.material, texture, normalMap]);
+
+   useEffect(() => {
+        if (object.material && object.material.normalMap) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const textureLoader = new THREE.TextureLoader();
+            const loadedTexture = textureLoader.load(e.target.result);
+              setNormalMap(loadedTexture);
+          };
+            reader.readAsDataURL(object.material.normalMap)
+        }
+    }, [object.material && object.material.normalMap]);
 
     useEffect(() => {
         if (object.material && object.material.texture) {

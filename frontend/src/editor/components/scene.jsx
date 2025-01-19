@@ -9,7 +9,7 @@ const Scene = ({ models, setCameraEnabled }) => {
     return (
         <div style={{justifyContent:'center'}}>
         <Canvas style={{ height: '100vh', width: '100vw', backgroundColor:'black' }}>
-            <ambientLight intensity={0.5} />
+            <ambientLight intensity={10} />
             <pointLight position={[10, 10, 10]} />
             <gridHelper args={[10, 10]} />
             <GroundPlane />
