@@ -37,13 +37,15 @@ body::-webkit-scrollbar-corner {
     color: #91b595;
 }
 /* Sidebar */
-.sidebar {
-    min-height: 140vh;
+.sidebar-home {
+    height: 50vh; /* Keep this to cover the full content height */
     width: 240px;
-    background-color: #222;
+    background-color: transparent;
     display: flex;
     flex-direction: column;
     padding: 20px;
+    position: sticky; /* Makes the sidebar sticky */
+    top: 0; /* Sticks it to the top of the viewport */
 }
 
 .profile-section {

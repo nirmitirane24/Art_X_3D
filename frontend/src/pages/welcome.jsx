@@ -4,7 +4,6 @@ import { OrbitControls } from '@react-three/drei';
 import { FBXLoader } from 'three-stdlib'; // Import FBXLoader from three-stdlib
 import './styles/welcomepage.css';
 import { useNavigate, Link } from 'react-router-dom';
-import { FaInstagram, FaTwitter, FaFacebook, FaTiktok, FaDiscord } from "react-icons/fa";
 
 // Navbar Component with Dropdown
 const Navbar = () => {
@@ -260,67 +259,6 @@ const Footer = () => {
     justifyContent: "center",
     gap: "15px",
   };
-
-  return (
-    <footer style={footerStyle}>
-      <div style={footerLinksStyle}>
-        <a href="/privacy" style={linkStyle}>
-          Privacy Policy
-        </a>
-        <a href="/terms" style={linkStyle}>
-          Terms of Service
-        </a>
-        <a href="/contact" style={linkStyle}>
-          Contact Us
-        </a>
-      </div>
-      <p style={{ fontSize: "14px", opacity: "0.7", margin: "10px 0" }}>
-        &copy; {new Date().getFullYear()} ArtX3D. All rights reserved.
-      </p>
-      <div style={footerLinksStyle}>
-        <a
-          href="https://instagram.com"
-          style={linkStyle}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <FaInstagram />
-        </a>
-        <a
-          href="https://twitter.com"
-          style={linkStyle}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <FaTwitter />
-        </a>
-        <a
-          href="https://facebook.com"
-          style={linkStyle}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <FaFacebook />
-        </a>
-        <a
-          href="https://tiktok.com"
-          style={linkStyle}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <FaTiktok />
-        </a>
-        <a
-          href="https://discord.com"
-          style={linkStyle}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <FaDiscord />
-        </a>
-      </div>
-    </footer>
-  );
 };
 
 export default WelcomePage;

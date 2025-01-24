@@ -1,32 +1,31 @@
 /* src/styles/toolbar.css */
 .toolbar {
-  
   position: absolute;
   top: 0;
-  left: 30%;
+  left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
   background: rgba(22, 22, 22, 0.471); /* Semi-transparent background */
-  border: 1px outset rgba(0, 0, 0, 0.471);
   padding: 5px;
-  width: auto;
-  max-width: 80%;
+  width: 35%;
+  justify-content: center;
   z-index: 20;
   border-radius: 10px;
   gap: 10px;
   margin-top: 20px;
+  outline: none;
 }
 
 /* Basic shapes container */
 .basic-shapes {
   display: flex;
   align-items: center;
-  gap: 5px; /* Space between basic shape buttons */
+  gap: 5px;
+  outline: none; /* Space between basic shape buttons */
 }
 
 .toolbar-section {
-  
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -36,10 +35,12 @@
   border-radius: 8px;
   transition: background-color 0.3s;
   padding: 5px;
+  outline: none;
 }
 
 .toolbar-section:hover {
   background-color: rgba(74, 74, 74, 0.8);
+  outline: none;
 }
 
 .toolbar-section-title {
@@ -51,29 +52,70 @@
   background-color: transparent;
   cursor: pointer;
   user-select: none;
+  outline: none;
 }
 
 .toolbar-section-title:focus {
   outline: none;
   border-color: #eee;
+  outline: none;
 }
 
-/* Advanced shape buttons positioning */
+/* Advanced shape buttons positioning and scrollable behavior */
 .advanced-shape-buttons {
-  overflow-y: auto;
+  position: absolute;
+  top: 115%;
+  left: 86%;
+  transform: translateX(-50%);
+  width: 25%;
+  background-color: rgba(40, 40, 40, 0.9); /* Slightly darker background */
+  border-radius: 8px;
+  padding: 10px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto; /* Allow scrolling */
+  max-height: 300px; /* Limit the height to ensure scroll */
+  max-width: 250px; /* Set max width */
+}
+
+.advanced-shapes-scroll {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  position: absolute;
-  top: 110%;
-  left: 60%;
-  transform: translateX(-50%);
-  width: max-content;
-  background-color: rgba(40, 40, 40, 0.9);
-  border-radius: 8px;
-  padding: 5px;
-  z-index: -1; /* Ensure it's above the toolbar */
 }
+
+/* Initially hide the scrollbar thumb */
+.advanced-shape-buttons::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: transparent; /* Make thumb invisible */
+}
+
+/* On hover, make the thumb visible */
+.advanced-shape-buttons::-webkit-scrollbar-thumb {
+  background-color: rgba(90, 90, 90, 0.8); /* Visible thumb with matching theme */
+  transition: background-color 0.2s; /* Smooth transition */
+}
+
+/* Scrollbar track styling remains transparent */
+.advanced-shape-buttons::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Scrollbar width */
+.advanced-shape-buttons::-webkit-scrollbar {
+  width: 6px; /* Thin scrollbar width */
+}
+
+.toolbar-text {
+  font-size: 12px;
+  color: #eee;
+  text-align: center;
+  margin-top: 5px;
+  white-space: nowrap;
+}
+
 
 .toolbar-button {
   border: none;
@@ -82,12 +124,13 @@
   padding: 8px;
   border-radius: 5px;
   transition: background-color 0.3s;
-  min-width: 50px;
   height: 40px;
+  outline: none;
 }
 
 .toolbar-button:hover {
   background-color: #414141;
+  outline: none;
 }
 
 .toolbar-button svg {
@@ -95,42 +138,49 @@
   filter: invert(100%) brightness(100%);
   width: 24px;
   height: 24px;
+  outline: none;
 }
 
-.toolbar-button span:hover {
-  -webkit-filter: invert(-100%) brightness(-100%);
-  filter: invert(-100%) brightness(-100%);
+/* Style for the SVG icon inside the button */
+.toolbar-button svg {
+  -webkit-filter: invert(100%) brightness(100%);
+  filter: invert(100%) brightness(100%);
+  width: 24px;
+  height: 24px;
+  outline: none;
 }
 
-.toolbar-button span {
-  display: none;
-}
-
+/* General button styling */
 .edit-mode-button {
-  position: relative;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #eee;
+  padding: 10px 15px;
+  font-size: 14px;
   border: none;
   cursor: pointer;
-  padding: 10px 20px;
-  border-radius: 10px; 
-  transition: all 1s;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  outline: none;
 }
 
-
-.edit-mode-button::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.5);
-  z-index: -1;
-  transition: all 0.5s ease-out;
+/* Enabled Edit Mode Button */
+.edit-mode-button.enabled {
+  background-color: #4caf50; /* Green background for enabled state */
+  color: rgba(40, 40, 40, 0.9);
+  outline: none;
 }
 
+/* Disabled Edit Mode Button */
+.edit-mode-button.disabled {
+  background-color: rgba(40, 40, 40, 0.9); /* Light gray background for disabled state */
+  color: #808080; /* Darker text color */
+  cursor: not-allowed;
+  outline: none;
+}
 
-
+/* Vertical line for separation */
+.vertical-line {
+  height: 3vh;
+  width: 0.5%;
+  background-color: #333333;
+  border: 1px outset #333333;
+  border-radius: 5px;
+  z-index: 30%;
+}

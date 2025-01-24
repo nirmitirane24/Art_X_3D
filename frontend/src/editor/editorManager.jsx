@@ -12,13 +12,66 @@ const EditorManager = () => {
     const [sceneObjects, setSceneObjects] = useState([]);
     const [selectedObjects, setSelectedObjects] = useState([]);
     const [cameraEnabled, setCameraEnabled] = useState(true);
-    const sceneRef = useRef(); 
+    const [isMoving, setIsMoving] = useState(false);
+
+    // Undo and redo stacks
+    const [undoStack, setUndoStack] = useState([]);
+    const [redoStack, setRedoStack] = useState([]);
+
+    const sceneRef = useRef();
+
+ // Undo and Redo logic
+const saveToUndoStack = (newScene) => {
+    setUndoStack((prevStack) => [...prevStack, newScene]);
+    setRedoStack([]); // Clear redo stack on new action
+};
+
+const undo = () => {
+    if (undoStack.length > 0) {
+        const previousState = undoStack.pop();
+        setRedoStack((prevStack) => [sceneObjects, ...prevStack]);
+        setSceneObjects(previousState);
+        setUndoStack([...undoStack]); // Update undo stack
+    }
+};
+
+const redo = () => {
+    if (redoStack.length > 0) {
+        const nextState = redoStack.shift();
+        setUndoStack((prevStack) => [...prevStack, sceneObjects]);
+        setSceneObjects(nextState);
+        setRedoStack([...redoStack]); // Update redo stack
+    }
+};
+
+    const addModel = (type) => {
+        saveToUndoStack([...sceneObjects]); // Save current state before adding
+        const newObject = {
+            id: Date.now(),
+            type,
+            position: [0, 0, 0],
+            rotation: [0, 0, 0],
+            scale: [1, 1, 1],
+            material: 'standard',
+            children: [],
+        };
+        setSceneObjects((prevObjects) => [...prevObjects, newObject]);
+    };
+
+    const updateObject = (objectId, newProps) => {
+        saveToUndoStack([...sceneObjects]); // Save current state before updating
+        setSceneObjects((prevObjects) =>
+            prevObjects.map((obj) =>
+                obj.id === objectId ? { ...obj, ...newProps } : obj
+            )
+        );
+    };
 
     const deleteSelectedObjects = () => {
+        saveToUndoStack([...sceneObjects]); // Save current state before deleting
         setSceneObjects((prevObjects) =>
             prevObjects.filter((obj) => {
                 if (selectedObjects.includes(obj.id)) {
-                    // Dispose geometry and material when deleting
                     const object3D = sceneRef.current.getObjectById(obj.id);
                     if (object3D) {
                         object3D.traverse((child) => {
@@ -41,22 +94,17 @@ const EditorManager = () => {
         const handleKeyDown = (event) => {
             if (event.key === 'Delete' && selectedObjects.length > 0) {
                 deleteSelectedObjects();
-            } 
-        };
-    
-        window.addEventListener('keydown', handleKeyDown);
-    
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-        };
-    }, [selectedObjects, deleteSelectedObjects]); // Include deleteSelectedObjects in the dependency array
-
-
-    useEffect(() => {
-        const handleKeyDown = (event) => {
-            if (event.key === 'q') {
-                setSelectedObjects([]);
-                setCameraEnabled(true);
+            } else if (event.ctrlKey && event.key === 'z') {
+                undo();
+            } else if (event.ctrlKey && event.key === 'y') {
+                redo();
+            } else if (
+                event.key === 'ArrowUp' ||
+                event.key === 'ArrowDown' ||
+                event.key === 'ArrowLeft' ||
+                event.key === 'ArrowRight'
+            ) {
+                handleArrowKeyMovement(event); // Move the object by 0.5 on each press
             }
         };
     
@@ -65,45 +113,69 @@ const EditorManager = () => {
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, []); 
-
-    const addModel = (type) => {
-        const newObject = {
-            id: Date.now(),
-            type,
-            position: [0, 0, 0],
-            rotation: [0, 0, 0],
-            scale: [1, 1, 1],
-            material: 'standard',
-            children: [],
-        };
-        setSceneObjects((prevObjects) => [...prevObjects, newObject]);
+    }, [selectedObjects, sceneObjects, undoStack, redoStack]);
+    
+    // Arrow key movement handler with undo/redo stack
+    const handleArrowKeyMovement = (event) => {
+        if (selectedObjects.length > 0) {
+            const step = 0.5;
+            const movement = { x: 0, y: 0, z: 0 };
+    
+            // Set movement direction based on the key pressed
+            if (event.key === 'ArrowUp') movement.y = step; // Move up
+            if (event.key === 'ArrowDown') movement.y = -step; // Move down
+            if (event.key === 'ArrowLeft') movement.x = -step; // Move left
+            if (event.key === 'ArrowRight') movement.x = step; // Move right
+    
+            // Save current scene state to undo stack before moving
+            saveToUndoStack([...sceneObjects]);
+    
+            // Update object positions
+            setSceneObjects((prevObjects) => {
+                const updatedObjects = prevObjects.map((obj) => {
+                    if (selectedObjects.includes(obj.id)) {
+                        return {
+                            ...obj,
+                            position: [
+                                obj.position[0] + movement.x,
+                                obj.position[1] + movement.y,
+                                obj.position[2] + movement.z,
+                            ],
+                        };
+                    }
+                    return obj;
+                });
+                return updatedObjects;
+            });
+        }
     };
-
+    
     const handleObjectSelect = (objectIds) => {
         setSelectedObjects(objectIds);
         setCameraEnabled(objectIds.length === 0);
     };
 
-    const updateObject = (objectId, newProps) => {
-        setSceneObjects((prevObjects) =>
-            prevObjects.map((obj) =>
-                obj.id === objectId ? { ...obj, ...newProps } : obj
-            )
-        );
-    };
-
     const deselectAllObjects = (event) => {
-        if (event.type === 'click' && ( event.target.closest('.edit-mode-button') || event.target.closest('.hierarchy-panel'))) {
+        if (
+            event.type === 'click' &&
+            (event.target.closest('.edit-mode-button') ||
+                event.target.closest('.hierarchy-panel'))
+        ) {
             setSelectedObjects([]);
             setCameraEnabled(true);
         }
     };
-    
 
     return (
         <div className="editor-container" onClick={deselectAllObjects}>
-            <Toolbar onAddModel={addModel} selectedObjects={selectedObjects} />
+            <Toolbar
+                onAddModel={addModel}
+                onUndo={undo}
+                onRedo={redo}
+                undoDisabled={undoStack.length === 0}
+                redoDisabled={redoStack.length === 0}
+                selectedObjects={selectedObjects}
+            />
             <div className="main-area">
                 <div className="sidebar">
                     <HierarchyPanel
@@ -125,7 +197,7 @@ const EditorManager = () => {
                         }}
                     >
                         <ambientLight intensity={0} />
-                        <pointLight position={[0, 0, 0]} intensity={50}/>
+                        <pointLight position={[0, 0, 0]} intensity={50} />
                         <gridHelper args={[10, 10]} />
                         <GroundPlane />
                         <group ref={sceneRef}>
@@ -136,7 +208,7 @@ const EditorManager = () => {
                                     isSelected={selectedObjects.includes(object.id)}
                                     setCameraEnabled={setCameraEnabled}
                                     onSelect={handleObjectSelect}
-                                    onUpdateObject={updateObject} // Pass the callback
+                                    onUpdateObject={updateObject}
                                 />
                             ))}
                         </group>
@@ -145,7 +217,6 @@ const EditorManager = () => {
                             selectedObjects={selectedObjects}
                         />
                     </Canvas>
-                    
                 </div>
             </div>
         </div>

@@ -60,7 +60,7 @@ const Home = () => {
 
   return (
     <div className="home-container">
-      <aside className="sidebar">
+      <aside className="sidebar-home">
         <div className="profile-section">
           <div className="profile-icon">
             <img  style={{height: '30px'}} src="/cube2.svg" alt="" />
