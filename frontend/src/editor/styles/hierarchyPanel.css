@@ -23,7 +23,7 @@
 .search-input {
   outline: none;
   width: 100%;
-  padding: 10px 15px;
+  padding: 6px 15px;
   border: 1px solid rgba(68, 68, 68, 0.667);
   border-radius: 10px;
   background-color: rgba(0, 0, 0, 0.1);
@@ -63,12 +63,22 @@
   overflow-y: auto; /* Make the object list scrollable */
 }
 
+.objects-list li {
+  padding: 2px 10px;
+  width:85%;
+  border-radius: 10px;
+
+
+}
+
+
 .hierarchy-panel hr{
   border: none;
   border-top: 2px solid rgb(255, 255, 255); /* Subtle divider line */
   margin: 5px 0; /* Add spacing around the line */
   width: 100%;
 }
+
 
 .objects-list hr {
   border: none;

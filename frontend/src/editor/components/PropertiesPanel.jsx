@@ -33,7 +33,6 @@ const PropertiesPanel = ({ selectedObjects, sceneObjects, updateObject }) => {
                 [`${prop}-${axis}`]: value,
             }));
         }
-
     };
 
 
@@ -77,7 +76,6 @@ const PropertiesPanel = ({ selectedObjects, sceneObjects, updateObject }) => {
     }, [dragging]);
 
 
-
     const handleMaterialChange = (newMaterial) => {
         if (selectedObject) {
             updateObject(selectedObject.id, {
@@ -90,13 +88,13 @@ const PropertiesPanel = ({ selectedObjects, sceneObjects, updateObject }) => {
         setMaterialEditorOpen(!isMaterialEditorOpen);
     };
 
+
     if (!selectedObject) {
         return (
             <div className="properties-panel">
                 <h3>Properties</h3>
-                <hr></hr>
-                <SceneEditor sceneObjects={sceneObjects} updateObject={updateObject} />
-                <p style={{color:'rgba(255, 255, 255, 0.7)'}}>No object selected</p>
+                  <SceneEditor sceneObjects={sceneObjects} updateObject={updateObject} />
+                <p>No object selected</p>
             </div>
         );
     }
@@ -105,7 +103,9 @@ const PropertiesPanel = ({ selectedObjects, sceneObjects, updateObject }) => {
         <>
             <div className="properties-panel">
                 <h3>Properties</h3>
-                <hr></hr>
+                <div>
+                    <h4>Selected : {selectedObject.type} </h4>
+                </div>
                 <div className="slider-group">
                     <div className="slider-row">
                         <h4>Position</h4>

@@ -32,6 +32,7 @@ const SceneEditor = ({ sceneObjects, updateObject }) => {
     return (
         <div className="scene-editor">
             <div className="bg-color-container">
+                <h3>Scene</h3>
                 <h4>BG Color</h4>
                 <div className="color-picker-container">
                     <div
