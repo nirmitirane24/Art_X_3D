@@ -23,7 +23,7 @@
 .search-input {
   outline: none;
   width: 100%;
-  padding: 6px 15px;
+  padding: 10px 15px;
   border: 1px solid rgba(68, 68, 68, 0.667);
   border-radius: 10px;
   background-color: rgba(0, 0, 0, 0.1);
@@ -63,22 +63,12 @@
   overflow-y: auto; /* Make the object list scrollable */
 }
 
-.objects-list li {
-  padding: 2px 10px;
-  width:85%;
-  border-radius: 10px;
-
-
-}
-
-
 .hierarchy-panel hr{
   border: none;
   border-top: 2px solid rgb(255, 255, 255); /* Subtle divider line */
   margin: 5px 0; /* Add spacing around the line */
   width: 100%;
 }
-
 
 .objects-list hr {
   border: none;
@@ -165,31 +155,103 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: #1e1e1e;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  color: white;
+  background-color:#16161acc; /* Semi-transparent dark background - as requested */
+  padding: 25px; /* Slightly reduced padding */
+  border-radius: 12px; /* More rounded corners */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); /* Stronger shadow */
+  color: #eee; /* Light text color - as requested */
   text-align: center;
   z-index: 1000;
+  width: 380px; /* Slightly reduced width for panel */
+  max-width: 90vw; /* Responsive width */
+  border: 5px solid #16161aed; /* Add a subtle border for definition */
+}
+
+.import-panel h3 {
+  margin-top: 0;
+  margin-bottom: 20px; /* Slightly reduced margin */
+  font-size: 1.4em; /* Slightly smaller font - was 1.6em */
+  font-weight: bold; /* Make heading bold */
+  color: #eee; /* Light text color - as requested, ensure heading also uses it */
 }
 
 .import-options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin: 20px 0;
+  display: flex; /* Use flexbox for buttons */
+  flex-direction: column; /* Stack buttons vertically */
+  align-items: center; /* Center buttons */
+  gap: 12px; /* Slightly reduced gap between buttons */
+  margin: 20px 0; /* Slightly reduced margin around buttons */
 }
 
 .modal-buttons {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  background: #007bff;
-  color: white;
+  padding: 12px 25px; /* Slightly smaller buttons - was 14px 30px */
+  border: none; /* Subtle border for buttons */
+  border-radius: 8px; /* Rounded corners */
+  background-color: #222; /* Dark button background */
+  color: #eee; /* Light text color - as requested */
   cursor: pointer;
+  font-size: 1em; /* Slightly smaller font - was 1.1em, now 1em (base size) */
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; /* Smooth transitions */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Subtle shadow for buttons */
 }
 
 .modal-buttons:hover {
-  background: #0056b3;
+  background-color: #333; /* Slightly lighter dark on hover */
+  border: none; /* Lighter border on hover */
+  color: #fff; /* White text on hover for contrast */
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.4); /* Shadow on hover */
+}
+
+.modal-buttons:disabled {
+  background-color: #333; /* Greyed out for disabled state, but still dark */
+  border-color: #444; /* Darker border for disabled */
+  color: #777; /* Darker text for disabled state */
+  cursor: not-allowed;
+  box-shadow: none; /* Remove shadow when disabled */
+}
+
+.loading-indicator {
+  margin-bottom: 20px; /* Slightly reduced margin below loading indicator */
+}
+
+.loading-text {
+  font-size: 1.1em; /* Slightly smaller font - was 1.2em */
+  margin-bottom: 8px; /* Slightly reduced space below text */
+  font-weight: bold; /* Bold loading text */
+  color: #eee; /* Light text color - as requested */
+}
+
+.loading-bar-container {
+  width: 100%;
+  height: 18px; /* Slightly reduced height of the loading bar - was 20px */
+  background-color: #333; /* Darker grey background for the unfilled part */
+  border-radius: 9px; /* Adjusted rounded ends for the bar */
+  border: 1px solid #555; /* Dark grey border */ /* Slightly lighter border for better visibility on dark background */
+  overflow: hidden; /* Clip the filled part to the rounded corners */
+  position: relative; /* For positioning the filled part */
+}
+
+.loading-bar-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 50%; /* Initial fill percentage - adjust as needed or dynamically */
+  background-color: #eee; /* Light fill color - white shade for contrast */
+  border-radius: 7px 0 0 7px; /* Adjusted rounded corners on the left side */
+  transition: width 0.3s ease; /* Smooth width transition for dynamic updates */
+}
+
+
+.spinner {
+  /* No spinner needed anymore, but you can keep these styles if you decide to use it elsewhere */
+  display: none; /* Hide the spinner icon */
+  animation: spin 1s linear infinite;
+  margin-right: 10px;
+  font-size: 1.2em;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

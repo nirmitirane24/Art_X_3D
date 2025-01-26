@@ -7,6 +7,7 @@ import CameraControls from './components/CameraControls';
 import GroundPlane from './components/GroundPlane';
 import Model from './components/Model';
 import './styles/editorManager.css';
+import * as THREE from "three";
 
 const EditorManager = () => {
     const [sceneObjects, setSceneObjects] = useState([]);
@@ -20,29 +21,29 @@ const EditorManager = () => {
 
     const sceneRef = useRef();
 
- // Undo and Redo logic
-const saveToUndoStack = (newScene) => {
-    setUndoStack((prevStack) => [...prevStack, newScene]);
-    setRedoStack([]); // Clear redo stack on new action
-};
+    // Undo and Redo logic
+    const saveToUndoStack = (newScene) => {
+        setUndoStack((prevStack) => [...prevStack, newScene]);
+        setRedoStack([]); // Clear redo stack on new action
+    };
 
-const undo = () => {
-    if (undoStack.length > 0) {
-        const previousState = undoStack.pop();
-        setRedoStack((prevStack) => [sceneObjects, ...prevStack]);
-        setSceneObjects(previousState);
-        setUndoStack([...undoStack]); // Update undo stack
-    }
-};
+    const undo = () => {
+        if (undoStack.length > 0) {
+            const previousState = undoStack.pop();
+            setRedoStack((prevStack) => [sceneObjects, ...prevStack]);
+            setSceneObjects(previousState);
+            setUndoStack([...undoStack]); // Update undo stack
+        }
+    };
 
-const redo = () => {
-    if (redoStack.length > 0) {
-        const nextState = redoStack.shift();
-        setUndoStack((prevStack) => [...prevStack, sceneObjects]);
-        setSceneObjects(nextState);
-        setRedoStack([...redoStack]); // Update redo stack
-    }
-};
+    const redo = () => {
+        if (redoStack.length > 0) {
+            const nextState = redoStack.shift();
+            setUndoStack((prevStack) => [...prevStack, sceneObjects]);
+            setSceneObjects(nextState);
+            setRedoStack([...redoStack]); // Update redo stack
+        }
+    };
 
     const addModel = (type) => {
         saveToUndoStack([...sceneObjects]); // Save current state before adding
@@ -107,29 +108,29 @@ const redo = () => {
                 handleArrowKeyMovement(event); // Move the object by 0.5 on each press
             }
         };
-    
+
         window.addEventListener('keydown', handleKeyDown);
-    
+
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
     }, [selectedObjects, sceneObjects, undoStack, redoStack]);
-    
+
     // Arrow key movement handler with undo/redo stack
     const handleArrowKeyMovement = (event) => {
         if (selectedObjects.length > 0) {
             const step = 0.5;
             const movement = { x: 0, y: 0, z: 0 };
-    
+
             // Set movement direction based on the key pressed
             if (event.key === 'ArrowUp') movement.y = step; // Move up
             if (event.key === 'ArrowDown') movement.y = -step; // Move down
             if (event.key === 'ArrowLeft') movement.x = -step; // Move left
             if (event.key === 'ArrowRight') movement.x = step; // Move right
-    
+
             // Save current scene state to undo stack before moving
             saveToUndoStack([...sceneObjects]);
-    
+
             // Update object positions
             setSceneObjects((prevObjects) => {
                 const updatedObjects = prevObjects.map((obj) => {
@@ -149,7 +150,7 @@ const redo = () => {
             });
         }
     };
-    
+
     const handleObjectSelect = (objectIds) => {
         setSelectedObjects(objectIds);
         setCameraEnabled(objectIds.length === 0);
@@ -164,6 +165,37 @@ const redo = () => {
             setSelectedObjects([]);
             setCameraEnabled(true);
         }
+    };
+
+    const onImportScene = (loadedScene) => {
+        const sceneGroup = loadedScene.scene || loadedScene;
+
+        // Compute bounding box for the entire group
+        const boundingBox = new THREE.Box3().setFromObject(sceneGroup);
+        const center = boundingBox.getCenter(new THREE.Vector3());
+        const size = boundingBox.getSize(new THREE.Vector3());
+
+
+        const importedObject = {
+            id: Date.now() + Math.random(), // Generate unique IDs
+            type: sceneGroup.name || "ImportedModel",
+            mesh: sceneGroup, // Store the entire scene group
+            position: [0,0,0], // Reset position to origin, can adjust if needed
+            rotation: [0, 0, 0],
+            scale: [1, 1, 1],
+            material: 'standard', // Default material, can be updated in properties panel
+            boundingBox: {
+                min: [boundingBox.min.x, boundingBox.min.y, boundingBox.min.z],
+                max: [boundingBox.max.x, boundingBox.max.y, boundingBox.max.z],
+                center: [center.x, center.y, center.z],
+                size: [size.x, size.y, size.z],
+            },
+            children: [],
+        };
+
+
+        setSceneObjects((prevObjects) => [...prevObjects, importedObject]);
+        // console.log("Updated sceneObjects after import:", sceneObjects); // Log after setting state
     };
 
     return (
@@ -182,7 +214,9 @@ const redo = () => {
                         sceneObjects={sceneObjects}
                         onObjectSelect={handleObjectSelect}
                         selectedObjects={selectedObjects}
+                        onImportScene={onImportScene}
                     />
+
                     <PropertiesPanel
                         selectedObjects={selectedObjects}
                         sceneObjects={sceneObjects}
@@ -201,16 +235,19 @@ const redo = () => {
                         <gridHelper args={[10, 10]} />
                         <GroundPlane />
                         <group ref={sceneRef}>
-                            {sceneObjects.map((object) => (
-                                <Model
-                                    key={object.id}
-                                    object={object}
-                                    isSelected={selectedObjects.includes(object.id)}
-                                    setCameraEnabled={setCameraEnabled}
-                                    onSelect={handleObjectSelect}
-                                    onUpdateObject={updateObject}
-                                />
-                            ))}
+                            {sceneObjects.map((object, index) => { // Keep index for logging
+                                // console.log(`EditorManager - sceneObjects[${index}]:`, object);
+                                return (
+                                    <Model
+                                        key={object.id}
+                                        object={object}
+                                        isSelected={selectedObjects.includes(object.id)}
+                                        setCameraEnabled={setCameraEnabled}
+                                        onSelect={handleObjectSelect}
+                                        onUpdateObject={updateObject}
+                                    />
+                                );
+                            })}
                         </group>
                         <CameraControls
                             enabled={cameraEnabled}

@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { TransformControls } from '@react-three/drei';
 import * as THREE from 'three';
-import { useLoader, useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 
 // Predefined Geometries (no changes needed)
 const geometries = {
@@ -47,93 +47,101 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
     const meshRef = useRef();
     const [material, setMaterial] = useState(null);
     const [texture, setTexture] = useState(null);
-     const [normalMap, setNormalMap] = useState(null);
+    const [normalMap, setNormalMap] = useState(null);
+    const [meshReady, setMeshReady] = useState(false); // Only used for loaded mesh case
 
-    const handlePointerDown = (event) => {
-        event.stopPropagation();
-        onSelect([object.id]);
-        setCameraEnabled(false);
-    };
+    // console.log("Model Component received object:", object);
+
+    useEffect(() => {
+        // console.log("Model useEffect - object:", object);
+        // console.log("Model useEffect - object.mesh:", object.mesh);
+        if (object.mesh) { // For loaded models (THREE.Group)
+            meshRef.current = object.mesh;
+            // console.log("Model useEffect - meshRef.current (group) set:", meshRef.current);
+            setMeshReady(true);
+        } else { // For predefined geometries, mesh is created in render, no need to set meshReady for geometry
+            setMeshReady(true); // Ensure meshReady is true for geometry case as well for consistent behavior after initial load.
+        }
+    }, [object.mesh]);
 
 
-  useEffect(() => {
+    useEffect(() => {
         if (object.material) {
-              let newSide;
-             if (object.material.side === 'front') {
+            let newSide;
+            if (object.material.side === 'front') {
                 newSide = THREE.FrontSide;
-             } else if (object.material.side === 'back') {
-                 newSide = THREE.BackSide;
-              } else if (object.material.side === 'double') {
-               newSide = THREE.DoubleSide;
-             } else {
-               newSide = THREE.FrontSide;
-             }
+            } else if (object.material.side === 'back') {
+                newSide = THREE.BackSide;
+            } else if (object.material.side === 'double') {
+                newSide = THREE.DoubleSide;
+            } else {
+                newSide = THREE.FrontSide;
+            }
 
             const newMaterial = new THREE.MeshPhysicalMaterial({
                 color: object.material.color || '#ffffff',
                 emissive: object.material.emissive || '#000000',
                 metalness: object.material.metalness || 0,
                 roughness: object.material.roughness || 0.5,
-                 map: texture,
+                map: texture,
                 normalMap: normalMap,
-                 opacity: object.material.opacity === undefined ? 1 : object.material.opacity,
-                 transparent: object.material.opacity < 1,
+                opacity: object.material.opacity === undefined ? 1 : object.material.opacity,
+                transparent: object.material.opacity < 1,
                 side: newSide,
                 reflectivity: object.material.reflectivity === undefined ? 0 : object.material.reflectivity,
                 shininess: object.material.shininess === undefined ? 30 : object.material.shininess,
                 ior: object.material.ior === undefined ? 1.5 : object.material.ior,
                 transmission: object.material.transmission === undefined ? 0 : object.material.transmission,
-                 clearcoat: object.material.clearcoat === undefined ? 0 : object.material.clearcoat,
+                clearcoat: object.material.clearcoat === undefined ? 0 : object.material.clearcoat,
                 clearcoatRoughness: object.material.clearcoatRoughness === undefined ? 0 : object.material.clearcoatRoughness,
                 sheen: object.material.sheen === undefined ? 0 : object.material.sheen,
-                 sheenRoughness: object.material.sheenRoughness === undefined ? 0 : object.material.sheenRoughness,
-                 thickness: object.material.thickness === undefined ? 0 : object.material.thickness,
+                sheenRoughness: object.material.sheenRoughness === undefined ? 0 : object.material.sheenRoughness,
+                thickness: object.material.thickness === undefined ? 0 : object.material.thickness,
             });
 
             setMaterial(newMaterial);
 
             return () => {
-              if(newMaterial)
-                newMaterial.dispose()
+                if (newMaterial)
+                    newMaterial.dispose()
             }
         }
-        
-    },[object.material, texture, normalMap]);
+    }, [object.material, texture, normalMap]);
 
-   useEffect(() => {
+    useEffect(() => {
         if (object.material && object.material.normalMap) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const textureLoader = new THREE.TextureLoader();
-            const loadedTexture = textureLoader.load(e.target.result);
-              setNormalMap(loadedTexture);
-          };
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const textureLoader = new THREE.TextureLoader();
+                const loadedTexture = textureLoader.load(e.target.result);
+                setNormalMap(loadedTexture);
+            };
             reader.readAsDataURL(object.material.normalMap)
         }
     }, [object.material && object.material.normalMap]);
 
     useEffect(() => {
         if (object.material && object.material.texture) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const textureLoader = new THREE.TextureLoader();
-            const loadedTexture = textureLoader.load(e.target.result);
-            setTexture(loadedTexture);
-          };
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const textureLoader = new THREE.TextureLoader();
+                const loadedTexture = textureLoader.load(e.target.result);
+                setTexture(loadedTexture);
+            };
             reader.readAsDataURL(object.material.texture)
         }
     }, [object.material && object.material.texture]);
-    
+
 
     useFrame(() => {
-       if (meshRef.current) {
+        if (meshRef.current) {
             meshRef.current.position.set(...object.position);
             meshRef.current.rotation.set(...object.rotation);
             meshRef.current.scale.set(...object.scale);
 
-            if(material) {
+            if (material) {
                 meshRef.current.material = material;
-                if(object.material && object.material.custom !== undefined && meshRef.current.material.userData) {
+                if (object.material && object.material.custom !== undefined && meshRef.current.material.userData) {
                     meshRef.current.material.userData.custom = object.material.custom;
                     meshRef.current.material.needsUpdate = true;
                 }
@@ -143,7 +151,7 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
 
     useEffect(() => {
         const handleTransformChange = () => {
-          if (meshRef.current && transformRef.current && transformRef.current.dragging) {
+            if (meshRef.current && transformRef.current && transformRef.current.dragging) {
                 const { position, rotation, scale } = meshRef.current;
                 onUpdateObject(object.id, {
                     position: position.toArray(),
@@ -168,21 +176,27 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
         if (isSelected && transformRef.current) {
             transformRef.current.attach(meshRef.current);
             transformRef.current.addEventListener('objectChange', handleTransformChange);
-             transformRef.current.addEventListener('dragging-changed', handleTransformDragEnd);
+            transformRef.current.addEventListener('dragging-changed', handleTransformDragEnd);
         } else if (transformRef.current) {
             transformRef.current.detach();
             transformRef.current.removeEventListener('objectChange', handleTransformChange);
-             transformRef.current.removeEventListener('dragging-changed', handleTransformDragEnd);
+            transformRef.current.removeEventListener('dragging-changed', handleTransformDragEnd);
         }
 
         return () => {
-              if (transformRef.current) {
+            if (transformRef.current) {
                 transformRef.current.removeEventListener('objectChange', handleTransformChange);
-                 transformRef.current.removeEventListener('dragging-changed', handleTransformDragEnd);
+                transformRef.current.removeEventListener('dragging-changed', handleTransformDragEnd);
             }
         };
     }, [isSelected, object, onSelect, onUpdateObject]);
 
+
+    const handlePointerDown = (event) => {
+        event.stopPropagation();
+        onSelect([object.id]);
+        setCameraEnabled(false);
+    };
 
 
     return (
@@ -194,13 +208,23 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
                     space="world"
                 />
             )}
-            <mesh
-                ref={meshRef}
-                 onPointerDown={handlePointerDown}
-            >
-             {geometries[object.type] ? <primitive object={geometries[object.type]} attach="geometry" /> : null}
-             
-            </mesh>
+            {object.mesh ? (
+                meshReady && meshRef.current && (
+                    <primitive
+                        ref={meshRef}
+                        object={meshRef.current}
+                        onPointerDown={handlePointerDown}
+                    />
+                )
+            ) : (
+                <mesh
+                    ref={meshRef}
+                    onPointerDown={handlePointerDown}
+                >
+                    {geometries[object.type] ? <primitive object={geometries[object.type]} attach="geometry" /> : null}
+                </mesh>
+            )}
+             {object.mesh && !meshReady && null} 
         </>
     );
 };
