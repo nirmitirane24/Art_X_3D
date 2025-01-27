@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import Toolbar from './components/Toolbar';
 import HierarchyPanel from './components/HierarchyPanel.jsx';
 import PropertiesPanel from './components/PropertiesPanel';
@@ -14,14 +14,30 @@ const EditorManager = () => {
     const [selectedObjects, setSelectedObjects] = useState([]);
     const [cameraEnabled, setCameraEnabled] = useState(true);
     const [isMoving, setIsMoving] = useState(false);
+    const [sceneSettings, setSceneSettings] = useState({
+        backgroundColor: '#2D2E32',
+        effectsEnabled: false,
+        fogEnabled: false,
+        fogColor: '#ffffff',
+        fogNear: 1,
+        fogFar: 100,
+        ambientShadowsEnabled: false,
+        ambientIntensity: 0,
+        lightColor: '#ffffff',
+        lightIntensity: 50,
+        lightX: 0,
+        lightY: 0,
+        lightZ: 0,
+        lightShadows: false,
+    });
+    const sceneRef = useRef();
 
     // Undo and redo stacks
     const [undoStack, setUndoStack] = useState([]);
     const [redoStack, setRedoStack] = useState([]);
 
-    const sceneRef = useRef();
 
-    // Undo and Redo logic
+
     const saveToUndoStack = (newScene) => {
         setUndoStack((prevStack) => [...prevStack, newScene]);
         setRedoStack([]); // Clear redo stack on new action
@@ -45,28 +61,6 @@ const EditorManager = () => {
         }
     };
 
-    const addModel = (type) => {
-        saveToUndoStack([...sceneObjects]); // Save current state before adding
-        const newObject = {
-            id: Date.now(),
-            type,
-            position: [0, 0, 0],
-            rotation: [0, 0, 0],
-            scale: [1, 1, 1],
-            material: 'standard',
-            children: [],
-        };
-        setSceneObjects((prevObjects) => [...prevObjects, newObject]);
-    };
-
-    const updateObject = (objectId, newProps) => {
-        saveToUndoStack([...sceneObjects]); // Save current state before updating
-        setSceneObjects((prevObjects) =>
-            prevObjects.map((obj) =>
-                obj.id === objectId ? { ...obj, ...newProps } : obj
-            )
-        );
-    };
 
     const deleteSelectedObjects = () => {
         saveToUndoStack([...sceneObjects]); // Save current state before deleting
@@ -116,22 +110,15 @@ const EditorManager = () => {
         };
     }, [selectedObjects, sceneObjects, undoStack, redoStack]);
 
-    // Arrow key movement handler with undo/redo stack
     const handleArrowKeyMovement = (event) => {
         if (selectedObjects.length > 0) {
             const step = 0.5;
             const movement = { x: 0, y: 0, z: 0 };
-
-            // Set movement direction based on the key pressed
-            if (event.key === 'ArrowUp') movement.y = step; // Move up
-            if (event.key === 'ArrowDown') movement.y = -step; // Move down
-            if (event.key === 'ArrowLeft') movement.x = -step; // Move left
-            if (event.key === 'ArrowRight') movement.x = step; // Move right
-
-            // Save current scene state to undo stack before moving
+            if (event.key === 'ArrowUp') movement.y = step;
+            if (event.key === 'ArrowDown') movement.y = -step;
+            if (event.key === 'ArrowLeft') movement.x = -step;
+            if (event.key === 'ArrowRight') movement.x = step;
             saveToUndoStack([...sceneObjects]);
-
-            // Update object positions
             setSceneObjects((prevObjects) => {
                 const updatedObjects = prevObjects.map((obj) => {
                     if (selectedObjects.includes(obj.id)) {
@@ -151,9 +138,45 @@ const EditorManager = () => {
         }
     };
 
+
+
+    const addModel = (type) => {
+        saveToUndoStack([...sceneObjects]); // Save current state before adding
+        const newObject = {
+            id: Date.now(),
+            type,
+            position: [0, 0, 0],
+            rotation: [0, 0, 0],
+            scale: [1, 1, 1],
+            material: {
+                color: '#ffffff',
+                metalness: 0,
+                roughness: 0.5,
+            },
+            children: [],
+        };
+        setSceneObjects((prevObjects) => [...prevObjects, newObject]);
+    };
+
     const handleObjectSelect = (objectIds) => {
         setSelectedObjects(objectIds);
         setCameraEnabled(objectIds.length === 0);
+    };
+
+    const updateObject = (objectId, newProps) => {
+        if (objectId === 'scene') {
+            setSceneSettings(prevSettings => ({
+                ...prevSettings,
+                ...newProps
+            }));
+        } else {
+            saveToUndoStack([...sceneObjects]); // Save current state before updating
+            setSceneObjects((prevObjects) =>
+                prevObjects.map((obj) =>
+                    obj.id === objectId ? { ...obj, ...newProps } : obj
+                )
+            );
+        }
     };
 
     const deselectAllObjects = (event) => {
@@ -169,15 +192,11 @@ const EditorManager = () => {
 
     const onImportScene = (loadedScene) => {
         const sceneGroup = loadedScene.scene || loadedScene;
-
-        // Compute bounding box for the entire group
         const boundingBox = new THREE.Box3().setFromObject(sceneGroup);
         const center = boundingBox.getCenter(new THREE.Vector3());
         const size = boundingBox.getSize(new THREE.Vector3());
-
-
         const importedObject = {
-            id: Date.now() + Math.random(), // Generate unique IDs
+            id: Date.now() + Math.random(),
             type: sceneGroup.name || "ImportedModel",
             mesh: sceneGroup, // Store the entire scene group
             position: [0,0,0], // Reset position to origin, can adjust if needed
@@ -192,11 +211,10 @@ const EditorManager = () => {
             },
             children: [],
         };
-
-
         setSceneObjects((prevObjects) => [...prevObjects, importedObject]);
-        // console.log("Updated sceneObjects after import:", sceneObjects); // Log after setting state
     };
+
+
 
     return (
         <div className="editor-container" onClick={deselectAllObjects}>
@@ -225,29 +243,35 @@ const EditorManager = () => {
                 </div>
                 <div className="viewport">
                     <Canvas
-                        camera={{ position: [0, 5, 10], fov: 45 }}
-                        onCreated={({ gl }) => {
-                            gl.setClearColor('#2D2E32');
+                         camera={{ position: [0, 5, 10], fov: 45 }}
+                         onCreated={({ gl }) => {
+                            gl.setClearColor(sceneSettings.backgroundColor);
                         }}
+                        style={{ backgroundColor: sceneSettings.backgroundColor }}
                     >
-                        <ambientLight intensity={0} />
-                        <pointLight position={[0, 0, 0]} intensity={50} />
+                         <ambientLight intensity={sceneSettings.ambientShadowsEnabled ? sceneSettings.ambientIntensity : 0} />
+                         {sceneSettings.lightShadows ? (
+                            <pointLight
+                                 position={[sceneSettings.lightX, sceneSettings.lightY, sceneSettings.lightZ]}
+                                 intensity={sceneSettings.lightIntensity}
+                                 color={sceneSettings.lightColor}
+                                castShadow={true}
+                               />
+                        ) : null}
+                        {sceneSettings.fogEnabled && <fog attach="fog" args={[sceneSettings.fogColor, sceneSettings.fogNear, sceneSettings.fogFar]} />}
                         <gridHelper args={[10, 10]} />
-                        <GroundPlane />
+                        <GroundPlane receiveShadow={true} />
                         <group ref={sceneRef}>
-                            {sceneObjects.map((object, index) => { // Keep index for logging
-                                // console.log(`EditorManager - sceneObjects[${index}]:`, object);
-                                return (
-                                    <Model
-                                        key={object.id}
-                                        object={object}
-                                        isSelected={selectedObjects.includes(object.id)}
-                                        setCameraEnabled={setCameraEnabled}
-                                        onSelect={handleObjectSelect}
-                                        onUpdateObject={updateObject}
-                                    />
-                                );
-                            })}
+                            {sceneObjects.map((object) => (
+                                <Model
+                                    key={object.id}
+                                    object={object}
+                                    isSelected={selectedObjects.includes(object.id)}
+                                    setCameraEnabled={setCameraEnabled}
+                                    onSelect={handleObjectSelect}
+                                    onUpdateObject={updateObject}
+                                />
+                            ))}
                         </group>
                         <CameraControls
                             enabled={cameraEnabled}

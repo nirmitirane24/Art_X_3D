@@ -116,14 +116,14 @@
   white-space: nowrap;
 }
 
-
 .toolbar-button {
   border: none;
+  color: rgba(141, 141, 141, 0.9);
   background-color: transparent;
   cursor: pointer;
   padding: 8px;
   border-radius: 5px;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s ease, transform 0.2s ease;
   height: 40px;
   outline: none;
 }
@@ -131,6 +131,7 @@
 .toolbar-button:hover {
   background-color: #414141;
   outline: none;
+  color:white
 }
 
 .toolbar-button svg {

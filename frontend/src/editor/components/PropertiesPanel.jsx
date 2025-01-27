@@ -94,7 +94,7 @@ const PropertiesPanel = ({ selectedObjects, sceneObjects, updateObject }) => {
             <div className="properties-panel">
                 <h3>Properties</h3>
                   <SceneEditor sceneObjects={sceneObjects} updateObject={updateObject} />
-                <p>No object selected</p>
+                
             </div>
         );
     }
