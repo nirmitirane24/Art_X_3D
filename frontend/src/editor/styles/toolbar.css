@@ -151,6 +151,21 @@
   outline: none;
 }
 
+.undo-redo-buttons{
+  background-color: transparent;
+  font-size: 17px;
+  margin-top: 2.5px;
+}
+
+.undo-redo-buttons.enabled {
+  color: white; /* White when enabled */
+}
+
+.undo-redo-buttons.disabled {
+  cursor: not-allowed;
+  color: rgba(141, 141, 141, 0.5); /* Lighter gray when disabled */
+}
+
 /* General button styling */
 .edit-mode-button {
   padding: 10px 15px;

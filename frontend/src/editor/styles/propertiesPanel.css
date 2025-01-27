@@ -11,7 +11,7 @@
     border-radius: 20px; /* Rounded corners */
     overflow-y: auto;
     z-index: 10;
-    height: 90%; /* Adjust height to account for margin and toolbar */
+    height: calc(100% - 74px); /* Adjust height to account for margin and toolbar */
     padding: 20px; /* Adjust padding */
     border-bottom-right-radius: 10px; /* Match border-radius */
     font-family: Futura, "Trebuchet MS", Arial, sans-serif;

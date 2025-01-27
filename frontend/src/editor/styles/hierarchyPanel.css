@@ -8,7 +8,7 @@
   color: #eee; /* Light text color */
   border-radius: 10px; /* Rounded corners */
   z-index: 10;
-  height: calc(100% - 79px); /* Adjust height to account for margin and toolbar */
+  height: calc(100% - 74px); /* Adjust height to account for margin and toolbar */
   padding: 20px; /* Adjust padding */
   font-family: Futura, "Trebuchet MS", Arial, sans-serif;
   display: flex;
@@ -116,6 +116,8 @@
   background-color: rgb(45, 45, 45);
 }
 
+
+
 .panel-buttons {
   margin-top: 10px;
   display: flex;
@@ -146,7 +148,6 @@
 }
 
 .no-objects {
-  text-align: center;
   color: rgba(255, 255, 255, 0.7);
 }
 

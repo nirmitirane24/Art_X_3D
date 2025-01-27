@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import "../styles/hierarchyPanel.css";
-import { FaBook, FaFileExport, FaFileImport, FaSpinner } from "react-icons/fa"; // Import FaSpinner for loading icon
+import { FaBook, FaFileExport, FaFileImport, FaSpinner, FaTrash } from "react-icons/fa"; // Import FaSpinner for loading icon
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import * as THREE from 'three'; // Import THREE for Vector3 and Box3
 
-const HierarchyPanel = ({ sceneObjects, onObjectSelect, selectedObjects, onImportScene }) => {
+const HierarchyPanel = ({ sceneObjects, onObjectSelect, selectedObjects, onImportScene, onObjectDelete }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [showImportPanel, setShowImportPanel] = useState(false);
     const [isLoading, setIsLoading] = useState(false); // State for loading indicator
@@ -38,6 +38,12 @@ const HierarchyPanel = ({ sceneObjects, onObjectSelect, selectedObjects, onImpor
 
     const objectsWithDynamicIds = generateDynamicIds(filteredObjects);
 
+    const handleDelete = (obj) => {
+        if (window.confirm(`Are you sure you want to delete ${obj.type}?`)) {
+            onObjectDelete(obj.id); // Trigger delete in parent component
+        }
+    };
+
     const applyScalingAndImport = (loadedScene) => {
         const sceneGroup = loadedScene.scene || loadedScene;
 
@@ -52,7 +58,6 @@ const HierarchyPanel = ({ sceneObjects, onObjectSelect, selectedObjects, onImpor
         setIsLoading(false); // Stop loading
         setShowImportPanel(false); // Close import panel
     };
-
 
     const handleGLTFImport = (data, extension) => {
         setIsLoading(true); // Start loading
@@ -106,7 +111,6 @@ const HierarchyPanel = ({ sceneObjects, onObjectSelect, selectedObjects, onImpor
         }
     };
 
-
     const handleFileSelection = (acceptedFormats) => {
         const input = document.createElement("input");
         input.type = "file";
@@ -146,7 +150,6 @@ const HierarchyPanel = ({ sceneObjects, onObjectSelect, selectedObjects, onImpor
         input.click();
     };
 
-
     return (
         <div className="hierarchy-panel">
             <h3>Objects</h3>
@@ -165,18 +168,24 @@ const HierarchyPanel = ({ sceneObjects, onObjectSelect, selectedObjects, onImpor
 
             <ul className="objects-list">
                 {objectsWithDynamicIds.length === 0 ? (
-                    <li className="no-objects">No models added</li>
+                    <p className="no-objects">No models added</p>
                 ) : (
                     objectsWithDynamicIds.map((obj, index) => (
                         <React.Fragment key={`${obj.type}-${obj.displayId}`}>
                             <li
                                 className={selectedObjects.includes(obj.id) ? "selected" : ""}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    onObjectSelect([obj.id]);
-                                }}
+                                onClick={() => onObjectSelect([obj.id])}
                             >
                                 <span className="object-type">{obj.displayId}</span>
+                                <div className="icon-buttons">
+                                    <FaTrash
+                                        style={{ marginLeft: '90px', marginTop: '4.5px', color: "rgba(255, 255, 255, 0.7)" }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDelete(obj);
+                                        }}
+                                    />
+                                </div>
                             </li>
                             {index < objectsWithDynamicIds.length - 1 && <hr />}
                         </React.Fragment>

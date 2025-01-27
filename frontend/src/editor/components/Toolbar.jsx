@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/toolbar.css';
 import ShapeButton from './toolbar/ShapeButton';
+import { FaUndo, FaRedo } from 'react-icons/fa';
 
 const basicShapes = ['cube', 'sphere']; // Basic shapes always visible
 const advancedShapes = [
@@ -28,11 +29,19 @@ const Toolbar = ({ onAddModel, selectedObjects, onUndo, onRedo, undoDisabled, re
     return (
         <div className="toolbar">
             <div className="undo-redo-buttons">
-                <button onClick={onUndo} disabled={undoDisabled} className="toolbar-button">
-                    Undo
+            <button
+                    onClick={onUndo}
+                    disabled={undoDisabled}
+                    className={`undo-redo-buttons ${undoDisabled ? 'disabled' : 'enabled'}`}
+                >
+                    <FaUndo />
                 </button>
-                <button onClick={onRedo} disabled={redoDisabled} className="toolbar-button">
-                    Redo
+                <button
+                    onClick={onRedo}
+                    disabled={redoDisabled}
+                    className={`undo-redo-buttons ${redoDisabled ? 'disabled' : 'enabled'}`}
+                >
+                    <FaRedo />
                 </button>
             </div>
             <hr className='vertical-line'></hr>
