@@ -116,8 +116,6 @@
   background-color: rgb(45, 45, 45);
 }
 
-
-
 .panel-buttons {
   margin-top: 10px;
   display: flex;
@@ -151,7 +149,32 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
-.import-panel {
+.export-panel{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color:#16161acc; /* Semi-transparent dark background - as requested */
+  padding: 25px; /* Slightly reduced padding */
+  border-radius: 12px; /* More rounded corners */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); /* Stronger shadow */
+  color: #eee; /* Light text color - as requested */
+  text-align: center;
+  z-index: 1000;
+  width: 380px; /* Slightly reduced width for panel */
+  max-width: 90vw; /* Responsive width */
+  border: 5px solid #16161aed; /* Add a subtle border for definition */
+}
+
+.export-panel h3 {
+  margin-top: 0;
+  margin-bottom: 20px; /* Slightly reduced margin */
+  font-size: 1.4em; /* Slightly smaller font - was 1.6em */
+  font-weight: bold; /* Make heading bold */
+  color: #eee; /* Light text color - as requested, ensure heading also uses it */
+}
+
+.import-panel{
   position: fixed;
   top: 50%;
   left: 50%;
@@ -178,8 +201,10 @@
 
 .import-options {
   display: flex; /* Use flexbox for buttons */
-  flex-direction: column; /* Stack buttons vertically */
-  align-items: center; /* Center buttons */
+  flex-direction: row; /* Stack buttons vertically */
+  align-items: center;
+  align-content: center;
+  justify-content: center; /* Center buttons */
   gap: 12px; /* Slightly reduced gap between buttons */
   margin: 20px 0; /* Slightly reduced margin around buttons */
 }
@@ -210,6 +235,110 @@
   cursor: not-allowed;
   box-shadow: none; /* Remove shadow when disabled */
 }
+
+.library-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #16161acc;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  color: #eee;
+  text-align: center;
+  z-index: 1000;
+  width: 480px;
+  max-width: 90vw;
+  border: 5px solid #16161aed;
+}
+
+.library-panel h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #eee;
+}
+
+.search-bar-container {
+  margin-bottom: 15px;
+}
+
+.search-input {
+  width: 90%;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  background-color: #222;
+  color: #eee;
+}
+
+.library-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.category-button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background-color: #222;
+  color: #eee;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.3s ease;
+}
+
+.category-button:hover,
+.category-button.selected {
+  background-color: #333;
+}
+
+.library-content {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.library-section {
+  margin-bottom: 20px;
+}
+
+.library-section h4 {
+  text-align: left;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+}
+
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.library-item {
+  padding: 15px;
+  background-color: #222;
+  border-radius: 6px;
+  text-align: center;
+  color: #eee;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.library-item:hover {
+  background-color: #333;
+}
+
+.modal-buttons.close-button {
+  margin-top: 15px;
+  width: 100%;
+}
+
 
 .loading-indicator {
   margin-bottom: 20px; /* Slightly reduced margin below loading indicator */

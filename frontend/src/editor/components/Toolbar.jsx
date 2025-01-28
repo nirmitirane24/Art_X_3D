@@ -16,7 +16,6 @@ const advancedShapes = [
     'icosahedron',
     'capsule',
     'lathe',
-    'polyhedron',
 ];
 
 const Toolbar = ({ onAddModel, selectedObjects, onUndo, onRedo, undoDisabled, redoDisabled }) => {
