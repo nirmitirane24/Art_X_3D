@@ -153,7 +153,7 @@ const HierarchyPanel = ({ sceneObjects, onObjectSelect, selectedObjects, onImpor
     return (
         <div className="hierarchy-panel">
             <h3>Objects</h3>
-            <hr />
+            
             <div className="search-bar-container">
                 <div className="search-input-container">
                     <input

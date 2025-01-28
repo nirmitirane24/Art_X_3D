@@ -1,24 +1,27 @@
 .scene-editor {
     display: flex;
+    overflow-x: hidden;
+    overflow-y: hidden; /* Enable scrolling */
     flex-direction: column; /* Align children vertically */
-    }
-    
-    .scene-editor > div {
+    position: relative; /* Ensure relative positioning for containing absolute elements */
+}
+ 
+.scene-editor > div {
     display: flex;
-    justify-content: flex-start;
-    align-items: center;
+    justify-content: flex-start; /* Ensure main divs are flex-start aligned */
+    align-items: flex-start; /* Align items to the start vertically within the row */
     margin-bottom: 7px;
     flex-wrap: wrap;
-    }
-    
-    .scene-editor h3 {
+}
+ 
+.scene-editor h3 {
     margin-top: 15px;
     margin-bottom: 15px;
     width: 100%;
     text-align: left;
-    }
-    
-    .scene-editor h4 {
+}
+ 
+.scene-editor h4 {
     margin-top: 10px;
     margin-bottom: 5px;
     font-size: 14px;
@@ -26,41 +29,46 @@
     width: fit-content;
     text-align: left;
     flex-shrink: 0;
-    }
-    
-    .scene-editor select {
+}
+
+.scene-editor hr {
+    border-top: 0.2px solid rgb(28, 27, 27);
+}
+.scene-editor select {
     padding: 5px;
     background-color: #444;
     color: white;
     border: 1px solid #555;
     border-radius: 3px;
     outline: none;
-    }
-    
-    .arrow-icon {
+}
+ 
+.arrow-icon {
     margin-left: auto;
     color: #777;
-    }
-    .scene-editor hr{
+}
+ 
+.scene-editor hr {
     width: 100%;
     border-top: 1px solid #444;
     margin-bottom: 5px;
-    }
-    /* Custom Switch styles */
-    .switch {
+}
+ 
+/* Custom Switch styles */
+.switch {
     position: relative;
     display: inline-block;
     width: 35px;
     height: 18px;
-    }
-    
-    .switch input {
+}
+ 
+.switch input {
     opacity: 0;
     width: 0;
     height: 0;
-    }
-    
-    .slider {
+}
+ 
+.slider {
     position: absolute;
     cursor: pointer;
     top: 0;
@@ -70,9 +78,9 @@
     background-color: #444;
     -webkit-transition: .4s;
     transition: .4s;
-    }
-    
-    .slider:before {
+}
+ 
+.slider:before {
     position: absolute;
     content: "";
     height: 12px;
@@ -82,182 +90,181 @@
     background-color: #eee;
     -webkit-transition: .4s;
     transition: .4s;
-    }
-    
-    input:checked + .slider {
+}
+ 
+input:checked + .slider {
     background-color: #007acc;
-    }
-    
-    input:checked + .slider:before {
+}
+ 
+input:checked + .slider:before {
     -webkit-transform: translateX(17px);
     -ms-transform: translateX(17px);
     transform: translateX(17px);
-    }
-    
-    /* Rounded sliders */
-    .slider.round {
+}
+ 
+/* Rounded sliders */
+.slider.round {
     border-radius: 18px;
-    }
-    
-    .slider.round:before {
+}
+ 
+.slider.round:before {
     border-radius: 50%;
-    }
-    
-    /* Color Picker Styling */
-    .bg-color-container {
+}
+ 
+/* Color Picker Styling */
+.bg-color-container {
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* Align items to the start */
     margin-bottom: 5px;
-    }
-    
-    .color-picker-container {
-    position: relative;
+    flex-direction: column; /* Stack color preview and picker vertically */
+    width: fit-content; /* Fit content width */
+}
+ 
+.light-color-container {
+    display: flex;
+    align-items: flex-start; /* Align items to the start */
+    margin-right: 5px;
+    margin-bottom: 5px; /* Add margin-bottom for spacing */
+    flex-direction: column; /* Stack color preview and picker vertically */
+    width: fit-content; /* Fit content width */
+}
+ 
+.color-picker-container {
+    position: relative; /* Keep position relative on the container */
     display: flex;
     align-items: center;
     margin-bottom: 5px;
     cursor: pointer;
-    }
-    
-    .color-preview {
+}
+ 
+.color-preview {
     width: 20px;
     height: 20px;
     border: 1px solid #555;
     border-radius: 3px;
     cursor: pointer;
-    margin-right: 10px;
-    }
-    
-    .color-picker-popout {
-    position: absolute;
-    z-index: 1001;
-    top: 100%;
-    left: 0;
-    background-color: #333;
-    border: none;
-    border-radius: 5px;
-    padding: 0px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
-    
-    .sketch-picker {
+    margin-right: 173px; /*change kela */
+}
+ 
+.color-picker-inline {
+    overflow: hidden; /* Clip content during animation */
+    transition: max-height 0.3s ease-out, opacity 0.2s ease-out; /* Animation properties */
+    max-height: 0; /* Initially hidden */
+    opacity: 0;
+    margin-top: 0;
+    width: 100%; /* Ensure it takes full width of parent */
+}
+ 
+.color-picker-inline.open {
+    max-height: 500px; /* Adjust to a large enough value */
+    opacity: 1;
+    margin-top: 10px; /* Add margin when open */
+}
+ 
+.sketch-picker {
     background-color: #333 !important;
     border-radius: 5px !important;
     padding: 5px !important;
     box-shadow: none !important;
     border: none !important;
-    }
-    
-    .sketch-picker input[type="text"] {
+    width: auto !important; /* Let SketchPicker determine its width */
+}
+ 
+.sketch-picker input[type="text"] {
     background-color: #444 !important;
     color: white !important;
     border: 1px solid #555 !important;
     border-radius: 3px !important;
     padding: 5px !important;
-    }
-    
-    .sketch-picker > div > div:nth-child(1) > div > div {
+}
+ 
+.sketch-picker > div > div:nth-child(1) > div > div {
     border-radius: 3px !important;
     box-shadow: none !important;
     border: none !important;
-    }
-    
-    .sketch-picker > div > div:nth-child(2) > div > div {
+}
+ 
+.sketch-picker > div > div:nth-child(2) > div > div {
     border-radius: 3px !important;
     box-shadow: none !important;
     border: none !important;
-    }
-    
-    .light-section h4{
+}
+ 
+#bg-color-picker-popout .sketch-picker {
+    background: red;
+}
+ 
+.light-section h4 {
     margin-bottom: 0px;
-    margin-right: 167px; /* Added to match spacing /
+    margin-right: 167px; /* Added to match spacing */
     flex-shrink: 0;
     text-align: left;
-    }
-    .light-container {
+}
+ 
+.light-container {
     display: flex;
-    align-items: center;
-    gap: 5px;
-    margin-bottom: 5px;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
     width: 100%;
     justify-content: flex-start;
-    }
-    .light-container-position {
+    flex-direction: column;
+}
+ 
+.light-container-position {
     display: flex;
-    align-items: center;
-    gap: 5px;
-    margin-left: 0px;
+    align-items: center; /* Keep vertical alignment centered */
+    gap: 5px; /* REDUCED gap for tighter spacing */
+    margin-left: 0;
     width: 100%;
     justify-content: flex-start;
-    }
-    .light-color-container {
-    display: flex;
-    align-items: center;
-    margin-right: 5px;
-    }
-    .light-input {
-    width: 30px;
-    padding: 5px;
+    flex-direction: row;
+    /* flex-wrap: wrap; REMOVED flex-wrap to force single row */
+}
+ 
+.light-container-position > label { /* Style labels inside position container */
+    display: flex;          /* Use flex to align label and input */
+    align-items: center;   /* Vertically align label and input */
+    margin-right: 10px;     /* Add some right margin between label-input groups */
+}
+ 
+.light-container-position > label:last-child {
+    margin-right: 0;       /* Remove right margin from the last label-input group */
+}
+ 
+ 
+.light-input,
+.fog-input,
+.ambient-input {
+    width: 40px; /* REDUCED input width to fit in row */
+    padding: 4px 6px; /* REDUCED input padding */
     background-color: #444;
     color: white;
     border: 1px solid #555;
-    border-radius: 3px;
-    margin-left: 5px;
+    border-radius: 4px;
+    margin-left: 2px; /* REDUCED input left margin */
     text-align: center;
-    }
-    .fog-section h4 {
-    margin-bottom: 0px;
-    margin-right: 161px; / Added to match spacing */
-    flex-shrink: 0;
-    text-align: left;
-    }
-    .fog-container {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    margin-bottom: 5px;
-    width: 100%;
-    justify-content: flex-start;
-    }
-    .fog-color-container {
-    display: flex;
-    align-items: center;
-    margin-right: 5px;
-    }
-    
-    .fog-input {
-    width: 50px;
-    padding: 5px;
-    background-color: #444;
-    color: white;
-    border: 1px solid #555;
-    border-radius: 3px;
-    text-align: center;
-    margin-left: 5px;
-    }
-    .ambient-input {
-    width: 50px;
-    padding: 5px;
-    background-color: #444;
-    color: white;
-    border: 1px solid #555;
-    border-radius: 3px;
-    margin-left: 10px;
-    text-align: center;
-    }
-    .light-section, .fog-section{
+    font-size: 0.8em; /* REDUCED input font size slightly */
+}
+ 
+.light-section,
+.fog-section {
     display: flex;
     flex-direction: column;
     width: 100%;
-    }
-    
-    .light-section > div, .fog-section > div {
+    margin-bottom: 10px;
+}
+ 
+.light-section > div,
+.fog-section > div {
     display: flex;
     align-items: center;
     width: 100%;
     justify-content: flex-start;
-    
-    }
-    
-    .light-section > label , .fog-section > label{
-    margin-right: 0px;
-    }
+}
+ 
+.light-section > label,
+.fog-section > label {
+    margin-right: 0;
+}
+ 

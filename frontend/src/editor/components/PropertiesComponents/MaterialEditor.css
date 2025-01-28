@@ -145,3 +145,92 @@
     box-shadow: none !important;
     border: none !important;
 }
+
+/* Improved Range Input Styles */
+.material-editor input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: #555;
+    outline: none;
+    border-radius: 2px;
+    margin-bottom: 10px;
+    cursor: pointer;
+
+}
+
+/* Style for thumb */
+.material-editor input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    background: #eee;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+.material-editor input[type="range"]::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: #eee;
+    border-radius: 50%;
+    cursor: pointer;
+   box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+.material-editor input[type="range"]::-ms-thumb {
+  width: 12px;
+  height: 12px;
+  background: #eee;
+  border-radius: 50%;
+  cursor: pointer;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+#number-input-materialeditor{
+    width: 50px;
+    margin-right: 5px;
+    padding: 3px;
+    border: 1px solid #666;
+    background-color: #333;
+    color: #eee;
+    border-radius: 3px;
+    outline: none;
+
+}
+
+/* Hover effect for the thumb */
+.material-editor input[type="range"]::-webkit-slider-thumb:hover {
+    background: #fff;
+}
+.material-editor input[type="range"]::-moz-range-thumb:hover {
+   background: #fff;
+}
+ .material-editor input[type="range"]::-ms-thumb:hover {
+      background: #fff;
+    }
+/* Style for the Side Buttons */
+.side-buttons-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.side-buttons-container button {
+  background-color: #333;
+  border: 1px solid #555;
+  color: #eee;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.side-buttons-container button:hover {
+  background-color: #444;
+}
+.side-buttons-container button.selected{
+  background-color: #5e656a;
+}

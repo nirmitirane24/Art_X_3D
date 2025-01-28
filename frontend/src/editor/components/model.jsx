@@ -49,26 +49,38 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
     const [texture, setTexture] = useState(null);
     const [normalMap, setNormalMap] = useState(null);
     const [meshReady, setMeshReady] = useState(false); // Only used for loaded mesh case
-
-    // console.log("Model Component received object:", object);
+    const [originalMaterials, setOriginalMaterials] = useState({});
 
     useEffect(() => {
-        // console.log("Model useEffect - object:", object);
-        // console.log("Model useEffect - object.mesh:", object.mesh);
-        if (object.mesh) { // For loaded models (THREE.Group)
+       if (object.mesh) {
             meshRef.current = object.mesh;
-            // console.log("Model useEffect - meshRef.current (group) set:", meshRef.current);
+
+            // Store original materials
+           const originalMats = {};
+            meshRef.current.traverse((child) => {
+                if (child.isMesh) {
+                  originalMats[child.uuid] = child.material
+                 }
+             });
+             setOriginalMaterials(originalMats);
+
+            // Traverse and apply material to all meshes within imported model
+             meshRef.current.traverse((child) => {
+                if (child.isMesh) {
+                   applyMaterial(child);
+                 }
+             });
             setMeshReady(true);
-        } else { // For predefined geometries, mesh is created in render, no need to set meshReady for geometry
-            setMeshReady(true); // Ensure meshReady is true for geometry case as well for consistent behavior after initial load.
-        }
+        } else {
+            setMeshReady(true);
+         }
     }, [object.mesh]);
 
 
-    useEffect(() => {
-        if (object.material) {
-            let newSide;
-            if (object.material.side === 'front') {
+
+ const applyMaterial = (mesh) =>{
+      let newSide;
+          if (object.material.side === 'front') {
                 newSide = THREE.FrontSide;
             } else if (object.material.side === 'back') {
                 newSide = THREE.BackSide;
@@ -77,36 +89,88 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
             } else {
                 newSide = THREE.FrontSide;
             }
+          let newMaterial;
+         if(object.mesh){
+              if(originalMaterials[mesh.uuid]){
+                  newMaterial = originalMaterials[mesh.uuid].clone();
+                      if(object.material && object.material.color && newMaterial.color){
+                          newMaterial.color = new THREE.Color(object.material.color);
+                         }
+                       if(object.material && object.material.opacity && newMaterial.opacity){
+                         newMaterial.transparent = object.material.opacity < 1;
+                         newMaterial.opacity = object.material.opacity;
+                       }
+                       if(object.material && object.material.side){
+                           newMaterial.side = newSide
+                       }
+                       
+              } else{
+                newMaterial =  new THREE.MeshPhysicalMaterial({
+                     color: object.material.color || '#ffffff',
+                    emissive: object.material.emissive || '#000000',
+                    metalness: object.material.metalness || 0,
+                    roughness: object.material.roughness || 0.5,
+                    map: texture,
+                    normalMap: normalMap,
+                    opacity: object.material.opacity === undefined ? 1 : object.material.opacity,
+                    transparent: object.material.opacity < 1,
+                     side: newSide,
+                    reflectivity: object.material.reflectivity === undefined ? 0 : object.material.reflectivity,
+                    shininess: object.material.shininess === undefined ? 30 : object.material.shininess,
+                    ior: object.material.ior === undefined ? 1.5 : object.material.ior,
+                    transmission: object.material.transmission === undefined ? 0 : object.material.transmission,
+                    clearcoat: object.material.clearcoat === undefined ? 0 : object.material.clearcoat,
+                    clearcoatRoughness: object.material.clearcoatRoughness === undefined ? 0 : object.material.clearcoatRoughness,
+                    sheen: object.material.sheen === undefined ? 0 : object.material.sheen,
+                    sheenRoughness: object.material.sheenRoughness === undefined ? 0 : object.material.sheenRoughness,
+                    thickness: object.material.thickness === undefined ? 0 : object.material.thickness,
+                 })
+              }
 
-            const newMaterial = new THREE.MeshPhysicalMaterial({
-                color: object.material.color || '#ffffff',
-                emissive: object.material.emissive || '#000000',
-                metalness: object.material.metalness || 0,
-                roughness: object.material.roughness || 0.5,
-                map: texture,
-                normalMap: normalMap,
-                opacity: object.material.opacity === undefined ? 1 : object.material.opacity,
-                transparent: object.material.opacity < 1,
-                side: newSide,
-                reflectivity: object.material.reflectivity === undefined ? 0 : object.material.reflectivity,
-                shininess: object.material.shininess === undefined ? 30 : object.material.shininess,
-                ior: object.material.ior === undefined ? 1.5 : object.material.ior,
-                transmission: object.material.transmission === undefined ? 0 : object.material.transmission,
-                clearcoat: object.material.clearcoat === undefined ? 0 : object.material.clearcoat,
-                clearcoatRoughness: object.material.clearcoatRoughness === undefined ? 0 : object.material.clearcoatRoughness,
-                sheen: object.material.sheen === undefined ? 0 : object.material.sheen,
-                sheenRoughness: object.material.sheenRoughness === undefined ? 0 : object.material.sheenRoughness,
-                thickness: object.material.thickness === undefined ? 0 : object.material.thickness,
-            });
+           } else {
+                newMaterial = new THREE.MeshPhysicalMaterial({
+                    color: object.material.color || '#ffffff',
+                    emissive: object.material.emissive || '#000000',
+                    metalness: object.material.metalness || 0,
+                    roughness: object.material.roughness || 0.5,
+                    map: texture,
+                    normalMap: normalMap,
+                   opacity: object.material.opacity === undefined ? 1 : object.material.opacity,
+                    transparent: object.material.opacity < 1,
+                    side: newSide,
+                    reflectivity: object.material.reflectivity === undefined ? 0 : object.material.reflectivity,
+                    shininess: object.material.shininess === undefined ? 30 : object.material.shininess,
+                    ior: object.material.ior === undefined ? 1.5 : object.material.ior,
+                   transmission: object.material.transmission === undefined ? 0 : object.material.transmission,
+                    clearcoat: object.material.clearcoat === undefined ? 0 : object.material.clearcoat,
+                    clearcoatRoughness: object.material.clearcoatRoughness === undefined ? 0 : object.material.clearcoatRoughness,
+                    sheen: object.material.sheen === undefined ? 0 : object.material.sheen,
+                    sheenRoughness: object.material.sheenRoughness === undefined ? 0 : object.material.sheenRoughness,
+                    thickness: object.material.thickness === undefined ? 0 : object.material.thickness,
 
-            setMaterial(newMaterial);
+                });
+            }
+             mesh.material = newMaterial;
+             setMaterial(newMaterial);
+    }
 
+   useEffect(() => {
+        if (object.material) {
+          if(meshRef.current && !object.mesh){
+               applyMaterial(meshRef.current)
+          } else if(meshRef.current && object.mesh) {
+             meshRef.current.traverse((child) => {
+                if (child.isMesh) {
+                  applyMaterial(child)
+                 }
+             });
+          }
             return () => {
-                if (newMaterial)
-                    newMaterial.dispose()
+              if(material)
+                  material.dispose()
             }
         }
-    }, [object.material, texture, normalMap]);
+    }, [object.material, texture, normalMap, originalMaterials]);
 
     useEffect(() => {
         if (object.material && object.material.normalMap) {
@@ -139,13 +203,23 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
             meshRef.current.rotation.set(...object.rotation);
             meshRef.current.scale.set(...object.scale);
 
-            if (material) {
-                meshRef.current.material = material;
-                if (object.material && object.material.custom !== undefined && meshRef.current.material.userData) {
-                    meshRef.current.material.userData.custom = object.material.custom;
-                    meshRef.current.material.needsUpdate = true;
+          if(material && !object.mesh){
+              meshRef.current.material = material;
+               if (object.material && object.material.custom !== undefined && meshRef.current.material.userData) {
+                      meshRef.current.material.userData.custom = object.material.custom;
+                      meshRef.current.material.needsUpdate = true;
                 }
-            }
+          }  else if (material && object.mesh){
+             meshRef.current.traverse((child) => {
+                if (child.isMesh) {
+                     child.material = material
+                       if (object.material && object.material.custom !== undefined && child.material.userData) {
+                              child.material.userData.custom = object.material.custom;
+                             child.material.needsUpdate = true;
+                       }
+                 }
+              });
+         }
         }
     });
 
@@ -224,7 +298,7 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
                     {geometries[object.type] ? <primitive object={geometries[object.type]} attach="geometry" /> : null}
                 </mesh>
             )}
-             {object.mesh && !meshReady && null} 
+             {object.mesh && !meshReady && null}
         </>
     );
 };

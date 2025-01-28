@@ -16,6 +16,7 @@
     border-bottom-right-radius: 10px; /* Match border-radius */
     font-family: Futura, "Trebuchet MS", Arial, sans-serif;
     overflow-x: hidden;
+    overflow-y: hidden;
   }
    
   .properties-panel h4 {
@@ -25,8 +26,8 @@
   }
    
   .properties-panel input[type="number"] {
-    width: 50px;
-    margin-right: 5px;
+    width: 37px;
+    margin-right: 0px;
     padding: 3px;
     border: 1px solid #666;
     background-color: #333;

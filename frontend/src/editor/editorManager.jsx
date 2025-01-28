@@ -141,7 +141,6 @@ const EditorManager = () => {
     };
 
 
-
     const addModel = (type) => {
          saveToUndoStack([...sceneObjects],{...sceneSettings});
         const newObject = {
@@ -217,9 +216,6 @@ const EditorManager = () => {
         };
         setSceneObjects((prevObjects) => [...prevObjects, importedObject]);
     };
-
-
-
 
     return (
         <div className="editor-container" onClick={deselectAllObjects}>
@@ -311,7 +307,6 @@ function SceneContent({sceneSettings,sceneRef,sceneObjects,selectedObjects,setCa
                 </group>
 
          </>
-
     )
 }
 
