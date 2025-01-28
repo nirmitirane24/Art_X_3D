@@ -3,7 +3,7 @@ import '../styles/propertiesPanel.css';
 import MaterialEditor from './PropertiesComponents/MaterialEditor';
 import SceneEditor from './PropertiesComponents/SceneEditor';
 
-const PropertiesPanel = ({ selectedObjects, sceneObjects, updateObject }) => {
+const PropertiesPanel = ({ selectedObjects, sceneObjects, updateObject, sceneSettings }) => {
     const [isMaterialEditorOpen, setMaterialEditorOpen] = useState(false);
     const [dragging, setDragging] = useState({ prop: null, axis: null, startX: 0, startValue: 0 });
     const [inputValue, setInputValue] = useState({});
@@ -93,7 +93,8 @@ const PropertiesPanel = ({ selectedObjects, sceneObjects, updateObject }) => {
         return (
             <div className="properties-panel">
                 <h3>Properties</h3>
-                  <SceneEditor sceneObjects={sceneObjects} updateObject={updateObject} />
+                {/*  Added sceneSettings here and passed to the scene editor component*/}
+                  <SceneEditor sceneObjects={sceneObjects} updateObject={updateObject} sceneSettings={sceneSettings} />
                 
             </div>
         );
