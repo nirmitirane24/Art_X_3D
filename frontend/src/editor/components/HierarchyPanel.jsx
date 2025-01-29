@@ -9,7 +9,7 @@ import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter";
 import { OBJExporter } from "three/examples/jsm/exporters/OBJExporter";
 import * as THREE from 'three'; // Import THREE for Vector3 and Box3
 
-const HierarchyPanel = ({ sceneObjects, onObjectSelect, selectedObjects, onImportScene, onObjectDelete, scene }) => {
+const HierarchyPanel = ({ sceneObjects = [], selectedObjects, onImportScene, onObjectDelete, scene }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [showImportPanel, setShowImportPanel] = useState(false);
     const [showLibraryPanel, setShowLibraryPanel] = useState(false);
@@ -22,9 +22,9 @@ const HierarchyPanel = ({ sceneObjects, onObjectSelect, selectedObjects, onImpor
         setSearchTerm(event.target.value);
     };
 
-    const filteredObjects = sceneObjects.filter((obj) =>
+    const filteredObjects = sceneObjects ? sceneObjects.filter((obj) =>
         obj.type.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    ) : [];
 
     const generateDynamicIds = (objects) => {
         const shapeCount = {};

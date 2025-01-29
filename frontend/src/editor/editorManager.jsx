@@ -46,52 +46,58 @@ const EditorManager = () => {
         ]);
         setRedoStack([]); // Clear redo stack on new action
     };
-    
+
     const undo = () => {
-        if (undoStack.length > 0) {
-            // Get the last state from the undo stack (without mutating it)
-            const previousState = undoStack[undoStack.length - 1];
+        try {
+            if (undoStack?.length > 0) {
+                const previousState = undoStack[undoStack.length - 1];
     
-            // Update the redo stack with the current state
-            setRedoStack((prevStack) => [
-                ...prevStack,
-                { sceneObjects, sceneSettings },
-            ]);
+                setRedoStack((prevStack) => [
+                    ...prevStack,
+                    { sceneObjects, sceneSettings },
+                ]);
     
-            // Apply the previous state
-            setSceneObjects(previousState.sceneObjects);
-            setSceneSettings(previousState.sceneSettings);
+                setSceneObjects(previousState.sceneObjects ?? []);
+                setSceneSettings(previousState.sceneSettings ?? {});
     
-            // Remove the last state from the undo stack
-            setUndoStack((prevStack) => prevStack.slice(0, -1));
+                // Ensure selectedObjects does not contain IDs that no longer exist
+                setSelectedObjects((prevSelected) =>
+                    previousState.sceneObjects?.length > 0
+                        ? prevSelected.filter(id => previousState.sceneObjects.some(obj => obj.id === id))
+                        : []
+                );
+    
+                setUndoStack((prevStack) => prevStack.slice(0, -1));
+            }
+        } catch (error) {
+            console.error("Undo error:", error);
         }
     };
     
+    
+    
     const redo = () => {
-        if (redoStack.length > 0) {
-            // Get the next state from the redo stack (without mutating it)
+        if (redoStack?.length > 0) {  // ✅ Prevent undefined errors
             const nextState = redoStack[redoStack.length - 1];
     
-            // Update the undo stack with the current state
             setUndoStack((prevStack) => [
                 ...prevStack,
                 { sceneObjects, sceneSettings },
             ]);
     
-            // Apply the next state
-            setSceneObjects(nextState.sceneObjects);
-            setSceneSettings(nextState.sceneSettings);
+            setSceneObjects(nextState.sceneObjects ?? []);
+            setSceneSettings(nextState.sceneSettings ?? {});
     
-            // Remove the last state from the redo stack
             setRedoStack((prevStack) => prevStack.slice(0, -1));
         }
     };
+    
 
     const deleteSelectedObjects = () => {
         if (selectedObjects.length > 0) {
             // Save the current state to the undo stack
             saveToUndoStack([...sceneObjects], { ...sceneSettings });
-    
+
             setSceneObjects((prevObjects) =>
                 prevObjects.filter((obj) => {
                     // Remove selected objects from the scene
@@ -111,7 +117,7 @@ const EditorManager = () => {
                     return true;
                 })
             );
-    
+
             // Clear selected objects
             setSelectedObjects([]);
         }
@@ -121,12 +127,12 @@ const EditorManager = () => {
     const handleDeleteObject = (objectId) => {
         // Save the current state to the undo stack
         saveToUndoStack([...sceneObjects], { ...sceneSettings });
-    
+
         // Update the scene objects by removing the specified object
         setSceneObjects((prevObjects) => prevObjects.filter((obj) => obj.id !== objectId));
         setSelectedObjects((prevSelected) => prevSelected.filter((id) => id !== objectId));
     };
-    
+
     useEffect(() => {
         const handleKeyDown = (event) => {
             if (event.key === 'Delete' && selectedObjects.length > 0) {
@@ -165,7 +171,7 @@ const EditorManager = () => {
             setIsDragging(true);
             document.body.classList.add('no-select'); // Disable text selection
         };
-    
+
         const handleMouseUp = () => {
             setIsDragging(false);
             document.body.classList.remove('no-select'); // Re-enable text selection
@@ -336,17 +342,18 @@ const EditorManager = () => {
                     />
 
                     <PropertiesPanel
-                        selectedObjects={selectedObjects}
-                        sceneObjects={sceneObjects}
+                        selectedObjects={selectedObjects ?? []}
+                        sceneObjects={sceneObjects ?? []}
                         updateObject={updateObject}
                         sceneSettings={sceneSettings}
                     />
+
                 </div>
                 <div className="viewport">
                     <Canvas
                         camera={{ position: [0, 5, 10], fov: 45 }}
 
-                        style={{ backgroundColor: sceneSettings.backgroundColor }}
+                        style={{ backgroundColor: sceneSettings?.backgroundColor || "#000000" }}
                     >
                         <SceneContent
                             sceneSettings={sceneSettings}

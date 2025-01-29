@@ -10,9 +10,8 @@ const PropertiesPanel = ({ selectedObjects, sceneObjects, updateObject, sceneSet
     const materialEditorButtonRef = useRef(null);
 
 
-    const selectedObject = selectedObjects.length === 1
-        ? sceneObjects.find((obj) => obj.id === selectedObjects[0])
-        : null;
+    const selectedObject = sceneObjects?.find(obj => obj.id === selectedObjects[0]) ?? null;
+
 
     const handlePropertyChange = (propName, value) => {
         if (selectedObject) {
