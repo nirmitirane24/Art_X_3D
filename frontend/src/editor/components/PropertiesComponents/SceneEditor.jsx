@@ -161,9 +161,9 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
     return (
         <div className="scene-editor">
             <h3>Scene</h3>
-            <hr />
+            <hr className="style-six" ></hr>
             <div className="bg-color-container">
-                <h4>BG Color</h4>
+                <h4>Background Color</h4>
                 <div className="color-picker-container">
                     <div
                         className="color-preview"
@@ -183,7 +183,7 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
                     )}
                 </div>
             </div>
- <hr />
+            <hr className="style-six" ></hr>
             <div>
                 <h4>Play Camera</h4> 
                 <div> 
@@ -192,10 +192,10 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
                 </select>
                 </div>
             </div>
- <hr />
+            <hr className="style-six" ></hr>
             <div className="light-section">
                 <h4>Light</h4>
-                <label className="switch" style={{ marginLeft: '60px', marginTop: '-16px' }}>
+                <label className="switch" style={{ marginLeft: '117px', marginTop: '-16px' }}>
                     <input type="checkbox" checked={lightShadows} onChange={handleLightShadowsChange} />
                     <span className="slider round"></span>
                 </label>
@@ -207,7 +207,7 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
                             onClick={() => handleLightColorToggle()}
                         />
                     </div>
-                    <div className={`color-picker-inline ${lightColorPickerOpen ? 'open' : ''}`} ref={lightColorPickerRef}>
+                    <div className={`color-picker-inline ${lightColorPickerOpen ? 'open' : ''}`} ref={lightColorPickerRef} style={{ marginTop: '-11px' }}>
                         {lightColorPickerOpen && (
                             <SketchPicker
                                 color={lightColor}
@@ -263,17 +263,17 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
                 </div>
  
             </div>
- <hr />
+            <hr className="style-six" ></hr>
  
 
             <div>
                 <h4>Effects</h4>
-                <label className="switch" style={{ marginLeft: '60px', marginTop: '12px' }}>
+                <label className="switch" style={{ marginLeft: '69px', marginTop: '12px' }}>
                     <input type="checkbox" checked={effectsEnabled} onChange={handleEffectsChange} />
                     <span className="slider round"></span>
                 </label>
             </div>
- <hr />
+            <hr className="style-six" ></hr>
             <div>
                 <h4>Ambient Shadows</h4>
                 <label className="switch" style={{ marginLeft: '0px', marginTop: '10px' }}>

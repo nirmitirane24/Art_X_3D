@@ -1,0 +1,68 @@
+.visibility-controls {
+  margin-top: 15px;
+}
+
+.visibility-controls h5 {
+  margin-bottom: 10px;
+  color: #ffffff;
+}
+
+.control-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+    justify-content: space-between;
+}
+.label-container{
+  text-align: left;
+       flex: 0 1 auto;
+      margin-right: 10px;
+}
+.option-buttons{
+  display: flex;
+   gap: 5px;
+   justify-content: flex-end;
+     flex: 1;
+}
+.option-buttons button {
+  width: 50px;
+  background-color: #333;
+  border: 1px solid #555;
+  color: #eee;
+  padding: 5px 2px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.option-buttons button:hover{
+  background-color: #444;
+}
+
+.option-buttons button.selected{
+   background-color: #545353;
+}
+
+.side-buttons-container {
+display: flex;
+align-items: center;
+gap: 5px;
+flex:1;
+ justify-content: flex-end;
+}
+
+.side-buttons-container button {
+background-color: #333;
+border: 1px solid #555;
+color: #eee;
+padding: 6px 2px;
+border-radius: 5px;
+cursor: pointer;
+transition: background-color 0.2s ease;
+width:45px
+}
+.side-buttons-container button:hover {
+background-color: #444;
+}
+.side-buttons-container button.selected{
+background-color: #6a6b6d;
+}

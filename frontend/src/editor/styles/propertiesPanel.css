@@ -1,95 +1,101 @@
 /* src/styles/propertiesPanel.css */
 .properties-panel {
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: 20px ; /* Add margin */
-    width: 200px;
-    background-color:#16161acc; /* Semi-transparent dark background */
-    color: #eee; /* Light text color */
-    border: 1px solid rgba(68, 68, 68, 0.5); /* Subtle semi-transparent border */
-    border-radius: 20px; /* Rounded corners */
-    overflow-y: auto;
-    z-index: 10;
-    height: calc(100% - 74px); /* Adjust height to account for margin and toolbar */
-    padding: 20px; /* Adjust padding */
-    border-bottom-right-radius: 10px; /* Match border-radius */
-    font-family: Futura, "Trebuchet MS", Arial, sans-serif;
-    overflow-x: hidden;
-    overflow-y: hidden;
-  }
-   
-  .properties-panel h4 {
-    margin-top: 15px;
-    margin-bottom: 5px;
-    font-size: 14px;
-  }
-   
-  .properties-panel input[type="number"] {
-    width: 37px;
-    margin-right: 0px;
-    padding: 3px;
-    border: 1px solid #666;
-    background-color: #333;
-    color: #eee;
-    border-radius: 3px;
-  }
-   
-  /* Material Editor Button styles */
-  .material-editor-button {
-      margin-top: 10px;
-      padding: 5px 10px;
-      background: #53585b;
-      outline: none;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-  }
-   
-  .material-editor-button:hover {
-    background: #53585b;
-    outline: none;
-  }
-   
-  /* Horizontal Slider styles */
-  .slider-group {
-      display: flex; /* Enable flexbox */
-      align-items: center; /* Vertically align items */
-      margin-bottom: 5px; /* Add spacing */
-  }
-  .slider-group h4{
-    margin-bottom: 5px;
-      margin-right: 1px; /* Add spacing to the right */
-      width: 70px; /* Set a width for the label */
-  }
-   
-  .slider-row {
-      display: flex;
-      flex-wrap: nowrap;
-      gap: 5px;
-      flex: 1; /* Allow the controls to expand */
-  }
-   
-  .slider-input-group {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-  }
-  .number-input {
-    width: 30px;
-     padding: 5px;
-     background-color: #444;
-     color: white;
-     border: 1px solid #555;
-     border-radius: 3px;
-      margin-bottom: 2px;
-  }
-   
-  .horizontal-slider {
-      height: 10px;
-      background: #16161a00;
-      border-radius: 5px;
-      cursor: ew-resize;
-        flex: 1; /* Allow the slider to expand */
-  }
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 20px ; /* Add margin */
+  width: 200px;
+  background-color:#16161acc; /* Semi-transparent dark background */
+  color: #eee; /* Light text color */
+  border: 1px solid rgba(68, 68, 68, 0.5); /* Subtle semi-transparent border */
+  border-radius: 20px; /* Rounded corners */
+  overflow-y: auto;
+  z-index: 10;
+  height: calc(100% - 74px); /* Adjust height to account for margin and toolbar */
+  padding: 20px; /* Adjust padding */
+  border-bottom-right-radius: 10px; /* Match border-radius */
+  font-family: Futura, "Trebuchet MS", Arial, sans-serif;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+ 
+.properties-panel h4 {
+  margin-top: 15px;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+ 
+.properties-panel input[type="number"] {
+  width: 37px;
+  margin-right: 0px;
+  padding: 3px;
+  border: 1px solid #666;
+  background-color: #333;
+  color: #eee;
+  border-radius: 3px;
+}
+ 
+/* Material Editor Button styles */
+.material-editor-button {
+  width: 209px;
+  margin-top: 10px;
+  padding: 5px 10px;
+  background: #6a6b6d;
+  outline: none;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+ 
+.material-editor-button:hover {
+  background: #53585b;
+  outline: none;
+}
+ 
+/* Horizontal Slider styles */
+.slider-group {
+    display: flex; /* Enable flexbox */
+    align-items: center; /* Vertically align items */
+    margin-bottom: 5px; /* Add spacing */
+}
+.slider-group h4{
+  margin-bottom: 5px;
+    margin-right: 1px; /* Add spacing to the right */
+    width: 70px; /* Set a width for the label */
+}
+ 
+.slider-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 5px;
+    flex: 1; /* Allow the controls to expand */
+}
+ 
+.slider-input-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+.number-input {
+  width: 30px;
+   padding: 5px;
+   background-color: #444;
+   color: white;
+   border: 1px solid #555;
+   border-radius: 3px;
+    margin-bottom: 2px;
+}
+ 
+.horizontal-slider {
+    height: 10px;
+    background: #16161a00;
+    border-radius: 5px;
+    cursor: ew-resize;
+      flex: 1; /* Allow the slider to expand */
+}
+.style-six {
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(to right, rgba(208, 200, 200, 0), rgba(103, 102, 102, 0.75), rgba(136, 130, 130, 0));
+}

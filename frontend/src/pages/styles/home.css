@@ -34,7 +34,7 @@ body::-webkit-scrollbar-corner {
 }
 
 .top-bar{
-    color: #91b595;
+    color: #e5e9e5;
 }
 /* Sidebar */
 .sidebar-home {
@@ -99,9 +99,9 @@ body::-webkit-scrollbar-corner {
 }
 
 .upgrade-button {
-    background-color: #6966a490;;
+    background-color:rgb(128, 121, 152);
     border: none;
-    color: #fff;
+    color: black;
     padding: 10px;
     width: 100%;
     border-radius: 10px;
@@ -126,7 +126,7 @@ body::-webkit-scrollbar-corner {
     border-radius: 10px;
     border: none;
     margin: 10px; /* Adds space around each button */
-    background-color: #6966a490;
+    background-color: rgb(128, 121, 152) ;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -136,7 +136,7 @@ body::-webkit-scrollbar-corner {
 .import-button:hover,
 .generate-button:hover,
 .new-file-button:hover {
-    background-color: rgb(201, 46, 70);
+    background-color: #ffffff90;
 }
 
 .import-button:active,
@@ -180,7 +180,8 @@ body::-webkit-scrollbar-corner {
 }
 
 .project-thumbnail.pink {
-    background-color: #91b595;
+    background-color: #726f75;
+    
 }
 
 .project-title {

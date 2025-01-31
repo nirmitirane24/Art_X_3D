@@ -235,29 +235,7 @@ const MaterialEditor = ({ material, onChange, onClose }) => {
                      onChange={(e) => handleMaterialChange('thickness', parseFloat(e.target.value))}
                  />
 </div>
-<div>
-  <h5>Sides</h5>
-  <div className="side-buttons-container">
-    <button
-       className={selectedSide === "double" ? 'selected' : ''}
-      onClick={() => handleSideChange("double")}
-    >
-      Both
-    </button>
-    <button
-        className={selectedSide === "front" ? 'selected' : ''}
-      onClick={() => handleSideChange("front")}
-    >
-      Front
-    </button>
-    <button
-      className={selectedSide === "back" ? 'selected' : ''}
-      onClick={() => handleSideChange("back")}
-    >
-      Back
-    </button>
-  </div>
-</div>
+
 <div>
 <h5>Texture</h5>
 <input

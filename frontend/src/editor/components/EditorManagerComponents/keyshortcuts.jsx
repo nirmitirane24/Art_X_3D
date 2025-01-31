@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-
 const KeyboardShortcuts = ({
   selectedObjects,
   deleteSelectedObjects,
@@ -15,17 +14,14 @@ const KeyboardShortcuts = ({
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
   const [showContextMenu, setShowContextMenu] = useState(false);
   const contextMenuRef = useRef(null); // Reference for the context menu
-
   const handleContextMenu = (event) => {
     event.preventDefault(); // Disable default context menu
     setContextMenuPosition({ x: event.clientX, y: event.clientY });
     setShowContextMenu(true); // Show the custom context menu
   };
-
   const handleCloseContextMenu = () => {
     setShowContextMenu(false);
   };
-
   const handleContextMenuOption = (action) => {
     if (action === "copy") {
       copySelectedObjects();
@@ -40,7 +36,6 @@ const KeyboardShortcuts = ({
     }
     setShowContextMenu(false); // Close context menu after selecting an option
   };
-
   // Close context menu if the user clicks outside of the context menu
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -48,14 +43,11 @@ const KeyboardShortcuts = ({
         setShowContextMenu(false);
       }
     };
-
     document.addEventListener("click", handleClickOutside);
-
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
-
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Delete" && selectedObjects.length > 0) {
@@ -77,16 +69,13 @@ const KeyboardShortcuts = ({
         handleArrowKeyMovement(event);
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("contextmenu", handleContextMenu);
-
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("contextmenu", handleContextMenu);
     };
   }, [selectedObjects, deleteSelectedObjects, undo, redo, copySelectedObjects, pasteCopiedObjects, handleArrowKeyMovement]);
-
   return (
     <>
       {showContextMenu && (

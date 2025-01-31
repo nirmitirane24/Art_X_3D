@@ -51,7 +51,6 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
     const [meshReady, setMeshReady] = useState(false); // Only used for loaded mesh case
     const [originalMaterials, setOriginalMaterials] = useState({});
 
-    
     useEffect(() => {
        if (object.mesh) {
             meshRef.current = object.mesh;
@@ -94,7 +93,7 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
          if(object.mesh){
               if(originalMaterials[mesh.uuid]){
                   newMaterial = originalMaterials[mesh.uuid].clone();
-                      if(object.material && object.material.color && newMaterial.color){
+                       if(object.material && object.material.color && newMaterial.color){
                           newMaterial.color = new THREE.Color(object.material.color);
                          }
                        if(object.material && object.material.opacity && newMaterial.opacity){
@@ -104,7 +103,12 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
                        if(object.material && object.material.side){
                            newMaterial.side = newSide
                        }
-                       
+                       if(object.material && object.material.wireframe !== undefined ){
+                           newMaterial.wireframe = object.material.wireframe
+                       }
+                     if(object.material && object.material.flatShading !== undefined ){
+                           newMaterial.flatShading = object.material.flatShading
+                       }
               } else{
                 newMaterial =  new THREE.MeshPhysicalMaterial({
                      color: object.material.color || '#ffffff',
@@ -124,8 +128,9 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
                     clearcoatRoughness: object.material.clearcoatRoughness === undefined ? 0 : object.material.clearcoatRoughness,
                     sheen: object.material.sheen === undefined ? 0 : object.material.sheen,
                     sheenRoughness: object.material.sheenRoughness === undefined ? 0 : object.material.sheenRoughness,
-                    thickness: object.material.thickness === undefined ? 0 : object.material.thickness,
-                 })
+                     wireframe: object.material.wireframe || false,
+                    flatShading: object.material.flatShading || false,
+                })
               }
 
            } else {
@@ -148,7 +153,8 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
                     sheen: object.material.sheen === undefined ? 0 : object.material.sheen,
                     sheenRoughness: object.material.sheenRoughness === undefined ? 0 : object.material.sheenRoughness,
                     thickness: object.material.thickness === undefined ? 0 : object.material.thickness,
-
+                  wireframe: object.material.wireframe || false,
+                    flatShading: object.material.flatShading || false,
                 });
             }
              mesh.material = newMaterial;
@@ -221,6 +227,23 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
                  }
               });
          }
+         if(meshRef.current && !object.mesh){
+           meshRef.current.castShadow = object.material?.castShadow || false;
+           meshRef.current.receiveShadow = object.material?.receiveShadow || false
+        } else if (meshRef.current && object.mesh){
+            meshRef.current.traverse((child) =>{
+              if(child.isMesh){
+                  child.castShadow = object.material?.castShadow || false;
+                 child.receiveShadow = object.material?.receiveShadow || false;
+              }
+           })
+         }
+         if(object.material){
+                if (object.material.shininess !== undefined){
+                   meshRef.current.material.shininess = object.material.shininess;
+                   meshRef.current.material.needsUpdate = true
+                   }
+            }
         }
     });
 

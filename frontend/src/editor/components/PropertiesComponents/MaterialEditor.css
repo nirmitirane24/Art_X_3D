@@ -1,15 +1,14 @@
 /* materialEditor.css */
 .material-editor {
-    height: 300px;
-    overflow-y:auto;
+    height: 421px;
+    overflow-y: auto;
     margin-top: 0px;
     padding: 10px;
     background: #16161a00;
     border: 1px solid #444;
     border-radius: 10px;
-    width: 300px;
+    width: 254px;
 }
-
 .material-editor-header {
     display: flex;
     justify-content: space-between;
@@ -28,7 +27,7 @@
 
 /* Style for the material editor pop-out container */
 .material-editor-popout {
-    margin-left: 1200px;
+    margin-left: 1280px;
      z-index: 1000; /* Increased z-index to ensure it's on top */
     position: absolute;
     background-color: #16161acc;

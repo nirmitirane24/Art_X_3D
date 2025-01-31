@@ -15,6 +15,7 @@ import CopyPaste from "./components/EditorManagerComponents/copypaste.jsx";
 const EditorManager = () => {
     const [sceneObjects, setSceneObjects] = useState([]);
     const [selectedObjects, setSelectedObjects] = useState([]);
+    const [copiedObjects, setCopiedObjects] = useState([]);
     const [cameraEnabled, setCameraEnabled] = useState(true);
     const [isMoving, setIsMoving] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
@@ -35,14 +36,14 @@ const EditorManager = () => {
         lightShadows: false,
     });
     const sceneRef = useRef(new THREE.Scene());
-
-    const { undo, redo, saveToUndoStack, undoStack, redoStack } = UndoRedo({ 
-        sceneObjects, 
-        setSceneObjects, 
-        sceneSettings, 
-        setSceneSettings, 
-        selectedObjects, 
-        setSelectedObjects 
+ 
+    const { undo, redo, saveToUndoStack, undoStack, redoStack } = UndoRedo({
+        sceneObjects,
+        setSceneObjects,
+        sceneSettings,
+        setSceneSettings,
+        selectedObjects,
+        setSelectedObjects
     });
 
     const { copySelectedObjects, pasteCopiedObjects, undoPaste, redoPaste } = CopyPaste({
@@ -51,11 +52,11 @@ const EditorManager = () => {
         setSceneObjects, 
         saveToUndoStack
     });
-
+ 
     const deleteSelectedObjects = () => {
         if (selectedObjects.length > 0) {
             saveToUndoStack([...sceneObjects], { ...sceneSettings });
-
+ 
             setSceneObjects((prevObjects) =>
                 prevObjects.filter((obj) => {
                     if (selectedObjects.includes(obj.id)) {
@@ -74,17 +75,19 @@ const EditorManager = () => {
                     return true;
                 })
             );
-
+ 
             setSelectedObjects([]);
         }
     };
-
+ 
     const handleDeleteObject = (objectId) => {
         saveToUndoStack([...sceneObjects], { ...sceneSettings });
         setSceneObjects((prevObjects) => prevObjects.filter((obj) => obj.id !== objectId));
         setSelectedObjects((prevSelected) => prevSelected.filter((id) => id !== objectId));
     };
-
+ 
+    
+ 
     const handleArrowKeyMovement = (event) => {
         if (selectedObjects.length > 0) {
             const step = 0.5;
@@ -112,7 +115,7 @@ const EditorManager = () => {
             });
         }
     };
-
+ 
     const addModel = (type) => {
         saveToUndoStack([...sceneObjects], { ...sceneSettings });
         const newObject = {
@@ -130,13 +133,13 @@ const EditorManager = () => {
         };
         setSceneObjects((prevObjects) => [...prevObjects, newObject]);
     };
-
+ 
     const handleObjectSelect = (objectIds) => {
-        saveToUndoStack();
+        // saveToUndoStack(); Remove this line
         setSelectedObjects(objectIds);
         setCameraEnabled(objectIds.length === 0);
     };
-
+ 
     const updateObject = (objectId, newProps) => {
         if (objectId === 'scene') {
             saveToUndoStack([...sceneObjects], { ...sceneSettings });
@@ -153,7 +156,7 @@ const EditorManager = () => {
             );
         }
     };
-
+ 
     const deselectAllObjects = (event) => {
         if (
             event.type === 'click' &&
@@ -164,7 +167,7 @@ const EditorManager = () => {
             setCameraEnabled(true);
         }
     };
-
+ 
     const onImportScene = (loadedScene) => {
         saveToUndoStack([...sceneObjects], { ...sceneSettings });
         const sceneGroup = loadedScene.scene || loadedScene;
@@ -189,7 +192,7 @@ const EditorManager = () => {
         };
         setSceneObjects((prevObjects) => [...prevObjects, importedObject]);
     };
-
+ 
     return (
         <div className="editor-container" onClick={deselectAllObjects}>
             <Toolbar
@@ -250,16 +253,16 @@ const EditorManager = () => {
         </div>
     );
 };
-
+ 
 function SceneContent({ sceneSettings, sceneRef, sceneObjects, selectedObjects, setCameraEnabled, updateObject, handleObjectSelect }) {
     const { gl } = useThree();
     useEffect(() => {
+        
         if (gl && sceneSettings.backgroundColor) {
-            console.log("Applying Background Color:", sceneSettings.backgroundColor);
             gl.setClearColor(sceneSettings.backgroundColor);
         }
     }, [sceneSettings.backgroundColor, gl]);
-    
+ 
     return (
         <>
             <ambientLight intensity={sceneSettings.ambientShadowsEnabled ? sceneSettings.ambientIntensity : 0} />
@@ -289,5 +292,5 @@ function SceneContent({ sceneSettings, sceneRef, sceneObjects, selectedObjects, 
         </>
     );
 }
-
+ 
 export default EditorManager;
