@@ -10,6 +10,7 @@ import './styles/editorManager.css';
 import * as THREE from "three";
 import UndoRedo from './components/EditorManagerComponents/undoredo.jsx';
 import KeyboardShortcuts from './components/EditorManagerComponents/keyshortcuts.jsx';
+import CopyPaste from "./components/EditorManagerComponents/copypaste.jsx";
 
 const EditorManager = () => {
     const [sceneObjects, setSceneObjects] = useState([]);
@@ -44,6 +45,13 @@ const EditorManager = () => {
         setSelectedObjects 
     });
 
+    const { copySelectedObjects, pasteCopiedObjects, undoPaste, redoPaste } = CopyPaste({
+        sceneObjects, 
+        selectedObjects, 
+        setSceneObjects, 
+        saveToUndoStack
+    });
+
     const deleteSelectedObjects = () => {
         if (selectedObjects.length > 0) {
             saveToUndoStack([...sceneObjects], { ...sceneSettings });
@@ -75,25 +83,6 @@ const EditorManager = () => {
         saveToUndoStack([...sceneObjects], { ...sceneSettings });
         setSceneObjects((prevObjects) => prevObjects.filter((obj) => obj.id !== objectId));
         setSelectedObjects((prevSelected) => prevSelected.filter((id) => id !== objectId));
-    };
-
-    const copySelectedObjects = () => {
-        const copied = sceneObjects.filter((obj) => selectedObjects.includes(obj.id));
-        setCopiedObjects(copied);
-    };
-
-    const pasteCopiedObjects = () => {
-        if (copiedObjects.length > 0) {
-            const newObjects = copiedObjects.map((obj) => {
-                const newObject = { ...obj, id: Date.now(), position: [...obj.position] };
-                newObject.position[0] += 1;
-                newObject.position[1] += 1;
-                newObject.position[2] += 1;
-                return newObject;
-            });
-
-            setSceneObjects((prevObjects) => [...prevObjects, ...newObjects]);
-        }
     };
 
     const handleArrowKeyMovement = (event) => {
@@ -252,8 +241,8 @@ const EditorManager = () => {
             <KeyboardShortcuts
                 selectedObjects={selectedObjects}
                 deleteSelectedObjects={deleteSelectedObjects}
-                undo={undo}
-                redo={redo}
+                undo={() => { undo(); undoPaste(); }} // Include undoPaste in main undo
+                redo={() => { redo(); redoPaste(); }} // Include redoPaste in main redo
                 copySelectedObjects={copySelectedObjects}
                 pasteCopiedObjects={pasteCopiedObjects}
                 handleArrowKeyMovement={handleArrowKeyMovement}
@@ -265,11 +254,12 @@ const EditorManager = () => {
 function SceneContent({ sceneSettings, sceneRef, sceneObjects, selectedObjects, setCameraEnabled, updateObject, handleObjectSelect }) {
     const { gl } = useThree();
     useEffect(() => {
-        if (gl) {
+        if (gl && sceneSettings.backgroundColor) {
+            console.log("Applying Background Color:", sceneSettings.backgroundColor);
             gl.setClearColor(sceneSettings.backgroundColor);
         }
     }, [sceneSettings.backgroundColor, gl]);
-
+    
     return (
         <>
             <ambientLight intensity={sceneSettings.ambientShadowsEnabled ? sceneSettings.ambientIntensity : 0} />

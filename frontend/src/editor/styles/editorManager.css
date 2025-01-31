@@ -42,10 +42,10 @@
   background-color: rgba(0, 0, 0, 0.7);
 }
 
-.no-select {
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
+/* Prevent text selection when moving objects */
+.no-select,
+.no-select * {
+    user-select: none;
+    pointer-events: none;
 }
 

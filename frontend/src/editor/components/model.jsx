@@ -51,6 +51,7 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
     const [meshReady, setMeshReady] = useState(false); // Only used for loaded mesh case
     const [originalMaterials, setOriginalMaterials] = useState({});
 
+    
     useEffect(() => {
        if (object.mesh) {
             meshRef.current = object.mesh;
