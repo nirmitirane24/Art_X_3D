@@ -1,6 +1,6 @@
 /* materialEditor.css */
 .material-editor {
-    height: 421px;
+    height: 370px;
     overflow-y: auto;
     margin-top: 0px;
     padding: 10px;
@@ -27,8 +27,8 @@
 
 /* Style for the material editor pop-out container */
 .material-editor-popout {
-    margin-left: 1280px;
-     z-index: 1000; /* Increased z-index to ensure it's on top */
+    margin-left: 1270px;
+    z-index: 1000; /* Increased z-index to ensure it's on top */
     position: absolute;
     background-color: #16161acc;
     border: 1px solid rgba(68, 68, 68, 0.5);

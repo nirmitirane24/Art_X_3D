@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { FaBook } from 'react-icons/fa';
 
 const Library = () => {
     const [showLibraryPanel, setShowLibraryPanel] = useState(false);
@@ -6,7 +7,8 @@ const Library = () => {
     return (
         <div>
             <button onClick={() => setShowLibraryPanel(true)}>
-                Library
+                <FaBook /> {/* Add the FaBook icon */}
+                <span>Library</span> {/* Optional: Add text next to the icon */}
             </button>
             {showLibraryPanel && (
                 <div className="library-panel">

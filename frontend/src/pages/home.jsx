@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaTimes } from "react-icons/fa"; // Import close icon
+import { FaTimes, FaFileAlt} from "react-icons/fa";
 import "./styles/home.css";
 import { useNavigate } from "react-router-dom";
 
@@ -63,7 +63,7 @@ const Home = () => {
       <aside className="sidebar-home">
         <div className="profile-section">
           <div className="profile-icon">
-            <img  style={{height: '30px'}} src="/cube2.svg" alt="" />
+            <img style={{ height: '30px' }} src="/cube2.svg" alt="" />
           </div>
           <span>Dummy Profile</span>
         </div>
@@ -168,34 +168,18 @@ const Home = () => {
         <section className="projects">
           <h2>Projects</h2>
           <div className="projects-grid">
-            {/* New File Dotted Frame */}
             <div onClick={() => navigate('/editor')} className="project-card new-file">
-              <p>🗃️ New File</p>
+              <FaFileAlt style={{ marginRight: "8px" }} />
+              <p>New File</p>
             </div>
             {/* Existing Projects */}
             <div className="project-card">
-              <div className="project-thumbnail"></div>
-              <p className="project-title">Untitled</p>
-              <span className="project-date">Edited 1 day ago</span>
-              <p>3D Gummy Bear</p>
             </div>
             <div className="project-card">
-              <div className="project-thumbnail pink"></div>
-              <p className="project-title">Mini Room - Art - Copy</p>
-              <span className="project-date">Edited 2 days ago</span>
-              <p>3D Gummy Bear</p>
             </div>
             <div className="project-card">
-              <div className="project-thumbnail"></div>
-              <p className="project-title">Untitled</p>
-              <span className="project-date">Edited 2 days ago</span>
-              <p>3D Gummy Bear</p>
             </div>
             <div className="project-card">
-              <div className="project-thumbnail pink"></div>
-              <p className="project-title">Mini Room - Art - Copy</p>
-              <span className="project-date">Edited 3 months ago</span>
-              <p>3D Gummy Bear</p>
             </div>
           </div>
         </section>
@@ -205,28 +189,12 @@ const Home = () => {
           <h2>Tutorials</h2>
           <div className="tutorials-grid">
             <div className="tutorial-card">
-              <div className="project-thumbnail pink"></div>
-              <p className="project-title">Room - Art - Copy</p>
-              <span className="project-date">Edited 9 months ago</span>
-              <p>3D Gummy Bear</p>
             </div>
             <div className="tutorial-card">
-              <div className="project-thumbnail"></div>
-              <p className="project-title">Room - Art - Copy</p>
-              <span className="project-date">Edited 9 months ago</span>
-              <p>3D Shape Blending</p>
             </div>
             <div className="tutorial-card">
-              <div className="project-thumbnail pink"></div>
-              <p className="project-title">Room - Art - Copy</p>
-              <span className="project-date">Edited 9 months ago</span>
-              <p>Making 3D Components</p>
             </div>
             <div className="tutorial-card">
-              <div className="project-thumbnail"></div>
-              <p className="project-title">Room - Art - Copy</p>
-              <span className="project-date">Edited 9 months ago</span>
-              <p>APIs & Webhooks</p>
             </div>
           </div>
         </section>

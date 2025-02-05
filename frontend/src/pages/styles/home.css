@@ -170,6 +170,7 @@ body::-webkit-scrollbar-corner {
     border-radius: 10px;
     padding: 10px;
     text-align: center;
+    height: 250px;
 }
 
 .project-thumbnail {
@@ -206,6 +207,7 @@ body::-webkit-scrollbar-corner {
     border-radius: 10px;
     text-align: center;
     padding: 10px;
+    height: 250px;
 }
 
 .tutorial-card img {
@@ -245,8 +247,6 @@ body::-webkit-scrollbar-corner {
     color: rgb(136, 224, 121);
 }
 
-
-  
   /* New File Card */
 .project-card.new-file {
     display: flex;

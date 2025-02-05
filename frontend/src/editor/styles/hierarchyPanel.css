@@ -54,8 +54,6 @@
 }
 
 .objects-list {
-  justify-content: center;
-  width: 105%;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -118,21 +116,21 @@
 
 .panel-buttons {
   margin-top: 10px;
+  border-radius: 5px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 10px 0;
-  background-color: transparent; /* Semi-transparent dark background */
+  background-color: rgb(52, 50, 50); /* Semi-transparent dark background */
   position: sticky; /* Fix the buttons at the bottom */
   bottom: 0;
-  left: 0;
-  width: 100%;
+  width: 109%;
 }
 
 .panel-buttons button {
   background-color: transparent; /* Match the theme */
   border: none;
-  color: rgb(133, 133, 133);
+  color: rgb(255, 255, 255);
   padding: 8px 12px;
   border-radius: 5px;
   font-weight: bold;
@@ -372,7 +370,6 @@
   transition: width 0.3s ease; /* Smooth width transition for dynamic updates */
 }
 
-
 .spinner {
   /* No spinner needed anymore, but you can keep these styles if you decide to use it elsewhere */
   display: none; /* Hide the spinner icon */
@@ -384,4 +381,46 @@
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+.file-name-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(30, 30, 30, 0.9);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  z-index: 1000;
+}
+
+.file-name-modal input {
+  width: 80%;
+  padding: 8px;
+  margin: 10px 0;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.delete-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(30, 30, 30, 0.95);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  z-index: 1000;
+}
+
+* {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }

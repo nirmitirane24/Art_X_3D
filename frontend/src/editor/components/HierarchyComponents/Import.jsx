@@ -1,13 +1,15 @@
 import React, { useState } from "react";
+import { FaFileImport } from 'react-icons/fa'; 
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
+import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import * as THREE from 'three';
 
 const Import = ({ onImportScene }) => {
     const [showImportPanel, setShowImportPanel] = useState(false);
-    const [isLoading, setIsLoading] = useState(false); // Manage isLoading state internally
+    const [isLoading, setIsLoading] = useState(false);
 
     const applyScalingAndImport = (loadedScene) => {
         const sceneGroup = loadedScene.scene || loadedScene;
@@ -45,7 +47,7 @@ const Import = ({ onImportScene }) => {
         dracoLoader.dispose();
     };
 
-    const handleFBXImport = (data, extension) => {
+    const handleFBXImport = (data) => {
         setIsLoading(true);
         const loader = new FBXLoader();
         loader.parse(
@@ -62,7 +64,7 @@ const Import = ({ onImportScene }) => {
         );
     };
 
-    const handleOBJImport = (data, extension) => {
+    const handleOBJImport = (data) => {
         setIsLoading(true);
         const loader = new OBJLoader();
         try {
@@ -71,6 +73,21 @@ const Import = ({ onImportScene }) => {
             applyScalingAndImport({ scene: object });
         } catch (error) {
             console.error("Error loading OBJ file:", error);
+            setIsLoading(false);
+        }
+    };
+
+    const handleSTLImport = (data) => {
+        setIsLoading(true);
+        const loader = new STLLoader();
+        try {
+            const geometry = loader.parse(data);
+            const material = new THREE.MeshStandardMaterial({ color: 0x888888, metalness: 0.5, roughness: 0.5 });
+            const mesh = new THREE.Mesh(geometry, material);
+            console.log("Loaded STL Scene:", mesh);
+            applyScalingAndImport({ scene: mesh });
+        } catch (error) {
+            console.error("Error loading STL file:", error);
             setIsLoading(false);
         }
     };
@@ -88,18 +105,28 @@ const Import = ({ onImportScene }) => {
                 reader.onload = (event) => {
                     const data = event.target.result;
 
-                    if (extension === "gltf" || extension === "glb") {
-                        handleGLTFImport(data, extension);
-                    } else if (extension === "obj") {
-                        handleOBJImport(data, extension);
-                    } else if (extension === "fbx") {
-                        handleFBXImport(data, extension);
-                    } else {
-                        console.error("Unsupported file format:", extension);
+                    switch (extension) {
+                        case "gltf":
+                        case "glb":
+                            handleGLTFImport(data, extension);
+                            break;
+                        case "obj":
+                            handleOBJImport(data);
+                            break;
+                        case "fbx":
+                            handleFBXImport(data);
+                            break;
+                        case "stl":
+                            handleSTLImport(data);
+                            break;
+                        default:
+                            console.error("Unsupported file format:", extension);
+                            setIsLoading(false);
                     }
                 };
+
                 setIsLoading(true);
-                if (extension === "gltf" || extension === "glb" || extension === "fbx") {
+                if (["gltf", "glb", "fbx", "stl"].includes(extension)) {
                     reader.readAsArrayBuffer(file);
                 } else if (extension === "obj") {
                     reader.readAsText(file);
@@ -117,8 +144,9 @@ const Import = ({ onImportScene }) => {
     return (
         <div>
             <button onClick={() => setShowImportPanel(true)} disabled={isLoading}>
-                Import
+                <FaFileImport /> <span>Import</span>
             </button>
+
             {showImportPanel && (
                 <div className="import-panel">
                     <h3>Import 3D Model</h3>
@@ -133,10 +161,10 @@ const Import = ({ onImportScene }) => {
                         <div className="import-options">
                             <button
                                 className="modal-buttons"
-                                onClick={() => handleFileSelection(".gltf,.glb,.obj,.fbx")}
+                                onClick={() => handleFileSelection(".gltf,.glb,.obj,.fbx,.stl")}
                                 disabled={isLoading}
                             >
-                                3D Model (GLTF, OBJ, FBX)
+                                3D Model (GLTF, OBJ, FBX, STL)
                             </button>
                         </div>
                     )}
