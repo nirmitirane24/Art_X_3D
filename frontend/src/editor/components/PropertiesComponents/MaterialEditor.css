@@ -1,14 +1,15 @@
 /* materialEditor.css */
 .material-editor {
-    height: 370px;
+    height: 411px;
     overflow-y: auto;
     margin-top: 0px;
     padding: 10px;
     background: #16161a00;
     border: 1px solid #444;
     border-radius: 10px;
-    width: 254px;
+    width: 300px;
 }
+
 .material-editor-header {
     display: flex;
     justify-content: space-between;
@@ -27,7 +28,7 @@
 
 /* Style for the material editor pop-out container */
 .material-editor-popout {
-    margin-left: 1270px;
+    margin-left: 1236px;
     z-index: 1000; /* Increased z-index to ensure it's on top */
     position: absolute;
     background-color: #16161acc;
@@ -49,7 +50,6 @@
 .material-editor-close-button:hover {
     color: #ccc;
 }
-
 
 /* Global style or specific container style */
 .material-editor {
@@ -85,25 +85,24 @@
 
 /* Color Picker Styling */
 .color-picker-container {
-     position: relative;
+    position: relative;
     display: flex;
     align-items: center;
     margin-bottom: 10px;
-     cursor: pointer;
+    cursor: pointer;
 }
 
-
 .color-preview {
-   width: 20px;
-   height: 20px;
-   border: 1px solid #555;
-   border-radius: 3px;
-  cursor: pointer;
-  margin-right: 10px;
+    width: 20px;
+    height: 20px;
+    border: 1px solid #555;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-right: 10px;
 }
 
 .color-picker-popout {
-     position: absolute;
+    position: absolute;
     z-index: 1001;
     top: 100%;
     left: 0;
@@ -113,7 +112,6 @@
     padding: 0px; /* Reduced padding */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
-
 
 /* Style for the react-color input fields */
 
@@ -127,19 +125,19 @@
 
 .sketch-picker input[type="text"] {
     background-color: #444 !important;
-      color: white !important;
+    color: white !important;
     border: 1px solid #555 !important;
     border-radius: 3px !important;
     padding: 5px !important;
 }
 
-.sketch-picker > div > div:nth-child(1) > div > div{
+.sketch-picker > div > div:nth-child(1) > div > div {
     border-radius: 3px !important;
     box-shadow: none !important;
     border: none !important;
 }
 
-.sketch-picker > div > div:nth-child(2) > div > div{
+.sketch-picker > div > div:nth-child(2) > div > div {
     border-radius: 3px !important;
     box-shadow: none !important;
     border: none !important;
@@ -177,18 +175,18 @@
     background: #eee;
     border-radius: 50%;
     cursor: pointer;
-   box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
 }
 
 .material-editor input[type="range"]::-ms-thumb {
-  width: 12px;
-  height: 12px;
-  background: #eee;
-  border-radius: 50%;
-  cursor: pointer;
+    width: 12px;
+    height: 12px;
+    background: #eee;
+    border-radius: 50%;
+    cursor: pointer;
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
 }
-#number-input-materialeditor{
+#number-input-materialeditor {
     width: 50px;
     margin-right: 5px;
     padding: 3px;
@@ -197,39 +195,73 @@
     color: #eee;
     border-radius: 3px;
     outline: none;
-
 }
 
 /* Hover effect for the thumb */
 .material-editor input[type="range"]::-webkit-slider-thumb:hover {
     background: #fff;
 }
+
 .material-editor input[type="range"]::-moz-range-thumb:hover {
-   background: #fff;
+    background: #fff;
 }
- .material-editor input[type="range"]::-ms-thumb:hover {
-      background: #fff;
-    }
+
+.material-editor input[type="range"]::-ms-thumb:hover {
+    background: #fff;
+}
+
 /* Style for the Side Buttons */
 .side-buttons-container {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 10px;
 }
 
 .side-buttons-container button {
-  background-color: #333;
-  border: 1px solid #555;
-  color: #eee;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+    background-color: #333;
+    border: 1px solid #555;
+    color: #eee;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
 }
+
 .side-buttons-container button:hover {
-  background-color: #444;
+    background-color: #444;
 }
-.side-buttons-container button.selected{
-  background-color: #5e656a;
+
+.side-buttons-container button.selected {
+    background-color: #5e656a;
+}
+ /* Advanced Button Styles */
+ .material-editor .advanced-button {
+    height: 34px;
+    background: #444;
+    border: none;
+    color: #eee;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+    margin-bottom: 10px;
+}
+
+
+.material-editor .advanced-button:hover {
+    background: #555;
+}
+
+/* Styles for Advanced Properties Section */
+.material-editor .advanced-properties {
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.material-editor .advanced-properties > div {
+  margin-bottom: 10px;
 }

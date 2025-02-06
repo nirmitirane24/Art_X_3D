@@ -60,13 +60,13 @@ const VisibilityControls = ({ object, updateObject }) => {
                     className={selectedSide === "front" ? 'selected' : ''}
                     onClick={() => handleSideChange("front")}
                 >
-                    Front
+                    Down
                 </button>
                 <button
                      className={selectedSide === "back" ? 'selected' : ''}
                      onClick={() => handleSideChange("back")}
                 >
-                    Back
+                    Top
                </button>
               </div>
          </div>

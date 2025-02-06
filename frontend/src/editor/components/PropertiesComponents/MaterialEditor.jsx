@@ -7,9 +7,9 @@ const MaterialEditor = ({ material, onChange, onClose }) => {
     const [emissivePickerOpen, setEmissivePickerOpen] = useState(false);
     const [selectedColorType, setSelectedColorType] = useState('color');
     const colorPickerRef = useRef(null);
+    const [showAdvanced, setShowAdvanced] = useState(false);
     const colorId = useRef(Date.now() + Math.random())
     const emissiveId = useRef(Date.now() + Math.random())
-    const [selectedSide, setSelectedSide] = useState(material.side || 'front');
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -46,10 +46,6 @@ const MaterialEditor = ({ material, onChange, onClose }) => {
         }
     };
 
-    const handleSideChange = (side) => {
-        setSelectedSide(side);
-        handleMaterialChange('side', side);
-    };
 
     return (
         <div className="material-editor">
@@ -124,17 +120,6 @@ const MaterialEditor = ({ material, onChange, onClose }) => {
                 />
             </div>
             <div>
-                <h5>Opacity</h5>
-                <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={material.opacity === undefined ? 1 : material.opacity}
-                    onChange={(e) => handleMaterialChange('opacity', parseFloat(e.target.value))}
-                />
-            </div>
-            <div>
                 <h5>Reflectivity</h5>
                 <input
                     type="range"
@@ -146,111 +131,133 @@ const MaterialEditor = ({ material, onChange, onClose }) => {
                 />
             </div>
             <div>
-                <h5>Shininess</h5>
-                <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    step="1"
-                    value={material.shininess === undefined ? 30 : material.shininess}
-                    onChange={(e) => handleMaterialChange('shininess', parseFloat(e.target.value))}
-                />
-            </div>
-            <div>
-                <h5>IOR</h5>
-                <input
-                    id="number-input-materialeditor"
-                    type="number"
-                    min="1"
-                    max="2.5"
-                    step="0.01"
-                    value={material.ior === undefined ? 1.5 : material.ior}
-                    onChange={(e) => handleMaterialChange('ior', parseFloat(e.target.value))}
-                />
-            </div>
-            <div>
-                <h5>Transmission</h5>
+                <h5>Opacity</h5>
                 <input
                     type="range"
                     min="0"
                     max="1"
                     step="0.01"
-                    value={material.transmission === undefined ? 0 : material.transmission}
-                    onChange={(e) => handleMaterialChange('transmission', parseFloat(e.target.value))}
+                    value={material.opacity === undefined ? 1 : material.opacity}
+                    onChange={(e) => handleMaterialChange('opacity', parseFloat(e.target.value))}
                 />
             </div>
+<br></br>
             <div>
-                <h5>Clearcoat</h5>
-                <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={material.clearcoat === undefined ? 0 : material.clearcoat}
-                    onChange={(e) => handleMaterialChange('clearcoat', parseFloat(e.target.value))}
-                />
-            </div>
-            <div>
-                <h5>Clearcoat Roughness</h5>
-                <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={material.clearcoatRoughness === undefined ? 0 : material.clearcoatRoughness}
-                    onChange={(e) => handleMaterialChange('clearcoatRoughness', parseFloat(e.target.value))}
-                />
-            </div>
-            <div>
-                <h5>Sheen</h5>
-                <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={material.sheen === undefined ? 0 : material.sheen}
-                    onChange={(e) => handleMaterialChange('sheen', parseFloat(e.target.value))}
-                />
-            </div>
-            <div>
-                <h5>Sheen Roughness</h5>
-                <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={material.sheenRoughness === undefined ? 0 : material.sheenRoughness}
-                    onChange={(e) => handleMaterialChange('sheenRoughness', parseFloat(e.target.value))}
-                />
-            </div>
-            <div>
-                <h5>Thickness</h5>
-                <input
-                    id="number-input-materialeditor"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={material.thickness === undefined ? 0 : material.thickness}
-                    onChange={(e) => handleMaterialChange('thickness', parseFloat(e.target.value))}
-                />
+                <button className='advanced-button' onClick={() => setShowAdvanced(!showAdvanced)}>
+                    Advanced Properties {showAdvanced ? '▲' : '▼ '}
+                </button>
             </div>
 
-            <div>
-                <h5>Texture</h5>
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleMaterialChange('texture', e.target.files[0])}
-                />
-            </div>
-            <div>
-                <h5>Normal Map</h5>
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleMaterialChange('normalMap', e.target.files[0])}
-                />
-            </div>
+            {showAdvanced && (
+                <div className="advanced-properties">
+
+                    <div>
+                        <h5>Shininess</h5>
+                        <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            step="1"
+                            value={material.shininess === undefined ? 30 : material.shininess}
+                            onChange={(e) => handleMaterialChange('shininess', parseFloat(e.target.value))}
+                        />
+                    </div>
+                    <div>
+                        <h5>Transmission</h5>
+                        <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            value={material.transmission === undefined ? 0 : material.transmission}
+                            onChange={(e) => handleMaterialChange('transmission', parseFloat(e.target.value))}
+                        />
+                    </div>
+                    <div>
+                        <h5>Clearcoat</h5>
+                        <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            value={material.clearcoat === undefined ? 0 : material.clearcoat}
+                            onChange={(e) => handleMaterialChange('clearcoat', parseFloat(e.target.value))}
+                        />
+                    </div>
+                    <div>
+                        <h5>Clearcoat Roughness</h5>
+                        <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            value={material.clearcoatRoughness === undefined ? 0 : material.clearcoatRoughness}
+                            onChange={(e) => handleMaterialChange('clearcoatRoughness', parseFloat(e.target.value))}
+                        />
+                    </div>
+                    <div>
+                        <h5>Sheen</h5>
+                        <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            value={material.sheen === undefined ? 0 : material.sheen}
+                            onChange={(e) => handleMaterialChange('sheen', parseFloat(e.target.value))}
+                        />
+                    </div>
+                    <div>
+                        <h5>Sheen Roughness</h5>
+                        <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            value={material.sheenRoughness === undefined ? 0 : material.sheenRoughness}
+                            onChange={(e) => handleMaterialChange('sheenRoughness', parseFloat(e.target.value))}
+                        />
+                    </div>
+                    <div>
+                        <h5>IOR</h5>
+                        <input
+                            id="number-input-materialeditor"
+                            type="number"
+                            min="1"
+                            max="2.5"
+                            step="0.01"
+                            value={material.ior === undefined ? 1.5 : material.ior}
+                            onChange={(e) => handleMaterialChange('ior', parseFloat(e.target.value))}
+                        />
+                    </div>
+                    <div>
+                        <h5>Thickness</h5>
+                        <input
+                            id="number-input-materialeditor"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={material.thickness === undefined ? 0 : material.thickness}
+                            onChange={(e) => handleMaterialChange('thickness', parseFloat(e.target.value))}
+                        />
+                    </div>
+                    <div>
+                        <h5>Texture</h5>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleMaterialChange('texture', e.target.files[0])}
+                        />
+                    </div>
+                    <div>
+                        <h5>Normal Map</h5>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleMaterialChange('normalMap', e.target.files[0])}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

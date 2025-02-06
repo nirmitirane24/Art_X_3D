@@ -121,7 +121,7 @@
   flex-direction: column;
   gap: 10px;
   padding: 10px 0;
-  background-color: rgb(52, 50, 50); /* Semi-transparent dark background */
+  background-color: transparent; /* Semi-transparent dark background */
   position: sticky; /* Fix the buttons at the bottom */
   bottom: 0;
   width: 109%;

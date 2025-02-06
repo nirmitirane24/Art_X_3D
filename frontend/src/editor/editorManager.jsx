@@ -6,6 +6,7 @@ import PropertiesPanel from './components/PropertiesPanel';
 import CameraControls from './components/CameraControls';
 import GroundPlane from './components/GroundPlane';
 import Model from './components/Model';
+import AIChat from './components/AIChat';
 import './styles/editorManager.css';
 import * as THREE from "three";
 import UndoRedo from './components/EditorManagerComponents/undoredo.jsx';
@@ -248,6 +249,8 @@ const EditorManager = () => {
                 pasteCopiedObjects={pasteCopiedObjects}
                 handleArrowKeyMovement={handleArrowKeyMovement}
             />
+
+            <AIChat />
         </div>
     );
 };
