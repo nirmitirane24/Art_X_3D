@@ -7,7 +7,7 @@
     background: #16161a00;
     border: 1px solid #444;
     border-radius: 10px;
-    width: 300px;
+    width: 267px;
 }
 
 .material-editor-header {
@@ -28,7 +28,7 @@
 
 /* Style for the material editor pop-out container */
 .material-editor-popout {
-    margin-left: 1236px;
+    margin-left: 1262px;
     z-index: 1000; /* Increased z-index to ensure it's on top */
     position: absolute;
     background-color: #16161acc;

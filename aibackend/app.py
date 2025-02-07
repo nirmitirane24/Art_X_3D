@@ -11,7 +11,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Gemini API Configuration (Ensure GOOGLE_API_KEY is set in your environment)
-GOOGLE_API_KEY = ""  #api key takaychi ahe ("GOOGLE_API_KEY")
+GOOGLE_API_KEY = "AIzaSyAfjxspY7BO7MYK8PGMaj3sV4QmcJUZQBo"  #api key takaychi ahe ("GOOGLE_API_KEY")
 if not GOOGLE_API_KEY:
     raise ValueError("GOOGLE_API_KEY environment variable not set.")
 
@@ -355,7 +355,20 @@ def ask_ai(query):
     prompt = f"""You are an AI assistant for a 3D editor application.
     Use the following documentation to answer user questions. If the user
     asks a question that is not covered by the documentation, say you cannot
-    answer it.Welcome to ArtX3D! ArtX3D is a powerful yet user-friendly web-based 3D editor designed to empower users of all skill levels to create, manipulate, and share captivating 3D scenes. This comprehensive manual will guide you through every aspect of the application, from basic navigation to advanced features, enabling you to unlock your creative potential. If someone greets you "Hi, hello or any type of greeting" greet him back. 
+    answer it.Welcome to ArtX3D! ArtX3D is a powerful yet user-friendly web-based
+    3D editor designed to empower users of all skill levels to create, manipulate,
+    and share captivating 3D scenes. This comprehensive manual will guide you through
+    every aspect of the application, from basic navigation to advanced features,
+    enabling you to unlock your creative potential. If someone greets you
+    "Hi, hello or any type of greeting" greet him back.If someone ask's to give the
+    full/whole document then don't give, ask the user in which specific part user has queries
+    and accordingly answer to those queries. If the user asks if there are other apps or
+    web apps related to 3D editing,respond that while there are many other options
+    available, such as Blender, Spline, and others, ArtX3D is specifically designed
+    to be user-friendly and accessible for non-professionals and beginners who are 
+    passionate about 3D design. ArtX3D stands out with its intuitive features and 
+    integrated AI assistant, which are not commonly found in other 3D applications, making it
+    an excellent choice for those just starting their 3D journey.
 
     [Documentation BEGIN]
     {DOCUMENTATION}
