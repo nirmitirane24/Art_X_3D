@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
-import '../styles/propertiesPanel.css';
-import MaterialEditor from './PropertiesComponents/MaterialEditor';
-import SceneEditor from './PropertiesComponents/SceneEditor';
-import VisibilityControls from './PropertiesComponents/VisibilityControls';
-import ShadowControls from './PropertiesComponents/ShadowControls';
+import React, { useState, useRef, useEffect } from "react";
+import "../styles/propertiesPanel.css";
+import MaterialEditor from "./PropertiesComponents/MaterialEditor";
+import SceneEditor from "./PropertiesComponents/SceneEditor";
+import VisibilityControls from "./PropertiesComponents/VisibilityControls";
+import ShadowControls from "./PropertiesComponents/ShadowControls";
 
 const PropertiesPanel = ({
   selectedObjects,
@@ -88,10 +88,10 @@ const PropertiesPanel = ({
     };
   }, [dragging]);
 
-  useEffect(() =>{
-      setInputValue({});
-    },[selectedObject])
- 
+  useEffect(() => {
+    setInputValue({});
+  }, [selectedObject]);
+
   const handleMaterialChange = (newMaterial) => {
     if (selectedObject) {
       updateObject(selectedObject.id, {
@@ -107,9 +107,11 @@ const PropertiesPanel = ({
   if (!selectedObject) {
     return (
       <div className="properties-panel">
-        
-          <SceneEditor sceneObjects={sceneObjects} updateObject={updateObject} sceneSettings={sceneSettings} />
-        
+        <SceneEditor
+          sceneObjects={sceneObjects}
+          updateObject={updateObject}
+          sceneSettings={sceneSettings}
+        />
       </div>
     );
   }
@@ -121,7 +123,7 @@ const PropertiesPanel = ({
         <div>
           <h4>Selected : {selectedObject.type} </h4>
         </div>
-        <hr className="style-six" ></hr>
+        <hr className="style-six"></hr>
         <div className="slider-group">
           <div className="slider-row">
             <h4>Position</h4>
@@ -207,7 +209,7 @@ const PropertiesPanel = ({
           </div>
         </div>
         <div>
-        <hr className="style-six" ></hr>
+          <hr className="style-six"></hr>
           <button
             className="material-editor-button"
             onClick={toggleMaterialEditor}
@@ -236,40 +238,37 @@ const PropertiesPanel = ({
             />
           </div>
         )}
-         <hr className="style-six" ></hr>
+        <hr className="style-six"></hr>
         <VisibilityControls
-            object={selectedObject}
-            updateObject={updateObject}
+          object={selectedObject}
+          updateObject={updateObject}
         />
-         <hr className="style-six" ></hr>
-          <ShadowControls
-            object={selectedObject}
-            updateObject = {updateObject}
-           />
-           <hr className="style-six" ></hr>
+        <hr className="style-six"></hr>
+        <ShadowControls object={selectedObject} updateObject={updateObject} />
+        <hr className="style-six"></hr>
       </div>
-       {isMaterialEditorOpen && (
-                <div
-                    className="material-editor-popout"
-                    style={{
-                        position: 'absolute',
-                        left: materialEditorButtonRef.current
-                        ? materialEditorButtonRef.current.offsetLeft - 310
-                        : 0,
-                        top: materialEditorButtonRef.current
-                        ? materialEditorButtonRef.current.offsetTop
-                        : 0,
-                    }}
-                >
-                    <MaterialEditor
-                        material={selectedObject.material}
-                        onChange={handleMaterialChange}
-                        onClose={toggleMaterialEditor}
-                    />
-                </div>
-             )}
+      {isMaterialEditorOpen && (
+        <div
+          className="material-editor-popout"
+          style={{
+            position: "absolute",
+            left: materialEditorButtonRef.current
+              ? materialEditorButtonRef.current.offsetLeft - 310
+              : 0,
+            top: materialEditorButtonRef.current
+              ? materialEditorButtonRef.current.offsetTop
+              : 0,
+          }}
+        >
+          <MaterialEditor
+            material={selectedObject.material}
+            onChange={handleMaterialChange}
+            onClose={toggleMaterialEditor}
+          />
+        </div>
+      )}
     </>
   );
 };
- 
+
 export default PropertiesPanel;
