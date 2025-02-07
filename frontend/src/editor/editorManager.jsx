@@ -1,4 +1,3 @@
-// --- START OF FILE editorManager.jsx ---
 import React, { useState, useRef, useEffect } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import Toolbar from "./components/Toolbar";
@@ -15,7 +14,7 @@ import UndoRedo from "./components/EditorManagerComponents/undoredo.jsx";
 import KeyboardShortcuts from "./components/EditorManagerComponents/keyshortcuts.jsx";
 import CopyPaste from "./components/EditorManagerComponents/copypaste.jsx";
 //import { CameraHelper } from 'three'; // CameraHelper import -  removed as per instructions
-
+ 
 const EditorManager = () => {
   const [sceneObjects, setSceneObjects] = useState([]);
   const [selectedObjects, setSelectedObjects] = useState([]);
@@ -45,7 +44,7 @@ const EditorManager = () => {
   });
   const sceneRef = useRef(new THREE.Scene());
   const dirLightRef = useRef(); // Ref for the directional light
-
+ 
   const { undo, redo, saveToUndoStack, undoStack, redoStack } = UndoRedo({
     sceneObjects,
     setSceneObjects,
@@ -54,7 +53,7 @@ const EditorManager = () => {
     selectedObjects,
     setSelectedObjects,
   });
-
+ 
   const { copySelectedObjects, pasteCopiedObjects, undoPaste, redoPaste } =
     CopyPaste({
       sceneObjects,
@@ -62,11 +61,11 @@ const EditorManager = () => {
       setSceneObjects,
       saveToUndoStack,
     });
-
+ 
   const deleteSelectedObjects = () => {
     if (selectedObjects.length > 0) {
       saveToUndoStack([...sceneObjects], { ...sceneSettings });
-
+ 
       setSceneObjects((prevObjects) =>
         prevObjects.filter((obj) => {
           if (selectedObjects.includes(obj.id)) {
@@ -85,11 +84,11 @@ const EditorManager = () => {
           return true;
         })
       );
-
+ 
       setSelectedObjects([]);
     }
   };
-
+ 
   const handleDeleteObject = (objectId) => {
     saveToUndoStack([...sceneObjects], { ...sceneSettings });
     setSceneObjects((prevObjects) =>
@@ -99,7 +98,7 @@ const EditorManager = () => {
       prevSelected.filter((id) => id !== objectId)
     );
   };
-
+ 
   const handleArrowKeyMovement = (event) => {
     if (selectedObjects.length > 0) {
       const step = 0.5;
@@ -127,7 +126,7 @@ const EditorManager = () => {
       });
     }
   };
-
+ 
   const addModel = (type) => {
     saveToUndoStack([...sceneObjects], { ...sceneSettings });
     const newObject = {
@@ -147,13 +146,13 @@ const EditorManager = () => {
     };
     setSceneObjects((prevObjects) => [...prevObjects, newObject]);
   };
-
+ 
   const handleObjectSelect = (objectIds) => {
     saveToUndoStack();
     setSelectedObjects(objectIds);
     setCameraEnabled(objectIds.length === 0);
   };
-
+ 
   const updateObject = (objectId, newProps) => {
     if (objectId === "scene") {
       saveToUndoStack([...sceneObjects], { ...sceneSettings });
@@ -170,7 +169,7 @@ const EditorManager = () => {
       );
     }
   };
-
+ 
   const deselectAllObjects = (event) => {
     if (
       event.type === "click" &&
@@ -181,7 +180,7 @@ const EditorManager = () => {
       setCameraEnabled(true);
     }
   };
-
+ 
   const onImportScene = (loadedScene) => {
     saveToUndoStack([...sceneObjects], { ...sceneSettings });
     const sceneGroup = loadedScene.scene || loadedScene;
@@ -206,7 +205,7 @@ const EditorManager = () => {
     };
     setSceneObjects((prevObjects) => [...prevObjects, importedObject]);
   };
-
+ 
   return (
     <div className="editor-container" onClick={deselectAllObjects}>
       <Toolbar
@@ -272,7 +271,7 @@ const EditorManager = () => {
         pasteCopiedObjects={pasteCopiedObjects}
         handleArrowKeyMovement={handleArrowKeyMovement}
       />
-
+ 
       <AIChat />
       <PropertiesCopyPaste
         sceneObjects={sceneObjects}
@@ -283,7 +282,7 @@ const EditorManager = () => {
     </div>
   );
 };
-
+ 
 function SceneContent({
   sceneSettings,
   sceneRef,
@@ -295,7 +294,7 @@ function SceneContent({
   dirLightRef,
 }) {
   const { gl } = useThree();
-
+ 
   useEffect(() => {
     if (gl && sceneSettings.backgroundColor) {
       gl.setClearColor(sceneSettings.backgroundColor);
@@ -324,7 +323,7 @@ function SceneContent({
     sceneSettings.shadowCameraBottom,
     dirLightRef,
   ]);
-
+ 
   return (
     <>
       <ambientLight
@@ -335,7 +334,7 @@ function SceneContent({
         }
       />
       {sceneSettings.lightShadows ? (
-        <directionalLight
+        <pointLight
           ref={dirLightRef}
           position={[
             sceneSettings.lightX,
@@ -348,7 +347,7 @@ function SceneContent({
         />
       ) : null}
       {/* Removed CameraHelper */}
-
+ 
       {sceneSettings.fogEnabled && (
         <fog
           attach="fog"
@@ -376,5 +375,5 @@ function SceneContent({
     </>
   );
 }
-
+ 
 export default EditorManager;
