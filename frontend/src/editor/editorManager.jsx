@@ -1,5 +1,6 @@
+// --- START OF FILE editorManager.jsx ---
 import React, { useState, useRef, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import Toolbar from './components/Toolbar';
 import HierarchyPanel from './components/HierarchyPanel.jsx';
 import PropertiesPanel from './components/PropertiesPanel';
@@ -11,15 +12,14 @@ import './styles/editorManager.css';
 import * as THREE from "three";
 import UndoRedo from './components/EditorManagerComponents/undoredo.jsx';
 import KeyboardShortcuts from './components/EditorManagerComponents/keyshortcuts.jsx';
-import CopyPaste from "./components/EditorManagerComponents/copypaste.jsx";
+import CopyPaste from "./components/EditorManagerComponents/copypaste.jsx";;
+//import { CameraHelper } from 'three'; // CameraHelper import -  removed as per instructions
+
 
 const EditorManager = () => {
     const [sceneObjects, setSceneObjects] = useState([]);
     const [selectedObjects, setSelectedObjects] = useState([]);
-    const [copiedObjects, setCopiedObjects] = useState([]);
     const [cameraEnabled, setCameraEnabled] = useState(true);
-    const [isMoving, setIsMoving] = useState(false);
-    const [isDragging, setIsDragging] = useState(false);
     const [sceneSettings, setSceneSettings] = useState({
         backgroundColor: '#2D2E32',
         effectsEnabled: false,
@@ -30,13 +30,22 @@ const EditorManager = () => {
         ambientShadowsEnabled: false,
         ambientIntensity: 0,
         lightColor: '#ffffff',
-        lightIntensity: 50,
+        lightIntensity: 5,
         lightX: 0,
         lightY: 0,
         lightZ: 0,
         lightShadows: false,
+        shadowMapSize: 1024,
+        shadowCameraNear: 0.1,
+        shadowCameraFar: 50,
+        shadowCameraLeft: -10,
+        shadowCameraRight: 10,
+        shadowCameraTop: 10,
+        shadowCameraBottom: -10,
     });
     const sceneRef = useRef(new THREE.Scene());
+    const dirLightRef = useRef(); // Ref for the directional light
+
 
     const { undo, redo, saveToUndoStack, undoStack, redoStack } = UndoRedo({
         sceneObjects,
@@ -55,7 +64,7 @@ const EditorManager = () => {
     });
 
     const deleteSelectedObjects = () => {
-        if (selectedObjects.length > 0) {
+       if (selectedObjects.length > 0) {
             saveToUndoStack([...sceneObjects], { ...sceneSettings });
 
             setSceneObjects((prevObjects) =>
@@ -82,7 +91,7 @@ const EditorManager = () => {
     };
 
     const handleDeleteObject = (objectId) => {
-        saveToUndoStack([...sceneObjects], { ...sceneSettings });
+       saveToUndoStack([...sceneObjects], { ...sceneSettings });
         setSceneObjects((prevObjects) => prevObjects.filter((obj) => obj.id !== objectId));
         setSelectedObjects((prevSelected) => prevSelected.filter((id) => id !== objectId));
     };
@@ -127,6 +136,8 @@ const EditorManager = () => {
                 color: '#ffffff',
                 metalness: 0,
                 roughness: 0.5,
+                 castShadow: false,
+                receiveShadow: false,
             },
             children: [],
         };
@@ -140,7 +151,7 @@ const EditorManager = () => {
     };
 
     const updateObject = (objectId, newProps) => {
-        if (objectId === 'scene') {
+      if (objectId === 'scene') {
             saveToUndoStack([...sceneObjects], { ...sceneSettings });
             setSceneSettings(prevSettings => ({
                 ...prevSettings,
@@ -157,7 +168,7 @@ const EditorManager = () => {
     };
 
     const deselectAllObjects = (event) => {
-        if (
+       if (
             event.type === 'click' &&
             (event.target.closest('.edit-mode-button') ||
                 event.target.closest('.hierarchy-panel'))
@@ -221,8 +232,9 @@ const EditorManager = () => {
                 </div>
                 <div className="viewport">
                     <Canvas
+                        shadows
                         camera={{ position: [0, 5, 10], fov: 45 }}
-                        style={{ backgroundColor: sceneSettings?.backgroundColor || "#000000" }}
+                        style={{ backgroundColor: sceneSettings.backgroundColor }}
                     >
                         <SceneContent
                             sceneSettings={sceneSettings}
@@ -232,6 +244,8 @@ const EditorManager = () => {
                             setCameraEnabled={setCameraEnabled}
                             updateObject={updateObject}
                             handleObjectSelect={handleObjectSelect}
+                            dirLightRef={dirLightRef}
+
                         />
                         <CameraControls
                             enabled={cameraEnabled}
@@ -243,8 +257,8 @@ const EditorManager = () => {
             <KeyboardShortcuts
                 selectedObjects={selectedObjects}
                 deleteSelectedObjects={deleteSelectedObjects}
-                undo={() => { undo(); undoPaste(); }} // Include undoPaste in main undo
-                redo={() => { redo(); redoPaste(); }} // Include redoPaste in main redo
+                undo={() => { undo(); undoPaste(); }}
+                redo={() => { redo(); redoPaste(); }}
                 copySelectedObjects={copySelectedObjects}
                 pasteCopiedObjects={pasteCopiedObjects}
                 handleArrowKeyMovement={handleArrowKeyMovement}
@@ -255,29 +269,54 @@ const EditorManager = () => {
     );
 };
 
-function SceneContent({ sceneSettings, sceneRef, sceneObjects, selectedObjects, setCameraEnabled, updateObject, handleObjectSelect }) {
+function SceneContent({ sceneSettings, sceneRef, sceneObjects, selectedObjects, setCameraEnabled, updateObject, handleObjectSelect, dirLightRef }) {
     const { gl } = useThree();
-    useEffect(() => {
 
+    useEffect(() => {
         if (gl && sceneSettings.backgroundColor) {
             gl.setClearColor(sceneSettings.backgroundColor);
         }
-    }, [sceneSettings.backgroundColor, gl]);
+        if (dirLightRef.current) {
+            dirLightRef.current.shadow.mapSize.width = sceneSettings.shadowMapSize;
+            dirLightRef.current.shadow.mapSize.height = sceneSettings.shadowMapSize;
+            dirLightRef.current.shadow.camera.near = sceneSettings.shadowCameraNear;
+            dirLightRef.current.shadow.camera.far = sceneSettings.shadowCameraFar;
+            dirLightRef.current.shadow.camera.left = sceneSettings.shadowCameraLeft;
+            dirLightRef.current.shadow.camera.right = sceneSettings.shadowCameraRight;
+            dirLightRef.current.shadow.camera.top = sceneSettings.shadowCameraTop;
+            dirLightRef.current.shadow.camera.bottom = sceneSettings.shadowCameraBottom;
+            dirLightRef.current.shadow.camera.updateProjectionMatrix();
+        }
+    }, [
+        sceneSettings.backgroundColor,
+        gl,
+        sceneSettings.shadowMapSize,
+        sceneSettings.shadowCameraNear,
+        sceneSettings.shadowCameraFar,
+        sceneSettings.shadowCameraLeft,
+        sceneSettings.shadowCameraRight,
+        sceneSettings.shadowCameraTop,
+        sceneSettings.shadowCameraBottom,
+        dirLightRef
+    ]);
 
     return (
         <>
             <ambientLight intensity={sceneSettings.ambientShadowsEnabled ? sceneSettings.ambientIntensity : 0} />
-            {sceneSettings.lightShadows ? (
-                <pointLight
-                    position={[sceneSettings.lightX, sceneSettings.lightY, sceneSettings.lightZ]}
-                    intensity={sceneSettings.lightIntensity}
-                    color={sceneSettings.lightColor}
-                    castShadow={true}
-                />
-            ) : null}
+             {sceneSettings.lightShadows ? (
+            <directionalLight
+                ref={dirLightRef}
+                position={[sceneSettings.lightX, sceneSettings.lightY, sceneSettings.lightZ]}
+                intensity={sceneSettings.lightIntensity}
+                color={sceneSettings.lightColor}
+                castShadow
+            />
+             ) : null}
+           {/* Removed CameraHelper */}
+
             {sceneSettings.fogEnabled && <fog attach="fog" args={[sceneSettings.fogColor, sceneSettings.fogNear, sceneSettings.fogFar]} />}
             <gridHelper args={[10, 10]} />
-            <GroundPlane receiveShadow={true} />
+            <GroundPlane  />
             <group ref={sceneRef}>
                 {sceneObjects.map((object) => (
                     <Model

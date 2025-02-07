@@ -1,3 +1,4 @@
+// --- START OF FILE model.jsx ---
 import React, { useRef, useEffect, useState } from 'react';
 import { TransformControls } from '@react-three/drei';
 import * as THREE from 'three';
@@ -130,6 +131,8 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
                     sheenRoughness: object.material.sheenRoughness === undefined ? 0 : object.material.sheenRoughness,
                      wireframe: object.material.wireframe || false,
                     flatShading: object.material.flatShading || false,
+                     castShadow: object.material.castShadow !== undefined ? object.material.castShadow : false, // Default to false if undefined
+                    receiveShadow: object.material.receiveShadow !== undefined ? object.material.receiveShadow : false, // Default to false
                 })
               }
 
@@ -155,6 +158,8 @@ const Model = ({ object, isSelected, setCameraEnabled, onSelect, onUpdateObject 
                     thickness: object.material.thickness === undefined ? 0 : object.material.thickness,
                   wireframe: object.material.wireframe || false,
                     flatShading: object.material.flatShading || false,
+                    castShadow: object.material.castShadow !== undefined ? object.material.castShadow : false, // Default to false if undefined
+                    receiveShadow: object.material.receiveShadow !== undefined ? object.material.receiveShadow : false, // Default to false
                 });
             }
              mesh.material = newMaterial;
