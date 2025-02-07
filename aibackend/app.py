@@ -77,7 +77,6 @@ Table of Contents:
             *   Receive Shadow: Determines whether the object receives shadows cast by other objects in the scene. (Boolean: true/false)
         3.3.4 Scene Settings
             * Background color
-            * Effects Enabled: Enables/disables the screen effects
             * Ambient Shadows Enabled: ambient shadows settings enable / disable
             * Ambient Intensity: Sets the ambient intensity of the ambient light in the scene
             * Light Settings
@@ -106,6 +105,16 @@ Table of Contents:
                 *   Scaling
             *   Precision Movement Techniques
             *   Resetting Transformations
+    3.5. Copying and Pasting Properties: Streamline Your Workflow
+        3.5.1. Copying Properties: Ctrl+A
+            1.  Select the single object whose properties you want to copy.
+            2.  Press Ctrl+A (or Cmd+A on macOS). This will copy the Position, Rotation, Scale, and Material properties of the selected object.  A message will appear in the console to confirm that the properties have been copied.
+
+        3.5.2. Pasting Properties: Ctrl+Q
+            1.  Select one or more objects to which you want to paste the copied properties.
+            2.  Press Ctrl+Q (or Cmd+Q on macOS). This will paste the copied properties onto all selected objects. A message will appear in the console to confirm that the properties have been pasted.
+            3.  **Note:** Only the Position, Rotation, Scale, and Material properties will be pasted.  Other object-specific properties will not be affected.
+            4.  Note: The object must be selected, properties are not copied if there are no models in the editor.
 
 4. Importing and Exporting
     4.1. Importing External 3D Models
@@ -124,7 +133,6 @@ Table of Contents:
 5. Advanced Features
     5.1. Lighting and Shadows: Creating Realistic Scenes
     5.2. Materials and Textures: Adding Detail and Realism
-    5.3. Special Effects (If any)
     5.4. Collaboration Features (If any)
 
 6. Troubleshooting
@@ -493,8 +501,7 @@ def ask_ai(query):
     integrated AI assistant, which are not commonly found in other 3D applications, making it
     an excellent choice for those just starting their 3D journey.
     THe creator of the ArtX3D is Pranav Patil (21101B0051) , Aniket Mahajan (21101B0059) & Nirmiti Rane (21101B0073).
-    Response should be plain text only.
-
+    Response should be plain text only .
     [Documentation BEGIN]
     {DOCUMENTATION}
     [Documentation END]
