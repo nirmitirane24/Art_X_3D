@@ -11,7 +11,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Gemini API Configuration (Ensure GOOGLE_API_KEY is set in your environment)
-GOOGLE_API_KEY = "AIzaSyAfjxspY7BO7MYK8PGMaj3sV4QmcJUZQBo"  #api key takaychi ahe ("GOOGLE_API_KEY")
+GOOGLE_API_KEY = ""  #api key takaychi ahe ("GOOGLE_API_KEY")
 if not GOOGLE_API_KEY:
     raise ValueError("GOOGLE_API_KEY environment variable not set.")
 
