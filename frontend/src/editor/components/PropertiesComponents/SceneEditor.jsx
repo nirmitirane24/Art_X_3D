@@ -1,5 +1,3 @@
-//--- START OF FILE SceneEditor.jsx ---
-
 import React, { useState, useRef, useEffect } from 'react';
 import './sceneEditor.css';
 import { SketchPicker } from 'react-color';
@@ -22,7 +20,7 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
     const [lightY, setLightY] = useState(sceneSettings.lightY || 0);
     const [lightZ, setLightZ] = useState(sceneSettings.lightZ || 0);
     const [lightShadows, setLightShadows] = useState(sceneSettings.lightShadows || false);
- 
+
     // Shadow Camera Controls
     const [shadowMapSize, setShadowMapSize] = useState(sceneSettings.shadowMapSize || 1024);
     const [shadowCameraNear, setShadowCameraNear] = useState(sceneSettings.shadowCameraNear || 0.1);
@@ -31,16 +29,16 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
     const [shadowCameraRight, setShadowCameraRight] = useState(sceneSettings.shadowCameraRight || 10);
     const [shadowCameraTop, setShadowCameraTop] = useState(sceneSettings.shadowCameraTop || 10);
     const [shadowCameraBottom, setShadowCameraBottom] = useState(sceneSettings.shadowCameraBottom || -10);
- 
- 
+
+
     const bgColorPickerRef = useRef(null);
     const fogColorPickerRef = useRef(null);
     const lightColorPickerRef = useRef(null);
     const bgColorId = useRef(Date.now() + Math.random());
     const fogColorId = useRef(Date.now() + Math.random());
     const lightColorId = useRef(Date.now() + Math.random());
- 
- 
+
+
     useEffect(() => {
         // Set local states with initial or updated values from sceneSettings
         setBgColor(sceneSettings.backgroundColor || '#000000');
@@ -57,7 +55,7 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
         setLightY(sceneSettings.lightY || 0);
         setLightZ(sceneSettings.lightZ || 0);
         setLightShadows(sceneSettings.lightShadows || false);
- 
+
         setShadowMapSize(sceneSettings.shadowMapSize || 1024);
         setShadowCameraNear(sceneSettings.shadowCameraNear || 0.1);
         setShadowCameraFar(sceneSettings.shadowCameraFar || 50);
@@ -65,9 +63,9 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
         setShadowCameraRight(sceneSettings.shadowCameraRight || 10);
         setShadowCameraTop(sceneSettings.shadowCameraTop || 10);
         setShadowCameraBottom(sceneSettings.shadowCameraBottom || -10);
- 
+
     }, [sceneSettings]);
- 
+
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -176,7 +174,7 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
         updateObject('scene', { lightShadows: event.target.checked });
     };
 
-     const handleShadowMapSizeChange = (event) => {
+    const handleShadowMapSizeChange = (event) => {
         const value = parseInt(event.target.value, 10);
         setShadowMapSize(value);
         updateObject('scene', { shadowMapSize: value });
@@ -189,7 +187,7 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
     };
 
     const handleShadowCameraFarChange = (event) => {
-         const value = parseFloat(event.target.value);
+        const value = parseFloat(event.target.value);
         setShadowCameraFar(value);
         updateObject('scene', { shadowCameraFar: value });
     };
@@ -201,19 +199,19 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
     };
 
     const handleShadowCameraRightChange = (event) => {
-       const value = parseFloat(event.target.value);
+        const value = parseFloat(event.target.value);
         setShadowCameraRight(value);
         updateObject('scene', { shadowCameraRight: value });
     };
 
     const handleShadowCameraTopChange = (event) => {
-       const value = parseFloat(event.target.value);
+        const value = parseFloat(event.target.value);
         setShadowCameraTop(value);
         updateObject('scene', { shadowCameraTop: value });
     };
 
     const handleShadowCameraBottomChange = (event) => {
-       const value = parseFloat(event.target.value);
+        const value = parseFloat(event.target.value);
         setShadowCameraBottom(value);
         updateObject('scene', { shadowCameraBottom: value });
     };
@@ -260,75 +258,78 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
                     <input type="checkbox" checked={lightShadows} onChange={handleLightShadowsChange} />
                     <span className="slider round"></span>
                 </label>
-                <div className="light-container">
-                    <div className="light-color-container">
-                        <div
-                            className="color-preview"
-                            style={{ backgroundColor: lightColor }}
-                            onClick={() => handleLightColorToggle()}
-                        />
-                    </div>
-                    <div className={`color-picker-inline ${lightColorPickerOpen ? 'open' : ''}`} ref={lightColorPickerRef} style={{ marginTop: '-11px' }}>
-                        {lightColorPickerOpen && (
-                            <SketchPicker
-                                color={lightColor}
-                                onChangeComplete={handleLightColorChangeComplete} // Use onChangeComplete to close after selection
-                                disableAlpha={true}
-                                presetColors={[]}
-                                id={lightColorId.current}
-                            />
-                        )}
-                    </div>
-                    <label style={{ marginLeft: '-93px' }}>
-                        Intensity
-                        <input
-                            type="number"
-                            className="light-input"
-                            placeholder="Intensity"
-                            value={lightIntensity}
-                            onChange={handleLightIntensityChange}
-                        />
-                    </label>
-                </div>
-                <div className="light-container-position">
-                    <label>
-                        X
-                        <input
-                            type="number"
-                            className="light-input"
-                            placeholder="X"
-                            value={lightX}
-                            onChange={handleLightXChange}
-                        />
-                    </label>
-                    <label>
-                        Y
-                        <input
-                            type="number"
-                            className="light-input"
-                            placeholder="Y"
-                            value={lightY}
-                            onChange={handleLightYChange}
-                        />
-                    </label>
-                    <label>
-                        Z
-                        <input
-                            type="number"
-                            className="light-input"
-                            placeholder="Z"
-                            value={lightZ}
-                            onChange={handleLightZChange}
-                        />
-                    </label>
-                </div>
-
+                {lightShadows && (
+                    <>
+                        <div className="light-container">
+                            <div className="light-color-container">
+                                <div
+                                    className="color-preview"
+                                    style={{ backgroundColor: lightColor }}
+                                    onClick={() => handleLightColorToggle()}
+                                />
+                            </div>
+                            <div className={`color-picker-inline ${lightColorPickerOpen ? 'open' : ''}`} ref={lightColorPickerRef} style={{ marginTop: '-11px' }}>
+                                {lightColorPickerOpen && (
+                                    <SketchPicker
+                                        color={lightColor}
+                                        onChangeComplete={handleLightColorChangeComplete} // Use onChangeComplete to close after selection
+                                        disableAlpha={true}
+                                        presetColors={[]}
+                                        id={lightColorId.current}
+                                    />
+                                )}
+                            </div>
+                            <label style={{ marginLeft: '-93px' }}>
+                                Intensity
+                                <input
+                                    type="number"
+                                    className="light-input"
+                                    placeholder="Intensity"
+                                    value={lightIntensity}
+                                    onChange={handleLightIntensityChange}
+                                />
+                            </label>
+                        </div>
+                        <div className="light-container-position">
+                            <label>
+                                X
+                                <input
+                                    type="number"
+                                    className="light-input"
+                                    placeholder="X"
+                                    value={lightX}
+                                    onChange={handleLightXChange}
+                                />
+                            </label>
+                            <label>
+                                Y
+                                <input
+                                    type="number"
+                                    className="light-input"
+                                    placeholder="Y"
+                                    value={lightY}
+                                    onChange={handleLightYChange}
+                                />
+                            </label>
+                            <label>
+                                Z
+                                <input
+                                    type="number"
+                                    className="light-input"
+                                    placeholder="Z"
+                                    value={lightZ}
+                                    onChange={handleLightZChange}
+                                />
+                            </label>
+                        </div>
+                    </>
+                )}
             </div>
             <hr className="style-six" ></hr>
-             {/* Shadow Controls */}
+            {/* Shadow Controls */}
             <div className="shadow-controls-section">
                 <h4>Shadow</h4>
-                <label style={{ marginRight : "12px"}}>
+                <label style={{ marginRight: "12px" }}>
                     Map Size
                     <select value={shadowMapSize} onChange={handleShadowMapSizeChange}>
                         <option value={512}>512</option>
@@ -380,13 +381,15 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
                     <input type="checkbox" checked={ambientShadowsEnabled} onChange={handleAmbientShadowsChange} />
                     <span className="slider round"></span>
                 </label>
-                <input
-                    type="number"
-                    className="ambient-input"
-                    placeholder="Intensity"
-                    value={ambientIntensity}
-                    onChange={handleAmbientIntensityChange}
-                />
+                {ambientShadowsEnabled && (
+                    <input
+                        type="number"
+                        className="ambient-input"
+                        placeholder="Intensity"
+                        value={ambientIntensity}
+                        onChange={handleAmbientIntensityChange}
+                    />
+                )}
             </div>
             <hr className="style-six" ></hr>
 

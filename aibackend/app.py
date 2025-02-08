@@ -108,13 +108,23 @@ Table of Contents:
     3.5. Copying and Pasting Properties: Streamline Your Workflow
         3.5.1. Copying Properties: Ctrl+A
             1.  Select the single object whose properties you want to copy.
-            2.  Press Ctrl+A (or Cmd+A on macOS). This will copy the Position, Rotation, Scale, and Material properties of the selected object.  A message will appear in the console to confirm that the properties have been copied.
+            2.  Press Ctrl+A (or Cmd+A on macOS). This will copy the Position, Rotation, Scale, and all the  Material properties of the selected object.  A message will appear in the console to confirm that the properties have been copied.
 
         3.5.2. Pasting Properties: Ctrl+Q
             1.  Select one or more objects to which you want to paste the copied properties.
             2.  Press Ctrl+Q (or Cmd+Q on macOS). This will paste the copied properties onto all selected objects. A message will appear in the console to confirm that the properties have been pasted.
-            3.  **Note:** Only the Position, Rotation, Scale, and Material properties will be pasted.  Other object-specific properties will not be affected.
+            3.  **Note:** Only the Position, Rotation, Scale, and all the Material properties will be pasted. 
             4.  Note: The object must be selected, properties are not copied if there are no models in the editor.
+
+3.6. Copying and Pasting Object: Streamline Your Workflow
+        3.6.1. Copying Object: Ctrl+C
+            1.  Select the single object which you want to copy.
+            2.  Press Ctrl+C (or Cmd+C on macOS). This will copy the object.
+
+        3.6.2. Pasting Properties: Ctrl+V
+            1.  Pasting the object where evr you want.
+            2.  Press Ctrl+V (or Cmd+V on macOS). This will paste the object which was previously selected for copying.
+            3.  Note: The object must be selected, for copying there are no models in the editor.
 
 4. Importing and Exporting
     4.1. Importing External 3D Models
@@ -133,7 +143,7 @@ Table of Contents:
 5. Advanced Features
     5.1. Lighting and Shadows: Creating Realistic Scenes
     5.2. Materials and Textures: Adding Detail and Realism
-    5.4. Collaboration Features (If any)
+    
 
 6. Troubleshooting
     6.1. Common Issues and Solutions

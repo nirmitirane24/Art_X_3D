@@ -12,6 +12,8 @@ const MaterialEditor = ({ material, onChange, onClose }) => {
     const [showAdvanced, setShowAdvanced] = useState(false);
     const colorId = useRef(Date.now() + Math.random())
     const emissiveId = useRef(Date.now() + Math.random())
+    const [textureFile, setTextureFile] = useState(material.texture || null);
+    const [normalMapFile, setNormalMapFile] = useState(material.normalMap || null);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -46,6 +48,17 @@ const MaterialEditor = ({ material, onChange, onClose }) => {
             setEmissivePickerOpen(!emissivePickerOpen)
             setColorPickerOpen(false)
         }
+    };
+    const handleTextureChange = (e) => {
+        const file = e.target.files[0];
+        setTextureFile(file); // Update local state
+        handleMaterialChange('texture', file); // Update object material
+    };
+
+    const handleNormalMapChange = (e) => {
+        const file = e.target.files[0];
+        setNormalMapFile(file); // Update local state
+        handleMaterialChange('normalMap', file); // Update object material
     };
 
 
@@ -143,7 +156,7 @@ const MaterialEditor = ({ material, onChange, onClose }) => {
                     onChange={(e) => handleMaterialChange('opacity', parseFloat(e.target.value))}
                 />
             </div>
-<br></br>
+            <br></br>
             <div>
                 <button className='advanced-button' onClick={() => setShowAdvanced(!showAdvanced)}>
                     Advanced Properties {showAdvanced ? '▲' : '▼ '}
@@ -247,16 +260,30 @@ const MaterialEditor = ({ material, onChange, onClose }) => {
                         <input
                             type="file"
                             accept="image/*"
-                            onChange={(e) => handleMaterialChange('texture', e.target.files[0])}
+                            onChange={handleTextureChange}
                         />
+                       {textureFile && typeof textureFile === 'string' ? (
+                            <p>Current Texture: {textureFile}</p>
+                        ) : textureFile && textureFile.name ? (
+                            <p className='ptag'>Current Texture: {textureFile.name}</p>
+                        ) : (
+                            <p className='ptag'>No texture selected</p>
+                        )}
                     </div>
                     <div>
                         <h5>Normal Map</h5>
                         <input
                             type="file"
                             accept="image/*"
-                            onChange={(e) => handleMaterialChange('normalMap', e.target.files[0])}
+                            onChange={handleNormalMapChange}
                         />
+                          {normalMapFile && typeof normalMapFile === 'string' ? (
+                            <p className='ptag'>Current Normal Map: {normalMapFile}</p>
+                        ) : normalMapFile && normalMapFile.name ? (
+                            <p className='ptag'>Current Normal Map: {normalMapFile.name}</p>
+                        ) : (
+                            <p className='ptag'>No normal map selected</p>
+                        )}
                     </div>
                 </div>
             )}
