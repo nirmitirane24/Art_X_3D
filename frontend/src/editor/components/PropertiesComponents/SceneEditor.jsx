@@ -376,7 +376,7 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
             </div>
             <hr className="style-six" ></hr> */}
             <div>
-                <h4>Ambient Shadows</h4>
+                <h4>Ambient Light</h4>
                 <label className="switch" style={{ marginLeft: '0px', marginTop: '10px' }}>
                     <input type="checkbox" checked={ambientShadowsEnabled} onChange={handleAmbientShadowsChange} />
                     <span className="slider round"></span>
