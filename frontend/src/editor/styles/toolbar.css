@@ -64,10 +64,10 @@
 /* Advanced shape buttons positioning and scrollable behavior */
 .advanced-shape-buttons {
   position: absolute;
-  top: 115%;
+  top: 110%;
   left: 86%;
-  transform: translateX(-50%);
-  width: 25%;
+  transform: translateX(-39%);
+  width: 30%;
   background-color: rgba(40, 40, 40, 0.9); /* Slightly darker background */
   border-radius: 8px;
   padding: 10px;
@@ -105,7 +105,7 @@
 
 /* Scrollbar width */
 .advanced-shape-buttons::-webkit-scrollbar {
-  width: 6px; /* Thin scrollbar width */
+  width: 0px; /* Thin scrollbar width */
 }
 
 .toolbar-text {
@@ -134,26 +134,14 @@
   color:white
 }
 
-.toolbar-button svg {
-  -webkit-filter: invert(100%) brightness(100%);
-  filter: invert(100%) brightness(100%);
-  width: 24px;
-  height: 24px;
-  outline: none;
-}
-
 /* Style for the SVG icon inside the button */
 .toolbar-button svg {
-  -webkit-filter: invert(100%) brightness(100%);
-  filter: invert(100%) brightness(100%);
-  width: 24px;
-  height: 24px;
   outline: none;
 }
 
 .undo-redo-buttons{
   background-color: transparent;
-  font-size: 17px;
+  font-size: 18px;
   margin-top: 2.5px;
 }
 

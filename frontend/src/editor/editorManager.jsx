@@ -13,8 +13,7 @@ import * as THREE from "three";
 import UndoRedo from "./components/EditorManagerComponents/undoredo.jsx";
 import KeyboardShortcuts from "./components/EditorManagerComponents/keyshortcuts.jsx";
 import CopyPaste from "./components/EditorManagerComponents/copypaste.jsx";
-//import { CameraHelper } from 'three'; // CameraHelper import -  removed as per instructions
- 
+
 const EditorManager = () => {
   const [sceneObjects, setSceneObjects] = useState([]);
   const [selectedObjects, setSelectedObjects] = useState([]);
@@ -44,7 +43,7 @@ const EditorManager = () => {
   });
   const sceneRef = useRef(new THREE.Scene());
   const dirLightRef = useRef(); // Ref for the directional light
- 
+
   const { undo, redo, saveToUndoStack, undoStack, redoStack } = UndoRedo({
     sceneObjects,
     setSceneObjects,
@@ -53,7 +52,7 @@ const EditorManager = () => {
     selectedObjects,
     setSelectedObjects,
   });
- 
+
   const { copySelectedObjects, pasteCopiedObjects, undoPaste, redoPaste } =
     CopyPaste({
       sceneObjects,
@@ -61,11 +60,11 @@ const EditorManager = () => {
       setSceneObjects,
       saveToUndoStack,
     });
- 
+
   const deleteSelectedObjects = () => {
     if (selectedObjects.length > 0) {
       saveToUndoStack([...sceneObjects], { ...sceneSettings });
- 
+
       setSceneObjects((prevObjects) =>
         prevObjects.filter((obj) => {
           if (selectedObjects.includes(obj.id)) {
@@ -84,11 +83,11 @@ const EditorManager = () => {
           return true;
         })
       );
- 
+
       setSelectedObjects([]);
     }
   };
- 
+
   const handleDeleteObject = (objectId) => {
     saveToUndoStack([...sceneObjects], { ...sceneSettings });
     setSceneObjects((prevObjects) =>
@@ -98,7 +97,7 @@ const EditorManager = () => {
       prevSelected.filter((id) => id !== objectId)
     );
   };
- 
+
   const handleArrowKeyMovement = (event) => {
     if (selectedObjects.length > 0) {
       const step = 0.5;
@@ -126,7 +125,7 @@ const EditorManager = () => {
       });
     }
   };
- 
+
   const addModel = (type) => {
     saveToUndoStack([...sceneObjects], { ...sceneSettings });
     const newObject = {
@@ -146,13 +145,16 @@ const EditorManager = () => {
     };
     setSceneObjects((prevObjects) => [...prevObjects, newObject]);
   };
- 
+
   const handleObjectSelect = (objectIds) => {
+    if (!objectIds || objectIds.length === 0) return;
+
     saveToUndoStack();
     setSelectedObjects(objectIds);
-    setCameraEnabled(objectIds.length === 0);
-  };
- 
+    setCameraEnabled(false); // Ensure camera control is disabled when selecting an object
+};
+
+
   const updateObject = (objectId, newProps) => {
     if (objectId === "scene") {
       saveToUndoStack([...sceneObjects], { ...sceneSettings });
@@ -169,7 +171,7 @@ const EditorManager = () => {
       );
     }
   };
- 
+
   const deselectAllObjects = (event) => {
     if (
       event.type === "click" &&
@@ -180,32 +182,64 @@ const EditorManager = () => {
       setCameraEnabled(true);
     }
   };
- 
+
   const onImportScene = (loadedScene) => {
     saveToUndoStack([...sceneObjects], { ...sceneSettings });
+  
     const sceneGroup = loadedScene.scene || loadedScene;
-    const boundingBox = new THREE.Box3().setFromObject(sceneGroup);
-    const center = boundingBox.getCenter(new THREE.Vector3());
-    const size = boundingBox.getSize(new THREE.Vector3());
-    const importedObject = {
-      id: Date.now() + Math.random(),
-      type: sceneGroup.name || "ImportedModel",
-      mesh: sceneGroup,
-      position: [0, 0, 0],
-      rotation: [0, 0, 0],
-      scale: [1, 1, 1],
-      material: "standard",
-      boundingBox: {
-        min: [boundingBox.min.x, boundingBox.min.y, boundingBox.min.z],
-        max: [boundingBox.max.x, boundingBox.max.y, boundingBox.max.z],
-        center: [center.x, center.y, center.z],
-        size: [size.x, size.y, size.z],
-      },
-      children: [],
-    };
-    setSceneObjects((prevObjects) => [...prevObjects, importedObject]);
-  };
- 
+    const childMeshes = [];
+  
+    sceneGroup.traverse((child) => {
+      if (child.isMesh) {
+        // Extract shape name properly
+        let shapeName = child.name && !child.name.startsWith("mesh_") ? child.name : null;
+  
+        // Check geometry type and parameters for common shapes
+        if (!shapeName && child.geometry.parameters) {
+          if (child.geometry.parameters.width !== undefined) shapeName = "Box";
+          else if (child.geometry.parameters.radius !== undefined) shapeName = "Sphere";
+          else if (child.geometry.parameters.radiusTop !== undefined) shapeName = "Cylinder";
+          else if (child.geometry.parameters.innerRadius !== undefined) shapeName = "Torus";
+        }
+  
+        // If no valid name, default to "UnknownShape"
+        if (!shapeName) shapeName = "UnknownShape";
+  
+        const childBoundingBox = new THREE.Box3().setFromObject(child);
+        const childCenter = childBoundingBox.getCenter(new THREE.Vector3());
+        const childSize = childBoundingBox.getSize(new THREE.Vector3());
+  
+        // Extract Material and Texture Information
+        const material = child.material;
+        let materialData = {
+          name: material?.name || "standard",
+          color: material?.color?.getHexString() || "ffffff",
+          texture: material?.map?.image ? material.map.image.src : null,
+        };
+  
+        const childObject = {
+          id: Date.now() + Math.random(),
+          type: shapeName, // Now displays proper shape name
+          mesh: child,
+          position: [child.position.x, child.position.y, child.position.z],
+          rotation: [child.rotation.x, child.rotation.y, child.rotation.z],
+          scale: [child.scale.x, child.scale.y, child.scale.z],
+          material: materialData,
+          boundingBox: {
+            min: [childBoundingBox.min.x, childBoundingBox.min.y, childBoundingBox.min.z],
+            max: [childBoundingBox.max.x, childBoundingBox.max.y, childBoundingBox.max.z],
+            center: [childCenter.x, childCenter.y, childCenter.z],
+            size: [childSize.x, childSize.y, childSize.z],
+          },
+        };
+  
+        childMeshes.push(childObject);
+      }
+    });
+  
+    setSceneObjects((prevObjects) => [...prevObjects, ...childMeshes]);
+  };    
+
   return (
     <div className="editor-container" onClick={deselectAllObjects}>
       <Toolbar
@@ -271,7 +305,7 @@ const EditorManager = () => {
         pasteCopiedObjects={pasteCopiedObjects}
         handleArrowKeyMovement={handleArrowKeyMovement}
       />
- 
+
       <AIChat />
       <PropertiesCopyPaste
         sceneObjects={sceneObjects}
@@ -282,7 +316,7 @@ const EditorManager = () => {
     </div>
   );
 };
- 
+
 function SceneContent({
   sceneSettings,
   sceneRef,
@@ -294,7 +328,7 @@ function SceneContent({
   dirLightRef,
 }) {
   const { gl } = useThree();
- 
+
   useEffect(() => {
     if (gl && sceneSettings.backgroundColor) {
       gl.setClearColor(sceneSettings.backgroundColor);
@@ -323,7 +357,7 @@ function SceneContent({
     sceneSettings.shadowCameraBottom,
     dirLightRef,
   ]);
- 
+
   return (
     <>
       <ambientLight
@@ -347,7 +381,7 @@ function SceneContent({
         />
       ) : null}
       {/* Removed CameraHelper */}
- 
+
       {sceneSettings.fogEnabled && (
         <fog
           attach="fog"
@@ -367,7 +401,7 @@ function SceneContent({
             object={object}
             isSelected={selectedObjects.includes(object.id)}
             setCameraEnabled={setCameraEnabled}
-            onSelect={handleObjectSelect}
+            onSelect={() => handleObjectSelect([object.id])}
             onUpdateObject={updateObject}
           />
         ))}
@@ -375,5 +409,5 @@ function SceneContent({
     </>
   );
 }
- 
+
 export default EditorManager;

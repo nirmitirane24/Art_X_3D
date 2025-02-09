@@ -64,8 +64,17 @@ const Model = ({
       // Store original materials
       const originalMats = {};
       meshRef.current.traverse((child) => {
-        if (child.isMesh) {
-          originalMats[child.uuid] = child.material;
+        if (child.isMesh && child.material) {
+          // Validate material before storing
+          if (child.material instanceof THREE.Material) {
+            originalMats[child.uuid] = child.material;
+          } else {
+            console.warn("Invalid material for mesh:", child);
+            // Provide a fallback material
+            originalMats[child.uuid] = new THREE.MeshStandardMaterial({
+              color: 0xffffff,
+            });
+          }
         }
       });
       setOriginalMaterials(originalMats);
@@ -95,7 +104,7 @@ const Model = ({
     }
     let newMaterial;
     if (object.mesh) {
-      if (originalMaterials[mesh.uuid]) {
+      if (originalMaterials[mesh.uuid] && originalMaterials[mesh.uuid].clone) {
         newMaterial = originalMaterials[mesh.uuid].clone();
         if (object.material && object.material.color && newMaterial.color) {
           newMaterial.color = new THREE.Color(object.material.color);

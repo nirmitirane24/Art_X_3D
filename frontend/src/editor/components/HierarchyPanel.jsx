@@ -4,6 +4,7 @@ import { FaTrash } from "react-icons/fa";
 import Import from "./HierarchyComponents/Import";
 import Export from "./HierarchyComponents/Export";
 import Library from "./HierarchyComponents/Library";
+import { shapeIcons } from "./Toolbar/ShapeButton";
 
 const HierarchyPanel = ({ sceneObjects = [], selectedObjects, onImportScene, onObjectSelect, onObjectDelete, scene }) => {
     const [searchTerm, setSearchTerm] = useState("");
@@ -57,17 +58,14 @@ const HierarchyPanel = ({ sceneObjects = [], selectedObjects, onImportScene, onO
                 height: "1px",
                 backgroundImage: "linear-gradient(to right, rgba(208, 200, 200, 0), rgba(103, 102, 102, 0.75), rgba(136, 130, 130, 0))"
             }}></hr>
-            <div className="search-bar-container">
-                <div className="search-input-container">
-                    <input
-                        type="text"
-                        placeholder="Search..."
-                        value={searchTerm}
-                        onChange={handleSearchChange}
-                        className="search-input"
-                    />
-                </div>
-            </div>
+
+            <input
+                type="text"
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="search-input"
+            />
             <ul className="objects-list">
                 {objectsWithDynamicIds.length === 0 ? (
                     <p className="no-objects">No models added</p>
@@ -81,7 +79,7 @@ const HierarchyPanel = ({ sceneObjects = [], selectedObjects, onImportScene, onO
                                     display: "flex",
                                     justifyContent: "space-between",
                                     alignItems: "center",
-                                    padding: "8px",
+                                    padding: "7px",
                                     backgroundColor: selectedObjects.includes(obj.id) ? "rgba(90, 90, 90, 0.8)" : "transparent",
                                     borderRadius: "5px",
                                     cursor: "pointer",
@@ -89,6 +87,10 @@ const HierarchyPanel = ({ sceneObjects = [], selectedObjects, onImportScene, onO
                                 }}
                                 onClick={() => onObjectSelect([obj.id])}
                             >
+                                {/* Render the shape SVG icon */}
+                                <span style={{ width: "25px", height: "25px", marginRight: "8px", color: 'black' }}>
+                                    {shapeIcons[obj.type] || null}
+                                </span>
                                 <span style={{ flexGrow: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                                     {obj.displayId}
                                 </span>
@@ -97,7 +99,7 @@ const HierarchyPanel = ({ sceneObjects = [], selectedObjects, onImportScene, onO
                                     style={{
                                         position: "absolute",
                                         right: "10px",
-                                        color: "rgba(255, 255, 255, 0.7)",
+                                        color: "rgba(255, 255, 255, 0.93)",
                                         cursor: "pointer",
                                     }}
                                     onClick={(e) => {

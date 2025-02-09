@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaTimes, FaFileAlt} from "react-icons/fa";
+import { FaTimes, FaFileAlt } from "react-icons/fa";
 import "./styles/home.css";
 import { useNavigate } from "react-router-dom";
 
@@ -88,7 +88,7 @@ const Home = () => {
         </header>
 
         {isImportPanelOpen && (
-          <div className="import-panel">
+          <div className="import-home">
             <div className="import-panel-header">
               <h2>Import or Drag & Drop</h2>
               <FaTimes className="close-icon" onClick={handleClosePanel} />
@@ -102,23 +102,8 @@ const Home = () => {
               <p>Drag & Drop files here or choose an option below</p>
             </div>
             <div className="import-options">
-              <button className="import-option" onClick={() => handleFileInput("video/mp4")}>
-                Video (MP4)
-              </button>
               <button className="import-option" onClick={() => handleFileInput(".gltf,.glb,.stl,.fbx,.obj")}>
                 3D Model (GLTF, STL, FBX, OBJ)
-              </button>
-              <button className="import-option" onClick={() => handleFileInput("audio/mpeg,audio/wav")}>
-                Sound (MP3, WAV)
-              </button>
-              <button className="import-option" onClick={() => handleFileInput("image/svg+xml")}>
-                Vector (SVG)
-              </button>
-              <button className="import-option" onClick={() => handleFileInput("image/jpeg,image/png")}>
-                Image (JPG, PNG)
-              </button>
-              <button className="import-option" onClick={() => handleFileInput(".ply")}>
-                Gaussian Splat (PLY)
               </button>
             </div>
           </div>
@@ -172,14 +157,29 @@ const Home = () => {
               <FaFileAlt style={{ marginRight: "8px" }} />
               <p>New File</p>
             </div>
-            {/* Existing Projects */}
             <div className="project-card">
+              <div onClick={() => navigate('/editor')} className="project-thumbnail"></div>
+              <p className="project-title">Untitled</p>
+              <span className="project-date"></span>
+              <p>3D Space</p>
             </div>
             <div className="project-card">
+              <div className="project-thumbnail"></div>
+              <p className="project-title">Mini Room - Art - Copy</p>
+              <span className="project-date"></span>
+              <p>3D Gummy Bear</p>
             </div>
             <div className="project-card">
+              <div className="project-thumbnail"></div>
+              <p className="project-title">3D icons</p>
+              <span className="project-date"></span>
+              <p>Packages</p>
             </div>
             <div className="project-card">
+            <div className="project-thumbnail"></div>
+              <p className="project-title">Untitled</p>
+              <span className="project-date"></span>
+              <p></p>
             </div>
           </div>
         </section>
@@ -189,12 +189,28 @@ const Home = () => {
           <h2>Tutorials</h2>
           <div className="tutorials-grid">
             <div className="tutorial-card">
+            <div className="project-thumbnail"></div>
+              <p className="project-title">Untitled</p>
+              <span className="project-date"></span>
+              <p></p>
             </div>
             <div className="tutorial-card">
+            <div className="project-thumbnail"></div>
+              <p className="project-title">Untitled</p>
+              <span className="project-date"></span>
+              <p></p>
             </div>
             <div className="tutorial-card">
+            <div className="project-thumbnail"></div>
+              <p className="project-title">Untitled</p>
+              <span className="project-date"></span>
+              <p></p>
             </div>
             <div className="tutorial-card">
+            <div className="project-thumbnail"></div>
+              <p className="project-title">Untitled</p>
+              <span className="project-date"></span>
+              <p></p>
             </div>
           </div>
         </section>

@@ -85,23 +85,15 @@ body::-webkit-scrollbar-corner {
     color: #fff;
 }
 
-.new-tag {
-    background-color: rgb(255, 56, 86);
-    color: #fff;
-    border-radius: 2px;
-    padding: 2px;
-    font-size: 10px;
-}
-
 /* Upgrade Section */
 .upgrade-section {
     margin-top: 10px;
 }
 
 .upgrade-button {
-    background-color:rgb(128, 121, 152);
+    background-color:#6866b1;
     border: none;
-    color: black;
+    color: rgb(255, 255, 255);
     padding: 10px;
     width: 100%;
     border-radius: 10px;
@@ -126,7 +118,7 @@ body::-webkit-scrollbar-corner {
     border-radius: 10px;
     border: none;
     margin: 10px; /* Adds space around each button */
-    background-color: rgb(128, 121, 152) ;
+    background-color: #6866b1;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -135,8 +127,9 @@ body::-webkit-scrollbar-corner {
 
 .import-button:hover,
 .generate-button:hover,
-.new-file-button:hover {
-    background-color: #ffffff90;
+.new-file-button:hover,
+.upgrade-button:hover {
+    background-color: #4f4d86;
 }
 
 .import-button:active,
@@ -157,7 +150,6 @@ body::-webkit-scrollbar-corner {
     gap: 20px; /* Space between buttons */
 }
 
-
 /* Projects Section */
 .projects-grid {
     display: grid;
@@ -170,11 +162,11 @@ body::-webkit-scrollbar-corner {
     border-radius: 10px;
     padding: 10px;
     text-align: center;
-    height: 250px;
+    height: 280px;
 }
 
 .project-thumbnail {
-    height: 100px;
+    height: 200px;
     background-color: #444;
     border-radius: 10px;
     margin-bottom: 10px;
@@ -207,7 +199,7 @@ body::-webkit-scrollbar-corner {
     border-radius: 10px;
     text-align: center;
     padding: 10px;
-    height: 250px;
+    height: 280px;
 }
 
 .tutorial-card img {
@@ -263,4 +255,3 @@ body::-webkit-scrollbar-corner {
     background-color: #3a3a5b;
     border-color: #ffffff;
   }
-  

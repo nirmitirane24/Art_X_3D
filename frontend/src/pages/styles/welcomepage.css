@@ -61,10 +61,6 @@ body::-webkit-scrollbar-corner {
   font-weight: 600;
 }
 
-.welcomeBTN:hover {
-  box-shadow: rgb(104, 112, 160) 0px 7px 0px 0px;
-}
-
 .welcomeBTN:active {
   background-color: rgb(255, 56, 86);
   box-shadow: rgb(201, 46, 70) 0px 0px 0px 0px;

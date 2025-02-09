@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter";
 import { OBJExporter } from "three/examples/jsm/exporters/OBJExporter";
 import { STLExporter } from "three/examples/jsm/exporters/STLExporter";
-import { FaFileExport } from "react-icons/fa";
+import { FaFileExport, FaTimes } from "react-icons/fa";
 import * as THREE from "three";
 
 const Export = ({ scene }) => {
@@ -14,6 +14,7 @@ const Export = ({ scene }) => {
 
     const handleExport = (format) => {
         setExportFormat(format);
+        setFileName(""); // Reset file name input field
         setShowFileNameModal(true);
     };
 
@@ -46,6 +47,7 @@ const Export = ({ scene }) => {
         setShowExportPanel(false);
     };
 
+    // === GLTF EXPORT WITH TEXTURES ===
     const exportGLTF = (objects) => {
         const exporter = new GLTFExporter();
         const group = new THREE.Group();
@@ -54,31 +56,72 @@ const Export = ({ scene }) => {
         exporter.parse(
             group,
             (result) => {
-                const output = JSON.stringify(result, null, 2);
-                const blob = new Blob([output], { type: "application/json" });
+                const blob = new Blob([JSON.stringify(result, null, 2)], { type: "application/json" });
                 downloadBlob(blob, `${fileName}.gltf`);
             },
             (error) => {
                 console.error("Error exporting GLTF:", error);
             },
-            { binary: false }
+            { binary: false, embedImages: true } // Ensures textures are embedded
         );
     };
 
     const exportOBJ = (objects) => {
         const exporter = new OBJExporter();
         const group = new THREE.Group();
-        objects.forEach(obj => group.add(obj.clone()));
+
+        objects.forEach(obj => {
+            const clonedObj = obj.clone();
+            clonedObj.userData.id = obj.uuid; // Store unique ID
+            group.add(clonedObj);
+        });
 
         try {
-            const objString = exporter.parse(group);
-            const blob = new Blob([objString], { type: "text/plain" });
-            downloadBlob(blob, `${fileName}.obj`);
+            let objString = "# Exported OBJ with embedded textures\n";
+
+            // Export object shape names & IDs
+            objects.forEach(obj => {
+                objString += `# Object: ${obj.name}, ID: ${obj.uuid}\n`;
+            });
+
+            // Generate OBJ file content
+            objString += exporter.parse(group);
+
+            // Process textures and embed them as Base64
+            const texturePromises = objects.map(obj => {
+                if (obj.material && obj.material.map && obj.material.map.image) {
+                    return convertTextureToBase64(obj.material.map.image).then(base64 => {
+                        objString += `# Embedded Texture for ${obj.name}: data:image/jpeg;base64,${base64}\n`;
+                    });
+                }
+                return Promise.resolve();
+            });
+
+            // After processing all textures, save the file
+            Promise.all(texturePromises).then(() => {
+                const blob = new Blob([objString], { type: "text/plain" });
+                downloadBlob(blob, `${fileName}.obj`);
+            });
+
         } catch (error) {
             console.error("Error exporting OBJ:", error);
         }
     };
 
+    // ✅ Convert texture to Base64
+    const convertTextureToBase64 = (image) => {
+        return new Promise((resolve) => {
+            const canvas = document.createElement("canvas");
+            canvas.width = image.width;
+            canvas.height = image.height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(image, 0, 0);
+
+            resolve(canvas.toDataURL("image/jpeg").split(",")[1]); // Extract Base64
+        });
+    };
+
+    // === STL EXPORT (STL DOES NOT SUPPORT TEXTURES) ===
     const exportSTL = (objects) => {
         const exporter = new STLExporter();
         const group = new THREE.Group();
@@ -93,6 +136,7 @@ const Export = ({ scene }) => {
         }
     };
 
+    // === Helper to Download Blob ===
     const downloadBlob = (blob, filename) => {
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
@@ -102,6 +146,37 @@ const Export = ({ scene }) => {
         document.body.removeChild(link);
     };
 
+    const exportPanelRef = useRef(null);
+    const fileNameModalRef = useRef(null);
+
+    // Close panels when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (exportPanelRef.current && !exportPanelRef.current.contains(event.target)) {
+                setShowExportPanel(false);
+            }
+            if (fileNameModalRef.current && !fileNameModalRef.current.contains(event.target)) {
+                setShowFileNameModal(false);
+            }
+        };
+
+        if (showExportPanel || showFileNameModal) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+
+        if (showFileNameModal) {
+            setShowExportPanel(false);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [showExportPanel, showFileNameModal]);
+
+    const handleClosePanel = () => {
+        setShowExportPanel(false);
+    };
+
     return (
         <div>
             <button onClick={() => setShowExportPanel(true)}>
@@ -109,33 +184,47 @@ const Export = ({ scene }) => {
             </button>
 
             {showExportPanel && (
-                <div className="export-panel">
+                <div className="export-panel" ref={exportPanelRef}>
                     <h3>Export Scene</h3>
+                    <FaTimes onClick={handleClosePanel} style={{
+                        position: "absolute",
+                        top: "20px",
+                        right: "20px",
+                        cursor: "pointer",
+                        fontSize: "20px",
+                    }} />
                     {isExporting ? (
                         <div className="loading-indicator">Exporting...</div>
                     ) : (
                         <div className="import-options">
-                            <button onClick={() => handleExport("gltf")}>Export as GLTF</button>
-                            <button onClick={() => handleExport("obj")}>Export as OBJ</button>
-                            <button onClick={() => handleExport("stl")}>Export as STL</button>
+                            <button className="modal-buttons" onClick={() => handleExport("gltf")}>Export as GLTF</button>
+                            <button className="modal-buttons" onClick={() => handleExport("obj")}>Export as OBJ</button>
+                            <button className="modal-buttons" onClick={() => handleExport("stl")}>Export as STL</button>
                         </div>
                     )}
-                    <button onClick={() => setShowExportPanel(false)}>Close</button>
                 </div>
             )}
 
             {showFileNameModal && (
-                <div className="file-name-modal">
+                <div className="file-name-modal" ref={fileNameModalRef}>
                     <h3>Enter File Name</h3>
                     <input
                         type="text"
                         value={fileName}
                         onChange={(e) => setFileName(e.target.value)}
                         placeholder="Enter file name"
+                        className="search-input"
                     />
-                    <div className="modal-buttons">
-                        <button onClick={confirmExport}>Export</button>
-                        <button onClick={() => setShowFileNameModal(false)}>Cancel</button>
+                    <div className="import-options">
+                        <button className="modal-buttons" onClick={confirmExport}>Export</button>
+                        <button className="modal-buttons"
+                            onClick={() => {
+                                setShowFileNameModal(false);
+                                setShowExportPanel(true); // Reopen Export Panel when Cancel is clicked
+                            }}
+                        >
+                            Cancel
+                        </button>
                     </div>
                 </div>
             )}

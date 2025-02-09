@@ -41,21 +41,8 @@
   background-color: rgb(54, 54, 54);
 }
 
-.search-bar-container {
-  margin-left: -6px;
-  margin-top: 5px;
-  position: relative;
-  max-width: 400px;
-}
-
-.search-input-container {
-  display: flex;
-  align-items: center;
-}
-
 .objects-list {
   list-style: none;
-  margin: 0;
   padding: 0;
   flex-grow: 1; /* Allow the object list to expand and take available space */
   overflow-y: auto; /* Make the object list scrollable */
@@ -93,12 +80,11 @@
 
 /* Scrollbar width */
 .objects-list::-webkit-scrollbar {
-  width: 6px; /* Thin scrollbar width */
+  width: 0px; /* Thin scrollbar width */
 }
 
 .objects-list li {
-  cursor: pointer;
-  padding: 8px 10px; /* Increase padding */
+  cursor: pointer; /* Increase padding */
   border: none;
   display: flex; /* Use flexbox to align icon and text */
 }
@@ -115,13 +101,12 @@
 }
 
 .panel-buttons {
-  margin-top: 10px;
   border-radius: 5px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 10px 0;
-  background-color: transparent; /* Semi-transparent dark background */
+  background-color: #5c6267; /* Semi-transparent dark background */
   position: sticky; /* Fix the buttons at the bottom */
   bottom: 0;
   width: 109%;
@@ -130,7 +115,7 @@
 .panel-buttons button {
   background-color: transparent; /* Match the theme */
   border: none;
-  color: rgb(255, 255, 255);
+  color: rgb(207, 207, 207);
   padding: 8px 12px;
   border-radius: 5px;
   font-weight: bold;
@@ -140,7 +125,7 @@
 }
 
 .panel-buttons button:hover {
-  color: rgb(214, 214, 214);
+  color: rgb(255, 255, 255);
 }
 
 .no-objects {
@@ -154,8 +139,7 @@
   transform: translate(-50%, -50%);
   background-color:#16161acc; /* Semi-transparent dark background - as requested */
   padding: 25px; /* Slightly reduced padding */
-  border-radius: 12px; /* More rounded corners */
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); /* Stronger shadow */
+  border-radius: 12px;
   color: #eee; /* Light text color - as requested */
   text-align: center;
   z-index: 1000;
@@ -180,13 +164,11 @@
   background-color:#16161acc; /* Semi-transparent dark background - as requested */
   padding: 25px; /* Slightly reduced padding */
   border-radius: 12px; /* More rounded corners */
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); /* Stronger shadow */
   color: #eee; /* Light text color - as requested */
   text-align: center;
   z-index: 1000;
-  width: 380px; /* Slightly reduced width for panel */
-  max-width: 90vw; /* Responsive width */
-  border: 5px solid #16161aed; /* Add a subtle border for definition */
+  width: 20vw; /* Responsive width */
+  border: none; /* Add a subtle border for definition */
 }
 
 .import-panel h3 {
@@ -222,16 +204,6 @@
 .modal-buttons:hover {
   background-color: #333; /* Slightly lighter dark on hover */
   border: none; /* Lighter border on hover */
-  color: #fff; /* White text on hover for contrast */
-  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.4); /* Shadow on hover */
-}
-
-.modal-buttons:disabled {
-  background-color: #333; /* Greyed out for disabled state, but still dark */
-  border-color: #444; /* Darker border for disabled */
-  color: #777; /* Darker text for disabled state */
-  cursor: not-allowed;
-  box-shadow: none; /* Remove shadow when disabled */
 }
 
 .library-panel {
@@ -242,7 +214,6 @@
   background-color: #16161acc;
   padding: 25px;
   border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
   color: #eee;
   text-align: center;
   z-index: 1000;
