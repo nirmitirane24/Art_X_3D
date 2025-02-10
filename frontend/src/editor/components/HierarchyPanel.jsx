@@ -4,7 +4,9 @@ import { FaTrash } from "react-icons/fa";
 import Import from "./HierarchyComponents/Import";
 import Export from "./HierarchyComponents/Export";
 import Library from "./HierarchyComponents/Library";
-import { shapeIcons } from "./Toolbar/ShapeButton";
+// import { shapeIcons } from "./toolbar/ShapeButton";
+// import { lightIcons } from "./toolbar/LightButton"; // Import light icons
+
 
 const HierarchyPanel = ({ sceneObjects = [], selectedObjects, onImportScene, onObjectSelect, onObjectDelete, scene }) => {
     const [searchTerm, setSearchTerm] = useState("");
@@ -19,25 +21,10 @@ const HierarchyPanel = ({ sceneObjects = [], selectedObjects, onImportScene, onO
         obj.type.toLowerCase().includes(searchTerm.toLowerCase())
     ) : [];
 
-    const generateDynamicIds = (objects) => {
-        const shapeCount = {};
-        return objects.map((obj) => {
-            const { type } = obj;
-            if (!shapeCount[type]) {
-                shapeCount[type] = 1;
-            } else {
-                shapeCount[type] += 1;
-            }
-            return {
-                ...obj,
-                displayId: `${type} ${shapeCount[type]}`,
-            };
-        });
-    };
+    // No need for generateDynamicIds if you're already setting displayId
+    // const objectsWithDynamicIds = generateDynamicIds(filteredObjects);
 
-    const objectsWithDynamicIds = generateDynamicIds(filteredObjects);
-
-    const handleDelete = (obj) => {
+      const handleDelete = (obj) => {
         setObjectToDelete(obj);
         setShowDeleteModal(true);
     };
@@ -49,6 +36,7 @@ const HierarchyPanel = ({ sceneObjects = [], selectedObjects, onImportScene, onO
             setObjectToDelete(null);
         }
     };
+
 
     return (
         <div className="hierarchy-panel">
@@ -67,32 +55,32 @@ const HierarchyPanel = ({ sceneObjects = [], selectedObjects, onImportScene, onO
                 className="search-input"
             />
             <ul className="objects-list">
-                {objectsWithDynamicIds.length === 0 ? (
+                 {filteredObjects.length === 0 ? (
                     <p className="no-objects">No models added</p>
                 ) : (
-                    objectsWithDynamicIds.map((obj, index) => (
-                        <React.Fragment key={`${obj.type}-${obj.displayId}`}>
+                    filteredObjects.map((obj, index) => (
+                        <React.Fragment key={`${obj.type}-${obj.id}`}>
 
                             <li
-                                key={obj.id}
+                                 key={obj.id}
                                 style={{
                                     display: "flex",
                                     justifyContent: "space-between",
                                     alignItems: "center",
                                     padding: "7px",
-                                    backgroundColor: selectedObjects.includes(obj.id) ? "rgba(90, 90, 90, 0.8)" : "transparent",
+                                    backgroundColor: selectedObjects.includes(obj.id) ? "rgba(90, 90, 90, 0.8)" : "transparent", //use obj.id here
                                     borderRadius: "5px",
                                     cursor: "pointer",
                                     position: "relative",
                                 }}
-                                onClick={() => onObjectSelect([obj.id])}
+                                 onClick={() => onObjectSelect([obj.id])} // Pass obj.id as an array
                             >
-                                {/* Render the shape SVG icon */}
-                                <span style={{ width: "25px", height: "25px", marginRight: "8px", color: 'black' }}>
-                                    {shapeIcons[obj.type] || null}
-                                </span>
+                                 {/* Render the shape or light SVG icon */}
+                                {/* <span style={{ width: "25px", height: "25px", marginRight: "8px", color: 'black' }}>
+                                      {shapeIcons[obj.type] || lightIcons[obj.type] }
+                                </span> */}
                                 <span style={{ flexGrow: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                    {obj.displayId}
+                                        {obj.displayId || obj.type} 
                                 </span>
 
                                 <FaTrash
@@ -102,13 +90,13 @@ const HierarchyPanel = ({ sceneObjects = [], selectedObjects, onImportScene, onO
                                         color: "rgba(255, 255, 255, 0.93)",
                                         cursor: "pointer",
                                     }}
-                                    onClick={(e) => {
+                                   onClick={(e) => {
                                         e.stopPropagation();
                                         handleDelete(obj);
                                     }}
                                 />
                             </li>
-                            {index < objectsWithDynamicIds.length - 1 && <hr />}
+                            {index < filteredObjects.length - 1 && <hr />}
                         </React.Fragment>
                     ))
                 )}

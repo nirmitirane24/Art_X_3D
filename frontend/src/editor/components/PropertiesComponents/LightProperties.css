@@ -1,0 +1,108 @@
+/* LightProperties.css */
+
+.light-props-container {
+    width: 90%;
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: #16161acc;
+    color: #eee;
+    border-radius: 10px;
+    font-family: Futura, "Trebuchet MS", Arial, sans-serif;
+  }
+  
+  .light-props-header {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: bold;
+      text-align: center; /* Center the header text */
+  }
+  
+  .light-props-row {
+    display: flex;
+    justify-content: space-between; /* Distribute space between items */
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .light-props-row-xyz {
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    margin-bottom: 8px;
+    align-items: stretch; /* Make children stretch to full width */
+  
+  }
+  
+  .light-props-label-column {
+    text-align: left;
+    padding-right: 10px;
+    white-space: nowrap; /* Prevent label text from wrapping */
+  }
+  
+  .light-props-input-column {
+      display: flex; /* Add display: flex */
+      justify-content: flex-end; /* Right-align content within the column */
+  }
+  .light-props-input-column-xyz{
+       display: flex;
+      justify-content: flex-end;
+      gap: 4px;
+  }
+  
+  .light-props-label {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 16px;
+  }
+  
+  .light-props-input,
+  .light-props-color-input {
+    width: 100%; /* Important: Allow input to fill its container */
+    max-width: 100px; /* Limit maximum width */
+    padding: 5px;
+    border: 1px solid #666;
+    background-color: #333;
+    color: #eee;
+    border-radius: 3px;
+    box-sizing: border-box;
+    font-size: 16px;
+  
+  }
+  
+  .light-props-color-input {
+    height: 30px;
+    padding: 2px;
+    max-width: 30px;
+  }
+  
+  .light-props-input-small {
+      max-width: 40px; /* Limit maximum width */
+      width: 100%;
+  }
+  
+  .light-props-input:focus,
+  .light-props-color-input:focus {
+    outline: none;
+    border-color: #999;
+    box-shadow: 0 0 3px rgba(255, 255, 255, 0.3);
+  }
+  .light-props-angle-input {
+    width: 100%; /* Important: Allow input to fill its container */
+    max-width: 100px; /* Limit maximum width */
+    width: 100%;
+  }
+  
+  .light-props-separator {
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(208, 200, 200, 0), rgba(103, 102, 102, 0.75), rgba(136, 130, 130, 0));
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .light-props-input::-webkit-outer-spin-button,
+  .light-props-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  

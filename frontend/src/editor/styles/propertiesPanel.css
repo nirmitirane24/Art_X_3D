@@ -3,7 +3,7 @@
   top: 0;
   right: 0;
   margin: 20px ; /* Add margin */
-  width: 200px;
+  width: 210px;
   background-color:#16161acc; /* Semi-transparent dark background */
   color: #eee; /* Subtle semi-transparent border */
   border-radius: 10px; /* Rounded corners */
@@ -13,7 +13,7 @@
   padding: 20px; /* Adjust padding */
   font-family: Futura, "Trebuchet MS", Arial, sans-serif;
   overflow-x: hidden;
-  overflow-y: hidden;
+  overflow-y: auto;
 }
  
 .properties-panel h4 {

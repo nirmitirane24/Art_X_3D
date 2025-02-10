@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './sceneEditor.css';
 import { SketchPicker } from 'react-color';
+import LightProperties from '../PropertiesComponents/LightProperties'; // Import LightProperties
 
-const SceneEditor = ({ sceneSettings, updateObject }) => {
+const SceneEditor = ({ sceneSettings, updateObject, sceneObjects, selectedObjects }) => {
     const [bgColorPickerOpen, setBgColorPickerOpen] = useState(false);
     const [bgColor, setBgColor] = useState(sceneSettings.backgroundColor || '#000000');
     const [effectsEnabled, setEffectsEnabled] = useState(sceneSettings.effectsEnabled || false);
@@ -13,13 +14,13 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
     const [fogFar, setFogFar] = useState(sceneSettings.fogFar || 100);
     const [ambientShadowsEnabled, setAmbientShadowsEnabled] = useState(sceneSettings.ambientShadowsEnabled || false);
     const [ambientIntensity, setAmbientIntensity] = useState(sceneSettings.ambientIntensity || 0);
-    const [lightColorPickerOpen, setLightColorPickerOpen] = useState(false);
-    const [lightColor, setLightColor] = useState(sceneSettings.lightColor || '#ffffff');
-    const [lightIntensity, setLightIntensity] = useState(sceneSettings.lightIntensity || 0);
-    const [lightX, setLightX] = useState(sceneSettings.lightX || 0);
-    const [lightY, setLightY] = useState(sceneSettings.lightY || 0);
-    const [lightZ, setLightZ] = useState(sceneSettings.lightZ || 0);
-    const [lightShadows, setLightShadows] = useState(sceneSettings.lightShadows || false);
+    const [lightColorPickerOpen, setLightColorPickerOpen] = useState(false);  // For the *scene* light
+    const [lightColor, setLightColor] = useState(sceneSettings.lightColor || '#ffffff'); // For the *scene* light
+    const [lightIntensity, setLightIntensity] = useState(sceneSettings.lightIntensity || 0);// For the *scene* light
+    const [lightX, setLightX] = useState(sceneSettings.lightX || 0);       // For the *scene* light
+    const [lightY, setLightY] = useState(sceneSettings.lightY || 0);       // For the *scene* light
+    const [lightZ, setLightZ] = useState(sceneSettings.lightZ || 0);       // For the *scene* light
+    const [lightShadows, setLightShadows] = useState(sceneSettings.lightShadows || false);  // For the *scene* light
 
     // Shadow Camera Controls
     const [shadowMapSize, setShadowMapSize] = useState(sceneSettings.shadowMapSize || 1024);
@@ -30,14 +31,37 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
     const [shadowCameraTop, setShadowCameraTop] = useState(sceneSettings.shadowCameraTop || 10);
     const [shadowCameraBottom, setShadowCameraBottom] = useState(sceneSettings.shadowCameraBottom || -10);
 
+     // --- Selected Light Dropdown State ---
+     const [selectedLightId, setSelectedLightId] = useState(null);
+
+     // Get currently selected object from EditorManager (via props)
+    const selectedObject =
+        selectedObjects.length === 1
+            ? sceneObjects.find((obj) => obj.id === selectedObjects[0])
+            : null;
+
 
     const bgColorPickerRef = useRef(null);
     const fogColorPickerRef = useRef(null);
-    const lightColorPickerRef = useRef(null);
+    const lightColorPickerRef = useRef(null); // Ref for the *scene* light color picker
     const bgColorId = useRef(Date.now() + Math.random());
     const fogColorId = useRef(Date.now() + Math.random());
-    const lightColorId = useRef(Date.now() + Math.random());
+    const lightColorId = useRef(Date.now() + Math.random()); // Unique ID for scene light picker
 
+    // --- DROPDOWN HANDLER ---
+    const handleLightSelect = (event) => {
+            setSelectedLightId(Number(event.target.value));  // Keep as number
+    };
+
+     // Filter for light objects
+    const lightObjects = sceneObjects.filter(obj =>
+        obj.type === 'pointLight' || obj.type === 'spotLight' || obj.type === 'directionalLight'
+    );
+      // Find selected light using the dropdown's ID.
+    const selectedLight = lightObjects.find(light => light.id === selectedLightId);
+
+     // Determine the active object (either from Hierarchy or dropdown)
+    const activeObject = selectedObject || selectedLight;
 
     useEffect(() => {
         // Set local states with initial or updated values from sceneSettings
@@ -111,16 +135,43 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
         setLightColorPickerOpen(false);
     };
 
-    const handleLightColorChangeComplete = (color) => {
+     // --- Handlers for the *scene* light ---
+     const handleLightColorChangeComplete = (color) => {
         setLightColor(color.hex);
         updateObject('scene', { lightColor: color.hex });
-        setLightColorPickerOpen(false); // Close picker after color is chosen
+        setLightColorPickerOpen(false); // Close after selection
     };
 
     const handleLightColorToggle = () => {
         setLightColorPickerOpen(!lightColorPickerOpen);
-        setBgColorPickerOpen(false); // Close other pickers
+        setBgColorPickerOpen(false);  // Close other pickers
         setFogColorPickerOpen(false);
+    };
+
+    const handleLightIntensityChange = (event) => {
+        const value = parseFloat(event.target.value);
+        setLightIntensity(value);
+        updateObject('scene', { lightIntensity: value });
+    };
+
+    const handleLightXChange = (event) => {
+        const value = parseFloat(event.target.value);
+        setLightX(value);
+        updateObject('scene', { lightX: value });
+    };
+    const handleLightYChange = (event) => {
+        const value = parseFloat(event.target.value);
+        setLightY(value);
+        updateObject('scene', { lightY: value });
+    };
+    const handleLightZChange = (event) => {
+        const value = parseFloat(event.target.value);
+        setLightZ(value);
+        updateObject('scene', { lightZ: value });
+    };
+     const handleLightShadowsChange = (event) => {
+        setLightShadows(event.target.checked);
+        updateObject('scene', { lightShadows: event.target.checked });
     };
 
 
@@ -153,26 +204,26 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
         setFogFar(parseFloat(event.target.value));
         updateObject('scene', { fogFar: parseFloat(event.target.value) });
     };
-    const handleLightIntensityChange = (event) => {
-        setLightIntensity(parseFloat(event.target.value));
-        updateObject('scene', { lightIntensity: parseFloat(event.target.value) });
-    };
-    const handleLightXChange = (event) => {
-        setLightX(parseFloat(event.target.value));
-        updateObject('scene', { lightX: parseFloat(event.target.value) });
-    };
-    const handleLightYChange = (event) => {
-        setLightY(parseFloat(event.target.value));
-        updateObject('scene', { lightY: parseFloat(event.target.value) });
-    };
-    const handleLightZChange = (event) => {
-        setLightZ(parseFloat(event.target.value));
-        updateObject('scene', { lightZ: parseFloat(event.target.value) });
-    };
-    const handleLightShadowsChange = (event) => {
-        setLightShadows(event.target.checked);
-        updateObject('scene', { lightShadows: event.target.checked });
-    };
+    // const handleLightIntensityChange = (event) => { //dupliacte function remvoing it
+    //     setLightIntensity(parseFloat(event.target.value));
+    //     updateObject('scene', { lightIntensity: parseFloat(event.target.value) });
+    // };
+    // const handleLightXChange = (event) => {
+    //     setLightX(parseFloat(event.target.value));
+    //     updateObject('scene', { lightX: parseFloat(event.target.value) });
+    // };
+    // const handleLightYChange = (event) => {
+    //     setLightY(parseFloat(event.target.value));
+    //     updateObject('scene', { lightY: parseFloat(event.target.value) });
+    // };
+    // const handleLightZChange = (event) => {
+    //     setLightZ(parseFloat(event.target.value));
+    //     updateObject('scene', { lightZ: parseFloat(event.target.value) });
+    // };
+    // const handleLightShadowsChange = (event) => {
+    //     setLightShadows(event.target.checked);
+    //     updateObject('scene', { lightShadows: event.target.checked });
+    // };
 
     const handleShadowMapSizeChange = (event) => {
         const value = parseInt(event.target.value, 10);
@@ -216,7 +267,6 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
         updateObject('scene', { shadowCameraBottom: value });
     };
 
-
     return (
         <div className="scene-editor">
             <h3>Scene</h3>
@@ -252,6 +302,7 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
                 </div>
             </div>
             <hr className="style-six" ></hr>
+            {/* --- Original Scene Light Controls --- */}
             <div className="light-section">
                 <h4>Light</h4>
                 <label className="switch" style={{ marginLeft: '117px', marginTop: '-16px' }}>
@@ -265,14 +316,14 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
                                 <div
                                     className="color-preview"
                                     style={{ backgroundColor: lightColor }}
-                                    onClick={() => handleLightColorToggle()}
+                                    onClick={handleLightColorToggle}
                                 />
                             </div>
                             <div className={`color-picker-inline ${lightColorPickerOpen ? 'open' : ''}`} ref={lightColorPickerRef} style={{ marginTop: '-11px' }}>
                                 {lightColorPickerOpen && (
                                     <SketchPicker
                                         color={lightColor}
-                                        onChangeComplete={handleLightColorChangeComplete} // Use onChangeComplete to close after selection
+                                        onChangeComplete={handleLightColorChangeComplete}
                                         disableAlpha={true}
                                         presetColors={[]}
                                         id={lightColorId.current}
@@ -328,9 +379,8 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
             <hr className="style-six" ></hr>
             {/* Shadow Controls */}
             <div className="shadow-controls-section">
-                <h4>Shadow</h4>
-                <label style={{ marginRight: "12px" }}>
-                    Map Size
+                <label >
+                <h4>Shadow</h4>Map Size
                     <select value={shadowMapSize} onChange={handleShadowMapSizeChange}>
                         <option value={512}>512</option>
                         <option value={1024}>1024</option>
@@ -338,60 +388,52 @@ const SceneEditor = ({ sceneSettings, updateObject }) => {
                         <option value={4096}>4096</option>
                     </select>
                 </label>
-                {/* <label>
-                    Near:
-                    <input type="number" value={shadowCameraNear} onChange={handleShadowCameraNearChange} />
-                </label>
-                <label>
-                    Far:
-                    <input type="number" value={shadowCameraFar} onChange={handleShadowCameraFarChange} />
-                </label>
-                <label>
-                    Left:
-                    <input type="number" value={shadowCameraLeft} onChange={handleShadowCameraLeftChange} />
-                </label>
-                <label>
-                    Right:
-                    <input type="number" value={shadowCameraRight} onChange={handleShadowCameraRightChange} />
-                </label>
-                <label>
-                    Top:
-                    <input type="number" value={shadowCameraTop} onChange={handleShadowCameraTopChange} />
-                </label>
-                <label>
-                    Bottom:
-                    <input type="number" value={shadowCameraBottom} onChange={handleShadowCameraBottomChange} />
-                </label> */}
             </div>
 
             <hr className="style-six" ></hr>
 
-
-            {/* <div>
-                <h4>Effects</h4>
-                <label className="switch" style={{ marginLeft: '69px', marginTop: '12px' }}>
-                    <input type="checkbox" checked={effectsEnabled} onChange={handleEffectsChange} />
-                    <span className="slider round"></span>
-                </label>
-            </div>
-            <hr className="style-six" ></hr> */}
             <div>
                 <h4>Ambient shadows</h4>
-                <label className="switch" style={{ marginLeft: '0px', marginTop: '10px' }}>
+                <label className="switch" style={{  marginLeft: '10px', marginTop: '10px' }}>
                     <input type="checkbox" checked={ambientShadowsEnabled} onChange={handleAmbientShadowsChange} />
                     <span className="slider round"></span>
                 </label>
                 {ambientShadowsEnabled && (
-                    <input
+                    <><input
                         type="number"
                         className="ambient-input"
                         placeholder="Intensity"
                         value={ambientIntensity}
                         onChange={handleAmbientIntensityChange}
-                    />
+                    /></>
                 )}
             </div>
             <hr className="style-six" ></hr>
+            <div style={{ width: "90%" }}>
+                        <h4>Select Light:</h4>
+                        <br />
+                        <select value={selectedLightId || ''} onChange={handleLightSelect} className="light-dropdown" >
+                        <br />
+                            <option value="" style={{ width: "100px" }}>Select a Light</option>
+                            {lightObjects.map((light) => (
+                                <option key={light.id} value={light.id}  >
+                                    {light.displayId.slice(0, 10) || light.type}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+             {/* Light Selection and Properties (Conditional) */}
+             {activeObject && (activeObject.type === 'pointLight' || activeObject.type === 'spotLight' || activeObject.type === 'directionalLight') && (
+                <>
+                    <LightProperties
+                        selectedObject={activeObject}  // Pass the *actual* selected object
+                        updateObject={updateObject}
+                        handleInputChange={() => {}} // Dummy handlers
+                        startDrag={() => {}}
+                        inputValue={{}}
+                    />
+                </>
+            )}
 
         </div>
     );

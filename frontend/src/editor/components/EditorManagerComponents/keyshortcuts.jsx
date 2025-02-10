@@ -106,7 +106,7 @@ const KeyboardShortcuts = ({
             >
               Paste
             </li>
-            <li
+            {/* <li
               style={{ padding: "5px", cursor: "pointer" }}
               onClick={() => handleContextMenuOption("duplicate")}
             >
@@ -123,7 +123,7 @@ const KeyboardShortcuts = ({
               onClick={() => handleContextMenuOption("scale")}
             >
               Scale
-            </li>
+            </li> */}
           </ul>
         </div>
       )}

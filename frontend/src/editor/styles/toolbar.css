@@ -8,7 +8,7 @@
   align-items: center;
   background: rgba(22, 22, 22, 0.471); /* Semi-transparent background */
   padding: 5px;
-  width: 35%;
+  width: 40%;
   justify-content: center;
   z-index: 20;
   border-radius: 10px;
@@ -63,21 +63,22 @@
 
 /* Advanced shape buttons positioning and scrollable behavior */
 .advanced-shape-buttons {
+  font-size: small;
   position: absolute;
   top: 110%;
-  left: 86%;
+  left: 70%;
   transform: translateX(-39%);
   width: 30%;
   background-color: rgba(40, 40, 40, 0.9); /* Slightly darker background */
   border-radius: 8px;
-  padding: 10px;
+  padding: 1px;
   z-index: 10;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 5px;
   overflow-y: auto; /* Allow scrolling */
-  max-height: 300px; /* Limit the height to ensure scroll */
-  max-width: 250px; /* Set max width */
+  max-height: 200px; /* Limit the height to ensure scroll */
+  max-width: 200px; /* Set max width */
 }
 
 .advanced-shapes-scroll {
@@ -187,4 +188,22 @@
   /* border: 1px outset #333333; */
   /* border-radius: 5px; */
   z-index: 30%;
+}
+.light-properties-container{
+  font-size: small;
+  position: absolute;
+  top: 110%;
+  left: 96%;
+  transform: translateX(-39%);
+  width: 25%;
+  background-color: rgba(40, 40, 40, 0.99); /* Slightly darker background */
+  border-radius: 8px;
+  padding: 1px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow-y: auto; /* Allow scrolling */
+  max-height: 200px; /* Limit the height to ensure scroll */
+  max-width: 200px; /* Set max width */
 }
