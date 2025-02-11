@@ -1,6 +1,7 @@
-// (Full code from previous responses, with minor updates for clarity)
+// --- START OF FILE editorManager.jsx ---
+
 import React, { useState, useRef, useEffect } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import Toolbar from "./components/Toolbar";
 import HierarchyPanel from "./components/HierarchyPanel.jsx";
 import PropertiesPanel from "./components/PropertiesPanel";
@@ -14,10 +15,11 @@ import * as THREE from "three";
 import UndoRedo from "./components/EditorManagerComponents/undoredo.jsx";
 import KeyboardShortcuts from "./components/EditorManagerComponents/keyshortcuts.jsx";
 import CopyPaste from "./components/EditorManagerComponents/copypaste.jsx";
-import LightHelperComponent from "./components/LightHelperComponent.jsx"; // Import the helper
+import LightComponent from "./components/Light/LightComponent.jsx"; // Import the new component
 
 
 const EditorManager = () => {
+     // State and Refs (no changes here)
     const [sceneObjects, setSceneObjects] = useState([]);
     const [selectedObjects, setSelectedObjects] = useState([]);
     const [cameraEnabled, setCameraEnabled] = useState(true);
@@ -47,6 +49,8 @@ const EditorManager = () => {
     const sceneRef = useRef(new THREE.Scene());
     const dirLightRef = useRef(); // Ref for the directional light
 
+   
+    // Undo/Redo and Copy/Paste (no changes here)
     const { undo, redo, saveToUndoStack, undoStack, redoStack } = UndoRedo({
         sceneObjects,
         setSceneObjects,
@@ -63,6 +67,7 @@ const EditorManager = () => {
             setSceneObjects,
             saveToUndoStack,
         });
+   // ... (other functions remain unchanged: deleteSelectedObjects, handleDeleteObject, handleArrowKeyMovement, addModel, addLight) ...
 
     const deleteSelectedObjects = () => {
         if (selectedObjects.length > 0) {
@@ -88,6 +93,7 @@ const EditorManager = () => {
             );
 
             setSelectedObjects([]);
+            setCameraEnabled(true); // Re-enable camera after delete
         }
     };
 
@@ -99,6 +105,7 @@ const EditorManager = () => {
         setSelectedObjects((prevSelected) =>
             prevSelected.filter((id) => id !== objectId)
         );
+        setCameraEnabled(true);  // Re-enable the camera.
     };
 
     const handleArrowKeyMovement = (event) => {
@@ -132,7 +139,7 @@ const EditorManager = () => {
     const addModel = (type) => {
         saveToUndoStack([...sceneObjects], { ...sceneSettings });
         const newObject = {
-            id: Date.now(),
+            id: Date.now() ,
             type,
             position: [0, 0, 0],
             rotation: [0, 0, 0],
@@ -152,7 +159,7 @@ const EditorManager = () => {
     // --- ADD LIGHT FUNCTION ---
     const addLight = (type) => {
         saveToUndoStack([...sceneObjects], { ...sceneSettings });
-        const lightId = Date.now(); // Consistent ID generation
+        const lightId = Math.floor(10000 + Math.random() * 90000); // Consistent ID generation
         const lightProps = {
             id: lightId, // Use the generated ID
             type,
@@ -177,18 +184,17 @@ const EditorManager = () => {
     };
 
 
-   const handleObjectSelect = (objectIds) => {
+    const handleObjectSelect = (objectIds) => {
         if (!objectIds || objectIds.length === 0) return;
-        saveToUndoStack();
-        setSelectedObjects(objectIds);  // No need to map to strings
-        setCameraEnabled(false); // Ensure camera control is disabled when selecting an object
-
+         setSelectedObjects(objectIds);
+         setCameraEnabled(false);
     };
+
 
 
     const updateObject = (objectId, newProps) => {
         if (objectId === "scene") {
-            saveToUndoStack([...sceneObjects], { ...sceneSettings });
+            saveToUndoStack([...sceneObjects], { ...sceneSettings });//save to stack
             setSceneSettings((prevSettings) => ({
                 ...prevSettings,
                 ...newProps,
@@ -203,18 +209,33 @@ const EditorManager = () => {
         }
     };
 
-    const deselectAllObjects = (event) => {
-        if (
-            event.type === "click" &&
-            (event.target.closest(".edit-mode-button") ||
-                event.target.closest(".hierarchy-panel"))
-        ) {
-            setSelectedObjects([]);
-            setCameraEnabled(true);
+const deselectAllObjects = (event) => {
+  // Check for TransformControls interaction (remains the same)
+  let isTransformControlsInteraction = false;
+  if (selectedObjects.length > 0) {
+    const sceneObject = sceneRef.current.getObjectById(selectedObjects[0]);
+    if (sceneObject) {
+      sceneObject.traverse((child) => {
+        if (child.isTransformControls && child.domElement.contains(event.target)) {
+          isTransformControlsInteraction = true;
         }
-    };
+      });
+    }
+  }
+
+  // Deselect and enable camera ONLY if:
+  // 1. Not interacting with TransformControls
+  // 2. Clicking the "Edit Mode" button
+  if (!isTransformControlsInteraction && event.target.closest(".edit-mode-button")) {
+    setSelectedObjects([]);
+    setCameraEnabled(true);
+  }
+};
+
 
     const onImportScene = (loadedScene) => {
+        //import logic
+        // ... (import logic remains unchanged) ...
         saveToUndoStack([...sceneObjects], { ...sceneSettings });
 
         const sceneGroup = loadedScene.scene || loadedScene;
@@ -310,14 +331,12 @@ const EditorManager = () => {
                             sceneRef={sceneRef}
                             sceneObjects={sceneObjects}
                             selectedObjects={selectedObjects}
-                            setCameraEnabled={setCameraEnabled}
                             updateObject={updateObject}
                             handleObjectSelect={handleObjectSelect}
                             dirLightRef={dirLightRef}
                         />
                         <CameraControls
                             enabled={cameraEnabled}
-                            selectedObjects={selectedObjects}
                         />
                     </Canvas>
                 </div>
@@ -354,7 +373,6 @@ function SceneContent({
     sceneRef,
     sceneObjects,
     selectedObjects,
-    setCameraEnabled,
     updateObject,
     handleObjectSelect,
     dirLightRef,
@@ -362,6 +380,8 @@ function SceneContent({
     const { gl } = useThree();
 
     useEffect(() => {
+        //useEffect logic
+        // ... (useEffect logic remains unchanged) ...
         if (gl && sceneSettings.backgroundColor) {
             gl.setClearColor(sceneSettings.backgroundColor);
         }
@@ -427,41 +447,18 @@ function SceneContent({
             <GroundPlane />
             <group ref={sceneRef}>
                 {sceneObjects.map((object) => {
-                    if (object.type === 'pointLight' || object.type === 'spotLight' || object.type === 'directionalLight') {
-                        // Render lights using <primitive>
-                        let lightInstance;
-                        if (object.type === 'pointLight') {
-                            lightInstance = new THREE.PointLight(object.color, object.intensity);
-                        } else if (object.type === 'spotLight') {
-                            lightInstance = new THREE.SpotLight(object.color, object.intensity, object.distance, object.angle, object.penumbra, object.decay);
-                             const targetObject = new THREE.Object3D();
-                            targetObject.position.fromArray(object.target);
-                            targetObject.name = `target-${object.id}` //give the name so we can easily refer the object
-                            sceneRef.current.add(targetObject)
-                            lightInstance.target = targetObject;
-
-
-                        } else if (object.type === 'directionalLight') {
-                             lightInstance = new THREE.DirectionalLight(object.color, object.intensity);
-                              const targetObject = new THREE.Object3D();
-                            targetObject.position.fromArray(object.target);
-                            targetObject.name = `target-${object.id}` //give the name so we can easily refer the object
-                            sceneRef.current.add(targetObject)
-                            lightInstance.target = targetObject;
-                        }
-
-                        lightInstance.position.fromArray(object.position);
-                        //we don't need to set rotation for lights individually, so removing it
-                        lightInstance.name = object.displayId;  // Set the name for easy access
-
-
+                    if (
+                        object.type === "pointLight" ||
+                        object.type === "spotLight" ||
+                        object.type === "directionalLight"
+                    ) {
                         return (
                             <React.Fragment key={object.id}>
-                                <primitive object={lightInstance} />
-                                {/* Conditionally render the helper */}
-                                {selectedObjects.includes(object.id) && ( //use obj.id in includes function
-                                    <LightHelperComponent lightType={object.type} lightObject={object} scene={sceneRef.current} />
-                                )}
+                                <LightComponent
+                                object={object}
+                                selectedObjects={selectedObjects}
+                                sceneRef={sceneRef}
+                            />
                             </React.Fragment>
                         );
                     } else {
@@ -471,8 +468,7 @@ function SceneContent({
                                 key={object.id}
                                 object={object}
                                 isSelected={selectedObjects.includes(object.id)}
-                                setCameraEnabled={setCameraEnabled}
-                                onSelect={() => handleObjectSelect([object.id])} // Pass an array containing the object ID
+                                onSelect={() => handleObjectSelect([object.id])}
                                 onUpdateObject={updateObject}
                             />
                         );

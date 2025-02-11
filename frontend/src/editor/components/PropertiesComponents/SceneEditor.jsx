@@ -408,7 +408,7 @@ const SceneEditor = ({ sceneSettings, updateObject, sceneObjects, selectedObject
                     /></>
                 )}
             </div>
-            <hr className="style-six" ></hr>
+            {/* <hr className="style-six" ></hr>
             <div style={{ width: "90%" }}>
                         <h4>Select Light:</h4>
                         <br />
@@ -421,9 +421,9 @@ const SceneEditor = ({ sceneSettings, updateObject, sceneObjects, selectedObject
                                 </option>
                             ))}
                         </select>
-                    </div>
+                    </div> */}
              {/* Light Selection and Properties (Conditional) */}
-             {activeObject && (activeObject.type === 'pointLight' || activeObject.type === 'spotLight' || activeObject.type === 'directionalLight') && (
+             {/* {activeObject && (activeObject.type === 'pointLight' || activeObject.type === 'spotLight' || activeObject.type === 'directionalLight') && (
                 <>
                     <LightProperties
                         selectedObject={activeObject}  // Pass the *actual* selected object
@@ -433,7 +433,7 @@ const SceneEditor = ({ sceneSettings, updateObject, sceneObjects, selectedObject
                         inputValue={{}}
                     />
                 </>
-            )}
+            )} */}
 
         </div>
     );

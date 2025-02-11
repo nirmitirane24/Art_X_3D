@@ -1,22 +1,34 @@
-// src/components/CameraControls.jsx
 import React, { useRef, useEffect } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import * as THREE from 'three';
 
-const CameraControls = ({ camera, enabled, selectedObjects }) => {
-    const controlsRef = useRef();
-    const { gl } = useThree();
+const CameraControls = ({ enabled, dampingFactor = 0.05, enableDamping = true }) => { // Removed selectedObjects
+  const { camera, gl } = useThree();
+  const controlsRef = useRef();
+  const orbitTarget = useRef(new THREE.Vector3(0, 0, 0)); // Initialize to origin or your desired default
+    const targetLerp = useRef(new THREE.Vector3()); // Smooth target
 
-    const orbitTarget = useRef(new THREE.Vector3()); // Target for orbit controls
-    const panStart = useRef(new THREE.Vector3()); // For panning calculations
+  useEffect(() => {
+    const controls = new OrbitControls(camera, gl.domElement);
+    controls.enabled = enabled;
+    controls.enableDamping = enableDamping;
+    controls.dampingFactor = dampingFactor;
+    controls.target.copy(orbitTarget.current)
 
-    useEffect(() => {
-        const currentCamera = camera;
-        const currentControls = controlsRef.current;
+    controlsRef.current = controls;
 
+    return () => {
+      controls.dispose();
+    };
+      // Only depend on enabled, dampingFactor, enableDamping.  NOT selectedObjects.
+  }, [camera, gl, enabled, dampingFactor, enableDamping]);
+
+  useEffect(() => {
+    const currentCamera = camera;
         const onKeyDown = (event) => {
             if (!enabled) return;
+
             const panSpeed = 0.1;
             const zoomSpeed = 0.5;
 
@@ -46,44 +58,28 @@ const CameraControls = ({ camera, enabled, selectedObjects }) => {
                 default:
                     break;
             }
-            currentControls.target.copy(orbitTarget.current);
         };
-        if (currentControls) {
-            currentControls.enabled = enabled;
-            currentControls.enableRotate = enabled;
-            currentControls.enableZoom = enabled;
-            currentControls.enablePan = enabled;
-            currentControls.mouseButtons = {
-                LEFT: THREE.MOUSE.ROTATE,
-                MIDDLE: THREE.MOUSE.PAN,
-                RIGHT: null, // Disable right-click
-            };
-            currentControls.touches = {
-                ONE: THREE.TOUCH.ROTATE,
-                TWO: null, // Disable two-finger touch
-            };
-        }
+
         window.addEventListener('keydown', onKeyDown);
 
         return () => {
             window.removeEventListener('keydown', onKeyDown);
+            if (controlsRef.current) {
+                controlsRef.current.dispose();
+            }
         };
-    }, [camera, enabled, selectedObjects]);
+  }, [camera, enabled, orbitTarget]);
 
-    // Update orbit controls target on each frame
     useFrame(() => {
-        if (controlsRef.current) {
-            controlsRef.current.target.copy(orbitTarget.current);
-        }
-    });
+    if (controlsRef.current && enabled) {
+      // Lerp the target position for smooth movement
+      targetLerp.current.lerp(orbitTarget.current, dampingFactor); // Use dampingFactor here too
+      controlsRef.current.target.copy(targetLerp.current);
+      controlsRef.current.update();
+    }
+  });
 
-    return (
-        <OrbitControls
-            ref={controlsRef}
-            args={[camera, gl.domElement]}
-            target={orbitTarget.current}
-        />
-    );
+  return null;
 };
 
 export default CameraControls;

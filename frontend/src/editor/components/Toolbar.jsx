@@ -1,3 +1,5 @@
+// --- START OF FILE Toolbar.jsx ---
+
 import React, { useState } from 'react';
 import '../styles/toolbar.css';
 import ShapeButton from './toolbar/ShapeButton';
@@ -71,7 +73,6 @@ const Toolbar = ({ onAddModel, onAddLight, selectedObjects, onUndo, onRedo, undo
 
             <hr className='vertical-line'></hr>
 
-            {/* Section for toggling advanced shapes */}
             <div className="toolbar-section" onClick={toggleShapes}>
                 <span className="toolbar-section-title">
                     {showShapes ? '▾' : '▸'} More Shapes
@@ -84,11 +85,12 @@ const Toolbar = ({ onAddModel, onAddLight, selectedObjects, onUndo, onRedo, undo
                                     key={shape}
                                     shape={shape}
                                     onAddModel={onAddModel}
-                                    isAdvancedShape={true}  // Pass the flag for advanced shapes
+                                    isAdvancedShape={true}
                                 />
                             ))}
-                        
-                        
+
+                            <hr className='style-six'></hr>
+
                             {lightTypes.map((type) => (
                                 <LightButton key={type} type={type} onAddLight={onAddLight} />
                             ))}
@@ -96,22 +98,8 @@ const Toolbar = ({ onAddModel, onAddLight, selectedObjects, onUndo, onRedo, undo
                     </div>
                 )}
             </div>
-            {/* <hr className='vertical-line'></hr> */}
-            {/* Section for toggling lights
-            <div className="toolbar-section" onClick={toggleLights}>
-                <span className="toolbar-section-title">
-                    {showLights ? '▾' : '▸'} Lights
-                </span>
-                {showLights && (
-                    <div className="light-properties-container">
-                        {lightTypes.map((type) => (
-                            <LightButton key={type} type={type} onAddLight={onAddLight} />
-                        ))}
-                    </div>
-                )}
-            </div> */}
         </div>
-        
+
     );
 };
 
