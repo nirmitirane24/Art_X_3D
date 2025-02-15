@@ -16,10 +16,38 @@ import UndoRedo from "./components/EditorManagerComponents/undoredo.jsx";
 import KeyboardShortcuts from "./components/EditorManagerComponents/keyshortcuts.jsx";
 import CopyPaste from "./components/EditorManagerComponents/copypaste.jsx";
 import LightComponent from "./components/Light/LightComponent.jsx"; // Import the new component
-
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import LoadingPage from "../pages/loading.jsx";
 
 const EditorManager = () => {
-     // State and Refs (no changes here)
+
+    const navigate = useNavigate();
+    // State and Refs
+    const [loading, setLoading] = useState(true);
+    const [username, setUsername] = useState("");
+
+    useEffect(() => {
+    const checkAuth = async () => {
+        try {
+        await axios.get("http://localhost:5050/user/logs", { withCredentials: true });
+        setUsername(localStorage.getItem("username"));
+        } catch (error) {
+        if (error.response && error.response.status === 401) {
+            navigate("/");
+        } else {
+            console.error("Error checking authentication:", error);
+        }
+        } finally {
+        setLoading(false);
+        }
+    };
+    checkAuth();
+    }, [navigate]);
+
+
+
+
     const [sceneObjects, setSceneObjects] = useState([]);
     const [selectedObjects, setSelectedObjects] = useState([]);
     const [cameraEnabled, setCameraEnabled] = useState(true);
@@ -291,7 +319,9 @@ const deselectAllObjects = (event) => {
 
         setSceneObjects((prevObjects) => [...prevObjects, ...childMeshes]);
     };
-
+    if (loading) {
+        return <LoadingPage />;
+        }
     return (
         <div className="editor-container" onClick={deselectAllObjects}>
             <Toolbar
@@ -409,6 +439,9 @@ function SceneContent({
         sceneSettings.shadowCameraBottom,
         dirLightRef,
     ]);
+
+
+
 
     return (
         <>

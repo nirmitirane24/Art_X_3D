@@ -1,0 +1,22 @@
+/*  pages/styles/loadingpage.css */
+
+.loading-container {
+    position: fixed; /* Or absolute, depending on your layout */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color:#000000; /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 1000; /* Make sure it's on top of other content */
+  }
+
+  .loading-gif {
+    width: 200px; /* Adjust as needed */
+    height: auto;
+    margin-bottom: 20px;
+  }
+

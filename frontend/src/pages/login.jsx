@@ -3,40 +3,59 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FaEnvelope, FaLock, FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import LoadingPage from './loading';
 
 function Login() {
-    const navigate = useNavigate();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState(null); // Holds error messages
-    const [isPasswordVisible, setIsPasswordVisible] = useState(false); // Password visibility state
+  const navigate = useNavigate();
+  const [username, setusername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await axios.post('http://localhost:5000/login', { email, password });
-            localStorage.setItem('token', response.data.token);
-            navigate('/editor');
-        } catch (error) {
-            // Set error message based on response
-            if (error.response) {
-                setError(error.response.data.message); // Set error message from backend
-            } else {
-                setError("An unexpected error occurred. Please try again."); // Fallback error message
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    let loginSuccess = false;
+    try {
+      const response = await axios.post('http://localhost:5050/auth/signin', { username: username, password }, { withCredentials: true });
+      localStorage.setItem('username', username); // Store username
+      loginSuccess = true;
+      if (loginSuccess) {
+        navigate('/home');
+     }
+
+    } catch (error) {
+      if (error.response) {
+        setError(error.response.data.message || "Login failed. Please check your credentials.");
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+         setTimeout(() => {
+            setIsLoading(false);
+            if (loginSuccess) {
+               navigate('/home');
             }
-        }
-    };
+          }, 2000);
+    }
+  };
 
-    const closeModal = () => {
-        setError(null); // Clear error
-    };
+  const closeModal = () => {
+    setError(null);
+  };
 
-    const togglePasswordVisibility = () => {
-        setIsPasswordVisible(!isPasswordVisible); // Toggle password visibility
-    };
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
 
-    return (
-        <div style={styles.body}>
+  if (isLoading) {
+    return <LoadingPage />;
+  }
+
+  return (
+    // ... (rest of your login JSX) ...
+     <div style={styles.body}>
             <div style={styles.formContainer}>
                 {/* Navigation Arrow to Home */}
                 <Link to="/" style={styles.backLink}>
@@ -48,25 +67,24 @@ function Login() {
                     <div style={styles.formGroup}>
                         <FaEnvelope style={styles.icon} />
                         <input
-                            type="email"
+                            type="username"
                             style={styles.input}
-                            placeholder="Email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="username"
+                            value={username}
+                            onChange={(e) => setusername(e.target.value)}
                             required
                         />
                     </div>
                     <div style={styles.formGroup}>
                         <FaLock style={styles.icon} />
                         <input
-                            type={isPasswordVisible ? 'text' : 'password'} // Show/hide password
+                            type={isPasswordVisible ? 'text' : 'password'}
                             style={styles.input}
                             placeholder="Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         />
-                        {/* Eye icon for showing/hiding password */}
                         <div onClick={togglePasswordVisibility} style={styles.eyeIcon}>
                             {isPasswordVisible ? <FaEye style={styles.icon} /> : <FaEyeSlash style={styles.icon} />}
                         </div>
@@ -78,7 +96,6 @@ function Login() {
                 </form>
             </div>
 
-            {/* Error Modal */}
             {error && (
                 <div style={styles.modalOverlay}>
                     <div style={styles.modal}>
@@ -89,9 +106,8 @@ function Login() {
                 </div>
             )}
         </div>
-    );
+  );
 }
-
 const styles = {
     body: {
         width: '100vw',
@@ -109,17 +125,17 @@ const styles = {
         boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
         width: '400px',
         textAlign: 'center',
-        position: 'relative', // Add relative positioning for back arrow
+        position: 'relative',
     },
     backLink: {
         display: 'flex',
         alignItems: 'center',
         marginBottom: '20px',
-        color: '#bbb', // Adjust the color as needed
+        color: '#bbb',
         cursor: 'pointer',
     },
     backIcon: {
-        fontSize: '20px', // Adjust size as needed
+        fontSize: '20px',
     },
     form: {
         display: 'flex',
@@ -136,7 +152,7 @@ const styles = {
         marginBottom: '20px',
         borderBottom: '2px solid rgba(179, 191, 255, 0.4)',
         paddingBottom: '10px',
-        position: 'relative', // For positioning the eye icon
+        position: 'relative',
     },
     icon: {
         marginRight: '10px',
@@ -211,5 +227,4 @@ const styles = {
         cursor: 'pointer',
     },
 };
-
 export default Login;

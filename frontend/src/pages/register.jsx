@@ -1,20 +1,25 @@
+// register.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaArrowLeft } from 'react-icons/fa'; // Import the arrow icon
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaArrowLeft } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import LoadingPage from './loading';
 
 function Register() {
-    const [email, setEmail] = useState('');
+    const navigate = useNavigate();
+    const [username, setUsername] = useState('');  // Corrected state variable name
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [email, setEmail] = useState(''); // Add email state
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState('');
     const [passwordMatch, setPasswordMatch] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
 
-    // Toggle password visibility
     const togglePasswordVisibility = () => {
         setShowPassword((prevState) => !prevState);
     };
@@ -23,7 +28,6 @@ function Register() {
         setShowConfirmPassword((prevState) => !prevState);
     };
 
-    // Password strength validation
     const validatePassword = (value) => {
         setPassword(value);
         const regexStrong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -38,14 +42,9 @@ function Register() {
         }
     };
 
-    // Check if password and confirmPassword match
     const checkPasswordMatch = (value) => {
         setConfirmPassword(value);
-        if (password !== value) {
-            setPasswordMatch(false);
-        } else {
-            setPasswordMatch(true);
-        }
+        setPasswordMatch(password === value);
     };
 
     const handleSubmit = async (e) => {
@@ -54,24 +53,62 @@ function Register() {
             toast.error("Passwords don't match!", { position: toast.POSITION.TOP_CENTER });
             return;
         }
+
+        setIsLoading(true);
+        let registrationSuccess = false;
         try {
-            await axios.post('http://localhost:5000/register', { email, password });
-            toast.success('Registration Successful!', { position: toast.POSITION.TOP_CENTER });
+            // Include email in the request body
+            const response = await axios.post('http://localhost:5050/auth/register', { username, password, email }, { withCredentials: true });
+            if (response.status === 201) {
+                toast.success('Registration Successful!  Please log in.', { position: toast.POSITION.TOP_CENTER });
+                localStorage.setItem('username', username); // Store the username
+                registrationSuccess = true;
+            }
         } catch (error) {
-            toast.error('Registration failed', { position: toast.POSITION.TOP_CENTER });
+            if (error.response) {
+                toast.error(error.response.data.message || 'Registration failed', { position: toast.POSITION.TOP_CENTER });
+            } else if (error.request) {
+                toast.error('No response from server. Please try again later.', { position: toast.POSITION.TOP_CENTER });
+            } else {
+                toast.error('An unexpected error occurred.', { position: toast.POSITION.TOP_CENTER });
+            }
+        } finally {
+            setTimeout(() => {
+                setIsLoading(false);
+                if (registrationSuccess) {
+                    navigate('/login');
+                }
+            }, 2000);
         }
     };
+
+
+    if (isLoading) {
+        return <LoadingPage />;
+    }
 
     return (
         <div style={styles.body}>
             <div style={styles.formContainer}>
-                {/* Navigation Arrow to Home */}
                 <Link to="/" style={styles.backLink}>
                     <FaArrowLeft style={styles.backIcon} />
                 </Link>
                 <form onSubmit={handleSubmit} style={styles.form}>
                     <Link to={'/'}><img src="/cube2.svg" style={styles.logo} alt="Logo" /></Link>
                     <h2 style={styles.title}>Welcome to ARTX3D</h2>
+                    {/* Username Input */}
+                    <div style={styles.formGroup}>
+                        <FaEnvelope style={styles.icon} />
+                        <input
+                            type="text"  
+                            style={styles.input}
+                            placeholder="Username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}  
+                            required
+                        />
+                    </div>
+                    {/* Email Input */}
                     <div style={styles.formGroup}>
                         <FaEnvelope style={styles.icon} />
                         <input
@@ -83,7 +120,7 @@ function Register() {
                             required
                         />
                     </div>
-
+                    {/* Password Input */}
                     <div style={styles.formGroup}>
                         <FaLock style={styles.icon} />
                         <input
@@ -99,7 +136,6 @@ function Register() {
                         </div>
                     </div>
 
-                    {/* Password strength indicator */}
                     {password && (
                         <p style={{
                             ...styles.passwordStrength,
@@ -109,7 +145,7 @@ function Register() {
                             Password Strength: {passwordStrength}
                         </p>
                     )}
-
+                    {/* Confirm Password Input */}
                     <div style={styles.formGroup}>
                         <FaLock style={styles.icon1} />
                         <input
@@ -125,7 +161,6 @@ function Register() {
                         </div>
                     </div>
 
-                    {/* Password matching indicator */}
                     {!passwordMatch && (
                         <p style={{ color: '#ff5e5e', fontSize: '14px' }}>
                             Passwords don't match!
@@ -144,7 +179,7 @@ function Register() {
         </div>
     );
 }
-
+//styles remain same
 const styles = {
     body: {
         width: '100vw',
@@ -171,11 +206,11 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         marginBottom: '20px',
-        color: '#bbb', // Adjust the color as needed
+        color: '#bbb',
         cursor: 'pointer',
     },
     backIcon: {
-        fontSize: '20px', // Adjust size as needed
+        fontSize: '20px',
     },
     title: {
         marginBottom: '20px',

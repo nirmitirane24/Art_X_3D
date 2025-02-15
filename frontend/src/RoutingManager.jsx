@@ -5,6 +5,7 @@ import Register from './pages/register.jsx';
 import WelcomePage from './pages/welcome.jsx';
 import EditorManager from './editor/editorManager.jsx';
 import Home from './pages/home.jsx';
+import ErrorPage from './pages/error.jsx';
 
 function RoutingManager() {
   return (
@@ -16,8 +17,7 @@ function RoutingManager() {
         <Route exact path="/home" element={<Home />} />
         <Route exact path="/editor" element={<EditorManager />} />
         
-        {/* Catch-all route for undefined paths */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
     </Router>
   );

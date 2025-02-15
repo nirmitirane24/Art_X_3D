@@ -1,18 +1,27 @@
 from flask import Flask
 from flask_cors import CORS
-from flask_bcrypt import Bcrypt
-from AuthFunctions.auth import create_auth_bp  # Import the correct function
-from DB_functions.db import init_db, get_db_connection
+from config import DevelopmentConfig, ProductionConfig  # Absolute import
+from routes.auth_routes import auth_bp  # Absolute import
+from routes.user_routes import user_bp  # Absolute import
+from utils.db import create_tables
 
-app = Flask(__name__)
-CORS(app)
-bcrypt = Bcrypt(app)
 
-# Initialize the database
-init_db()
+def create_app(config_class=DevelopmentConfig):
+    app = Flask(__name__)
+    app.config.from_object(config_class)
+    CORS(app, supports_credentials=True)
 
-# Register Blueprints and pass the database connection function
-app.register_blueprint(create_auth_bp(get_db_connection))
+    # Register blueprints
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(user_bp)
+    create_tables()
+    # Create tables if they don't exist
+    if not create_tables():
+        print("FATAL: Database table creation failed. Exiting.")
+        exit(1)
+
+    return app
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app = create_app()
+    app.run(port=5050)
