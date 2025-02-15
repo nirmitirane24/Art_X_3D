@@ -1,4 +1,8 @@
-Flask==2.2.2
-mysql-connector-python==8.0.31
-python-dotenv==0.21.0
-Werkzeug==2.2.2
+flask
+flask-cors
+python-dotenv
+pymysql
+werkzeug
+boto3
+pako
+requests

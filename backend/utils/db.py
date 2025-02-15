@@ -1,15 +1,18 @@
 import pymysql
 from config import Config  # Absolute import
+import os #for env usage
+from dotenv import load_dotenv
 
+load_dotenv()
 def get_db_connection():
     """Establishes a connection to the AWS RDS database."""
     try:
         conn = pymysql.connect(
-            host=Config.DB_HOST,
-            user=Config.DB_USER,
-            password=Config.DB_PASSWORD,
-            database=Config.DB_NAME,
-            port=Config.DB_PORT,
+            host=os.environ.get('DB_HOST'),
+            user=os.environ.get('DB_USER'),
+            password=os.environ.get('DB_PASSWORD'),
+            database=os.environ.get('DB_NAME'),
+            port=int(os.environ.get('DB_PORT', 3306)),  # Ensure port is an integer
             cursorclass=pymysql.cursors.DictCursor
         )
         return conn
@@ -39,6 +42,19 @@ def create_tables():
                     activity VARCHAR(255),
                     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (user_id) REFERENCES users(id)
+                );
+            """)
+            # Add Scenes Table Creation
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS Scenes (
+                    scene_id INT PRIMARY KEY AUTO_INCREMENT,
+                    user_id INT NOT NULL,
+                    s3_bucket_name VARCHAR(255) NOT NULL,
+                    s3_key VARCHAR(255) NOT NULL,
+                    scene_name VARCHAR(255) NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
                 );
             """)
             conn.commit()

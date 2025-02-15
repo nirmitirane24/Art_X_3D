@@ -1,13 +1,12 @@
-// --- START OF FILE HierarchyPanel.jsx ---
-
-import React, { useState } from "react";
+// HierarchyPanel.jsx
+import React, { useState, useRef } from "react";
 import "../styles/hierarchyPanel.css";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaFileExport, FaFileImport } from "react-icons/fa";
 import Import from "./HierarchyComponents/Import";
 import Export from "./HierarchyComponents/Export";
 import Library from "./HierarchyComponents/Library";
-// import { shapeIcons } from "./toolbar/ShapeButton";
-// import { lightIcons } from "./toolbar/LightButton"; // Import light icons
+import { saveScene, loadScene } from "./saveAndLoad"; // Import the functions
+
 
 const HierarchyPanel = ({
   sceneObjects = [],
@@ -16,10 +15,15 @@ const HierarchyPanel = ({
   onObjectSelect,
   onObjectDelete,
   scene,
+  setSceneObjects,
+  setSceneSettings,
+  sceneSettings, // Add sceneSettings as a prop
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [objectToDelete, setObjectToDelete] = useState(null);
+  const [showFileNameModal, setShowFileNameModal] = useState(false); //for save file name
+  const [fileName, setFileName] = useState(""); //for save file name
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -30,9 +34,6 @@ const HierarchyPanel = ({
         obj.type.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : [];
-
-  // No need for generateDynamicIds if you're already setting displayId
-  // const objectsWithDynamicIds = generateDynamicIds(filteredObjects);
 
   const handleDelete = (obj) => {
     setObjectToDelete(obj);
@@ -47,25 +48,31 @@ const HierarchyPanel = ({
     }
   };
 
+   const handleSave = () => {
+        setShowFileNameModal(true);
+    };
+
+    const confirmSave = () => {
+        if (fileName) {
+            saveScene(sceneObjects, sceneSettings, fileName); // Use sceneSettings from props
+             setShowFileNameModal(false);
+              setFileName(""); // Reset for next save
+        } else {
+           alert("please enter a file name")
+        }
+    };
+
+   const handleImportArtxThree = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      loadScene(file, setSceneObjects, setSceneSettings); // Use imported function
+    }
+  };
+
   return (
     <div className="hierarchy-panel">
       <h3>Objects</h3>
-      <hr
-        style={{
-          border: "0",
-          height: "1px",
-          backgroundImage:
-            "linear-gradient(to right, rgba(208, 200, 200, 0), rgba(103, 102, 102, 0.75), rgba(136, 130, 130, 0))",
-        }}
-      ></hr>
-
-      <input
-        type="text"
-        placeholder="Search..."
-        value={searchTerm}
-        onChange={handleSearchChange}
-        className="search-input"
-      />
+      {/* ... (rest of your HierarchyPanel code remains unchanged) ... */}
       <ul className="objects-list">
         {filteredObjects.length === 0 ? (
           <p className="no-objects">No models added</p>
@@ -140,10 +147,51 @@ const HierarchyPanel = ({
           </div>
         </div>
       )}
+
+      {/* --- Save and Load Buttons --- */}
       <div className="panel-buttons" style={{ marginLeft: "-10px" }}>
-        <Import onImportScene={onImportScene} />
-        <Library />
-        <Export scene={scene} />
+          <Import onImportScene={onImportScene} />
+          <Library />
+          <Export scene={scene} />
+          {/* Load Button (Hidden Input) */}
+            <input
+              type="file"
+              accept=".artxthree"
+              onChange={handleImportArtxThree}
+              style={{ display: "none" }}
+              id="import-artxthree"
+            />
+            <label htmlFor="import-artxthree" className="custom-button">
+               <FaFileImport /> Import .artxthree
+            </label>
+            {/* Save Button */}
+            <button onClick={handleSave} className="custom-button">
+               <FaFileExport/> Save .artxthree
+            </button>
+
+            {/*file name modal*/}
+            {showFileNameModal && (
+                <div className="file-name-modal">
+                    <h3>Enter File Name</h3>
+                    <input
+                        type="text"
+                        value={fileName}
+                        onChange={(e) => setFileName(e.target.value)}
+                        placeholder="Enter file name"
+                        className="search-input"
+                    />
+                    <div className="import-options">
+                        <button className="modal-buttons" onClick={confirmSave}>Save</button>
+                        <button className="modal-buttons"
+                            onClick={() => {
+                                setShowFileNameModal(false);
+                            }}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            )}
       </div>
     </div>
   );

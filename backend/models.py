@@ -120,3 +120,13 @@ class UserLog:  # Example model for user logs
             return False
         finally:
             conn.close()
+
+class Scene: #create a scene model
+    def __init__(self, scene_id, user_id, s3_bucket_name, s3_key, scene_name, created_at=None, updated_at=None):
+        self.scene_id = scene_id
+        self.user_id = user_id
+        self.s3_bucket_name = s3_bucket_name
+        self.s3_key = s3_key
+        self.scene_name = scene_name
+        self.created_at = created_at
+        self.updated_at = updated_at

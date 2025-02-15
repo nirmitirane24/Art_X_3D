@@ -3,6 +3,7 @@ from flask_cors import CORS
 from config import DevelopmentConfig, ProductionConfig  # Absolute import
 from routes.auth_routes import auth_bp  # Absolute import
 from routes.user_routes import user_bp  # Absolute import
+from routes.scene_routes import scene_bp  # NEW: Import the scene routes
 from utils.db import create_tables
 
 
@@ -14,6 +15,8 @@ def create_app(config_class=DevelopmentConfig):
     # Register blueprints
     app.register_blueprint(auth_bp)
     app.register_blueprint(user_bp)
+    app.register_blueprint(scene_bp)  # NEW: Register the scene blueprint
+
     create_tables()
     # Create tables if they don't exist
     if not create_tables():
