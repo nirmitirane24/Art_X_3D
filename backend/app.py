@@ -17,11 +17,7 @@ def create_app(config_class=DevelopmentConfig):
     app.register_blueprint(user_bp)
     app.register_blueprint(scene_bp)  # NEW: Register the scene blueprint
 
-    create_tables()
-    # Create tables if they don't exist
-    if not create_tables():
-        print("FATAL: Database table creation failed. Exiting.")
-        exit(1)
+    #create_tables() #remove
 
     return app
 
