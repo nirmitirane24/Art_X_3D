@@ -1,4 +1,4 @@
-# --- scene_routes.py (Handles JSON) ---
+# --- scene_routes.py ---
 from flask import Blueprint, request, jsonify, session
 import boto3
 import json
@@ -46,6 +46,7 @@ def save_scene():
         scene_name = data.get('sceneName')
         objects = data.get('objects')
         scene_settings = data.get('sceneSettings')
+        scene_id = data.get('sceneId')  # Get scene_id from the request
 
         if not scene_name or not objects or not scene_settings:
             return jsonify({'error': 'Missing required data (sceneName, objects, or sceneSettings)'}), 400
@@ -59,57 +60,68 @@ def save_scene():
             return jsonify({'error': 'User not found'}), 404
         user_id = user.id
 
-
         # Combine scene data
         scene_data = {
             'objects': objects,
             'sceneSettings': scene_settings
         }
         conn = get_db_connection()
-        # --- S3 UPLOAD FIRST ---
-        # 1.  Generate the object key *before* the S3 upload.
-        object_key = f"{user_id}/{scene_name}-{username}.json" #scene id is not available yet
+        # --- S3 UPLOAD (Both Save and Update) ---
+        # 1. Generate the object key.  Use scene_id if it exists (update).
+        if scene_id:
+            object_key = f"{user_id}/{scene_id}-{scene_name}-{username}.json"
+        else:
+            object_key = f"{user_id}/{scene_name}-{username}.json"  # No scene_id for new scenes
+
 
         # 2. Convert data to JSON.
         json_data = json.dumps(scene_data)
 
-        # 3. Upload to S3.
+        # 3. Upload to S3 (always overwrite).
         s3_client.put_object(Bucket=S3_BUCKET_NAME, Key=object_key, Body=json_data, ContentType='application/json')
         print(f"Uploaded to S3: {object_key}")
 
-        # --- DATABASE INSERT *AFTER* SUCCESSFUL S3 UPLOAD ---
-        # 4.  *Now* that S3 is successful, insert into the database.
-
+        # --- DATABASE (Save or Update) ---
         conn = get_db_connection()
         if conn is None:
             return jsonify({'error': 'Database connection failed'}), 500
 
         with conn.cursor() as cursor:
-            #  Include *all* columns, including s3_key, in a *single* INSERT.
-            cursor.execute(
-                "INSERT INTO Scenes (user_id, s3_bucket_name, scene_name, s3_key) VALUES (%s, %s, %s, %s) RETURNING scene_id",
-                (user_id, S3_BUCKET_NAME, scene_name, object_key)  # Pass object_key here
-            )
-            scene_id = cursor.fetchone()[0]
-            conn.commit()  # Commit after successful INSERT
+            if scene_id:
+                # UPDATE existing scene
+                cursor.execute(
+                    "UPDATE Scenes SET s3_bucket_name = %s, scene_name = %s, s3_key = %s WHERE scene_id = %s AND user_id = %s",
+                    (S3_BUCKET_NAME, scene_name, object_key, scene_id, user_id)  # Include user_id for security
+                )
+                if cursor.rowcount == 0:  # Check if update was successful
+                    conn.rollback()
+                    return jsonify({'error': 'Scene not found or unauthorized'}), 404 #or 403
+                conn.commit()
+                return jsonify({'message': 'Scene updated successfully', 'sceneId': scene_id}), 200  # Return 200 for update
 
-        return jsonify({'message': 'Scene saved successfully', 'sceneId': scene_id}), 201
+            else:
+                # INSERT new scene
+                cursor.execute(
+                    "INSERT INTO Scenes (user_id, s3_bucket_name, scene_name, s3_key) VALUES (%s, %s, %s, %s) RETURNING scene_id",
+                    (user_id, S3_BUCKET_NAME, scene_name, object_key)
+                )
+                scene_id = cursor.fetchone()[0]
+                conn.commit()
+                return jsonify({'message': 'Scene saved successfully', 'sceneId': scene_id}), 201  # Return 201 for create
 
     except ClientError as e:
         if conn:
-            conn.rollback()  # Rollback if S3 upload fails
+            conn.rollback()
         print(f"S3 Error: {e}")
         return jsonify({'error': 'Failed to upload to S3'}), 500
-    except Exception as e:  # Catch other potential errors
+    except Exception as e:
         if conn:
-            conn.rollback() #rollback if any error
+            conn.rollback()
         print(f"Error saving scene: {e}")
         return jsonify({'error': 'An unexpected error occurred'}), 500
     finally:
         if conn:
             conn.close()
-
-
 
 
 @scene_bp.route('/get-scene-url', methods=['GET'])

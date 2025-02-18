@@ -1,10 +1,10 @@
-// Toolbar.jsx
+// --- Toolbar.jsx ---
 import React, { useState } from 'react';
 import '../styles/toolbar.css';
 import ShapeButton from './toolbar/ShapeButton';
 import LightButton from './toolbar/LightButton'; // Import LightButton
-import { FaUndo, FaRedo, FaSave } from 'react-icons/fa'; // Import FaSave
-import axios from "axios";
+import { FaUndo, FaRedo } from 'react-icons/fa'; //  Remove FaSave
+// import axios from "axios";  // REMOVE: No axios calls in Toolbar
 
 
 const basicShapes = ['cube', 'sphere']; // Basic shapes always visible
@@ -33,9 +33,9 @@ const Toolbar = ({
   onRedo,
   undoDisabled,
   redoDisabled,
-  currentSceneId, // Receive currentSceneId
-    currentSceneName,
-    setCurrentSceneName,
+  // currentSceneId,     // REMOVE: No longer needed here
+  // currentSceneName,   // REMOVE: No longer needed here
+  // setCurrentSceneName, // REMOVE: No longer needed here
 }) => {
     const [showShapes, setShowShapes] = useState(false);
     const [showLights, setShowLights] = useState(false);
@@ -48,53 +48,9 @@ const Toolbar = ({
     const toggleLights = () => {
         setShowLights(!showLights);
     }
-  const handleSave = async () => {
-    if (!currentSceneName) { //scene name must be present
-      alert("Please enter a scene name before saving.");
-      return;
-    }
 
-    const formData = new FormData();
-    formData.append("sceneName", currentSceneName); // Use currentSceneName
-    formData.append("username", localStorage.getItem("username"));
+    // REMOVE: handleSave is completely removed from Toolbar
 
-    // Get the Three.js scene data
-    const sceneData = document.querySelector("canvas").toDataURL();
-    const blob = await (await fetch(sceneData)).blob();
-    formData.append("sceneFile", blob, `${currentSceneName}.artxthree`);
-
-     if (currentSceneId) {
-            formData.append('sceneId', currentSceneId);  // Include sceneId if available
-        }
-
-    try {
-      const response = await axios.post(
-        "http://localhost:5050/save",
-        formData,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-       if (response.status === 200) {
-                console.log("Scene saved successfully:", response.data);
-                alert(response.data.message); // Show success message
-                  if (!currentSceneId) {
-                    setCurrentSceneName(response.data.sceneName);
-                    setCurrentSceneId(response.data.sceneId); // Update currentSceneId after first save
-                  }
-            } else {
-                console.error("Scene save failed:", response);
-                alert("Failed to save scene.");
-            }
-
-    } catch (error) {
-      console.error("Error saving scene:", error);
-      alert(`Error saving scene: ${error.response.data.error}`);
-    }
-  };
     return (
         <div className="toolbar">
             <div className="undo-redo-buttons">
@@ -121,8 +77,8 @@ const Toolbar = ({
             ) : (
                 <button className="edit-mode-button disabled">Edit Mode</button>
             )}
-            {/* <hr className='vertical-line'></hr> */}
-             {/* <button onClick={handleSave} title="Save Scene" className='save-button'>
+            {/* REMOVED Save button:  <hr className='vertical-line'></hr> */}
+             {/* REMOVED Save button: <button onClick={handleSave} title="Save Scene" className='save-button'>
                 <FaSave />
             </button> */}
               <hr className='vertical-line'></hr>

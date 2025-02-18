@@ -6,7 +6,7 @@
   width: 210px;
   background-color:#16161acc; /* Semi-transparent dark background */
   color: #eee; /* Subtle semi-transparent border */
-  border-radius: 10px; /* Rounded corners */
+  border-radius: 15px; /* Rounded corners */
   overflow-y: auto;
   z-index: 10;
   height: calc(100% - 74px); /* Adjust height to account for margin and toolbar */

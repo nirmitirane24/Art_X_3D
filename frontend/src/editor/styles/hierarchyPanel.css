@@ -6,7 +6,7 @@
   width: 210px;
   background-color: #16161acc; /* Semi-transparent dark background */
   color: #eee; /* Light text color */
-  border-radius: 10px; /* Rounded corners */
+  border-radius: 15px; /* Rounded corners */
   z-index: 10;
   height: calc(100% - 74px); /* Adjust height to account for margin and toolbar */
   padding: 20px; /* Adjust padding */
@@ -394,4 +394,38 @@
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+}
+
+.scene-name-input{
+  margin-left: -5px;
+  outline: none;
+  width: 90%;
+  padding: 10px;
+  border-radius: 7px;
+  border: none;
+  background-color: #2523235d;
+  color: #eee;
+
+}
+.scene-name-input:focus{
+  margin-left: -5px;
+  outline: none;
+  width: 90%;
+  padding: 10px;
+  border-radius: 7px;
+  border: none;
+  background-color: #252323;
+  color: #eee;
+}
+
+.custom-button {
+  display: flex;          /* Use flexbox */
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 14px;
 }

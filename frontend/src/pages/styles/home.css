@@ -255,3 +255,23 @@ body::-webkit-scrollbar-corner {
     background-color: #3a3a5b;
     border-color: #ffffff;
   }
+
+  .skeleton-loading {
+    background: linear-gradient(90deg, 
+      hsla(199, 20%, 70%, 0.155) 25%, 
+      hsla(202, 22%, 90%, 0.617) 50%, 
+      hsla(199, 20%, 70%, 0.155) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite linear;
+  }
+  
+  @keyframes skeleton-loading {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  

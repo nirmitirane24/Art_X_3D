@@ -1,72 +1,104 @@
-import React, { useState } from "react";
- 
-const UndoRedo = ({ sceneObjects, setSceneObjects, sceneSettings, setSceneSettings, selectedObjects, setSelectedObjects }) => {
-    const [undoStack, setUndoStack] = useState([]);
-    const [redoStack, setRedoStack] = useState([]);
- 
-    const saveToUndoStack = (newSceneObjects, newSceneSettings) => {
-        if (!newSceneObjects || !newSceneSettings) {
-            console.warn("Skipping invalid state save to undo stack.");
-            return;
-        }
-        // Ensure at least one object exists in scene before saving
-        if (newSceneObjects.length === 0 && undoStack.length > 0) {
-            console.warn("Skipping empty scene save to undo stack.");
-            return;
-        }
-        setUndoStack((prevStack) => [
-            ...prevStack,
-            { 
-                sceneObjects: [...newSceneObjects], 
-                sceneSettings: { ...newSceneSettings }
-            }
-        ]);
-        setRedoStack([]); // Clear redo stack on new action
-    };
+// --- EditorManagerComponents/undoredo.jsx ---
+import React, { useState, useCallback } from "react"; // Import useCallback
 
- 
-    const undo = () => {
-        try {
-            if (undoStack?.length > 0) {
-                const previousState = undoStack[undoStack.length - 1];
-                // If previous state is invalid, restore the most recent valid one
-                if (!previousState.sceneObjects || !previousState.sceneSettings) {
-                    console.warn("Undo: Previous state is invalid, restoring last valid state.");
-                    return;
-                }
-                setRedoStack((prevStack) => [
-                    ...prevStack,
-                    { sceneObjects, sceneSettings },
-                ]);
-                console.log("Restoring Background Color:", previousState.sceneSettings.backgroundColor);
-                setSceneObjects([...previousState.sceneObjects]);
-                setSceneSettings({ ...previousState.sceneSettings });
-                setSelectedObjects(prevSelected =>
-                    previousState.sceneObjects.length > 0
-                        ? prevSelected.filter(id => previousState.sceneObjects.some(obj => obj.id === id))
-                        : []
-                );
-                setUndoStack((prevStack) => prevStack.slice(0, -1));
-            }
-        } catch (error) {
-            console.error("Undo error:", error);
-        }
-    };
+const UndoRedo = ({
+  sceneObjects,
+  setSceneObjects,
+  sceneSettings,
+  setSceneSettings,
+  selectedObjects,
+  setSelectedObjects,
+}) => {
+  const [undoStack, setUndoStack] = useState([]);
+  const [redoStack, setRedoStack] = useState([]);
 
-    const redo = () => {
-        if (redoStack?.length > 0) {  //  Prevent undefined errors
-            const nextState = redoStack[redoStack.length - 1];
-            setUndoStack((prevStack) => [
-                ...prevStack,
-                { sceneObjects, sceneSettings },
-            ]);
-            setSceneObjects(nextState.sceneObjects ?? []);
-            setSceneSettings(nextState.sceneSettings ?? {});
-            setRedoStack((prevStack) => prevStack.slice(0, -1));
-        }
-    };
- 
-    return { undo, redo, saveToUndoStack, undoStack, redoStack };
+  // Use useCallback for saveToUndoStack
+  const saveToUndoStack = useCallback((newSceneObjects, newSceneSettings) => {
+    if (!newSceneObjects || !newSceneSettings) {
+      console.warn("Skipping invalid state save to undo stack.");
+      return;
+    }
+    // No need to check for empty scene here.  Let the user undo to an empty scene.
+
+    setUndoStack((prevStack) => [
+      ...prevStack,
+      {
+        sceneObjects: [...newSceneObjects],
+        sceneSettings: { ...newSceneSettings },
+      },
+    ]);
+    setRedoStack([]); // Clear redo stack on new action
+  }, []); // Empty dependency array because all dependencies are passed as arguments
+
+  const undo = useCallback(() => {
+    if (undoStack.length > 0) {
+      const previousState = undoStack[undoStack.length - 1];
+
+      // No need for these checks.  It's OK to restore an empty scene.
+      // if (!previousState.sceneObjects || !previousState.sceneSettings) {
+      //     console.warn("Undo: Previous state is invalid, restoring last valid state.");
+      //     return;
+      // }
+
+      // Use functional updates for state updates
+      setRedoStack((prevStack) => [
+        ...prevStack,
+        {
+          sceneObjects: [...sceneObjects],
+          sceneSettings: { ...sceneSettings },
+        }, // Deep copy current state
+      ]);
+
+      // Use functional updates, and spread the previous state to avoid mutation
+      setSceneObjects([...previousState.sceneObjects]);
+      setSceneSettings({ ...previousState.sceneSettings });
+
+      // Clear selection after undo.  This is generally better UX.
+      setSelectedObjects([]);
+
+      setUndoStack((prevStack) => prevStack.slice(0, -1));
+    }
+  }, [
+    undoStack,
+    sceneObjects,
+    sceneSettings,
+    setSceneObjects,
+    setSceneSettings,
+    setSelectedObjects,
+  ]); // Add dependencies
+
+  const redo = useCallback(() => {
+    if (redoStack.length > 0) {
+      const nextState = redoStack[redoStack.length - 1];
+
+      // Use functional updates for state updates.  Deep copy current state.
+      setUndoStack((prevStack) => [
+        ...prevStack,
+        {
+          sceneObjects: [...sceneObjects],
+          sceneSettings: { ...sceneSettings },
+        },
+      ]);
+
+      // Use functional updates, and spread the next state to avoid mutation
+      setSceneObjects([...nextState.sceneObjects]);
+      setSceneSettings({ ...nextState.sceneSettings });
+
+      // Clear selection after redo.
+      setSelectedObjects([]);
+
+      setRedoStack((prevStack) => prevStack.slice(0, -1));
+    }
+  }, [
+    redoStack,
+    sceneObjects,
+    sceneSettings,
+    setSceneObjects,
+    setSceneSettings,
+    setSelectedObjects,
+  ]); // Add dependencies
+
+  return { undo, redo, saveToUndoStack, undoStack, redoStack };
 };
- 
+
 export default UndoRedo;

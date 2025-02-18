@@ -17,6 +17,7 @@ function RoutingManager() {
         <Route exact path="/home" element={<Home />} />
         <Route exact path="/editor" element={<EditorManager />} />
         
+        <Route path="/error" element={<ErrorPage />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
     </Router>
