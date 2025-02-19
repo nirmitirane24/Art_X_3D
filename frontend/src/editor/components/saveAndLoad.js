@@ -164,15 +164,28 @@ const saveScene = async (sceneObjects, sceneSettings, sceneName, sceneId) => { /
   }
 };
 
-const loadScene = async (sceneId, setSceneObjects, setSceneSettings) => {
+const loadScene = async (sceneId, setSceneObjects, setSceneSettings, type) => {
   try {
-    const response = await axios.get(
-      `http://localhost:5050/get-scene?sceneId=${sceneId}`,
-      {
-        responseType: "json", // Expect JSON
-        withCredentials: true,
-      }
-    );
+    let response
+    if(type==1){
+      response = await axios.get(
+        `http://localhost:5050/get-scene?sceneId=${sceneId}`,
+        {
+          responseType: "json", // Expect JSON
+          withCredentials: true,
+        }
+      );
+    }
+    if(type==2){
+      response = await axios.get(
+        `http://localhost:5050/get-community-example?exampleId=${sceneId}`,
+        {
+          responseType: "json", // Expect JSON
+          withCredentials: true,
+        }
+      );
+    }
+
 
     if (response.status !== 200) {
       throw new Error(`Failed to load scene: ${response.status}`);

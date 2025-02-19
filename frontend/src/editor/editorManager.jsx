@@ -1,11 +1,11 @@
 // --- editorManager.jsx ---
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import Toolbar from "./components/Toolbar";
 import HierarchyPanel from "./components/HierarchyPanel.jsx";
 import PropertiesPanel from "./components/PropertiesPanel";
-import CameraControls from "./components/CameraControls";
+import CameraControls, { SceneContext } from "./components/CameraControls";
 import GroundPlane from "./components/GroundPlane";
 import Model from "./components/Model";
 import AIChat from "./components/AIChat";
@@ -41,7 +41,6 @@ const EditorManager = () => {
           navigate("/");
         }
         setUsername(response.data.username);
-        fetchProjects();
       } catch (error) {
         if (error.response && error.response.status === 401) {
           navigate("/");
@@ -303,24 +302,31 @@ const EditorManager = () => {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const sceneId = urlParams.get("sceneId");
+    const sceneId = urlParams.get('sceneId');
+    const exampleId = urlParams.get('exampleId');
+
     if (sceneId) {
-      loadScene(sceneId, setSceneObjects, setSceneSettings);
-      setCurrentSceneId(sceneId); // Set ID
+        // Load user's scene
+        loadScene(sceneId, setSceneObjects, setSceneSettings,1);
+        setCurrentSceneId(sceneId);
+        localStorage.setItem('currentSceneId', sceneId);
         setLoading(true);
-      axios
-        .get(`http://localhost:5050/get-scene-url?sceneId=${sceneId}`, {
-          withCredentials: true,
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            setCurrentSceneName(response.data.sceneName); // Set name
-            localStorage.setItem("currentSceneName", response.data.sceneName);
-            localStorage.setItem("currentSceneId", sceneId);
-            setLoading(false);
-          }
-        })
-        .catch((error) => console.error("Error getting scene name", error));
+        axios.get(`http://localhost:5050/get-scene-url?sceneId=${sceneId}`, { withCredentials: true })
+            .then(response => {
+                if (response.status === 200) {
+                    setCurrentSceneName(response.data.sceneName);
+                    localStorage.setItem('currentSceneName', response.data.sceneName);
+                    setLoading(false);
+                }
+            })
+            .catch(error => console.error("Error getting scene name", error));
+
+    } else if (exampleId) {
+        // Load community example
+        setLoading(true);
+        loadScene(exampleId, setSceneObjects, setSceneSettings, 2);
+    } else {
+        setLoading(false);
     }
   }, []);
 

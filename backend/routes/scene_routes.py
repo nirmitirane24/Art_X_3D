@@ -10,6 +10,9 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 from urllib.parse import urlparse
+from datetime import datetime, timezone
+import timeago
+import pytz
 
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / '.env')
 
@@ -35,6 +38,7 @@ if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
     )
 else:
     s3_client = boto3.client('s3', region_name=AWS_REGION)
+
 
 
 @scene_bp.route('/save', methods=['POST'])
@@ -190,6 +194,105 @@ def get_scene():
         if conn is not None:
             conn.close()
 
+@scene_bp.route('/community-examples', methods=['GET'])
+@login_required
+def get_community_examples():
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({'error': 'Database connection failed'}), 500
+
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT example_id, example_name, description, thumbnail_s3_key FROM community_examples")  # Select necessary fields
+            examples = cursor.fetchall()
+
+        example_list = []
+        for example in examples:
+            example_list.append({
+                "example_id": example[0],
+                "example_name": example[1],
+                "description": example[2],
+                "thumbnail_s3_key": example[3]  # Include thumbnail key
+            })
+        return jsonify(example_list), 200
+
+    except Exception as e:
+        print(f"Error getting community examples: {e}")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn is not None:
+            conn.close()
+
+@scene_bp.route('/get-community-example-url', methods=['GET'])
+@login_required
+def get_community_example_url():
+    example_id = request.args.get('exampleId')
+    if not example_id:
+        return jsonify({'error': 'exampleId is required'}), 400
+
+    try:
+        conn = get_db_connection()
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT s3_key FROM community_examples WHERE example_id = %s", (example_id,))
+            example_data = cursor.fetchone()
+
+        if not example_data:
+            return jsonify({'error': 'Community example not found'}), 404
+
+        return jsonify({'s3Key': example_data[0]}), 200
+
+    except Exception as e:
+        print(f"Error getting community example URL: {e}")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn is not None:
+            conn.close()
+
+@scene_bp.route('/get-community-example', methods=['GET'])
+@login_required
+def get_community_example():
+    example_id = request.args.get('exampleId')
+    if not example_id:
+        return jsonify({'error': 'exampleId is required'}), 400
+
+    conn = None
+    try:
+        conn = get_db_connection()
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT s3_key FROM community_examples WHERE example_id = %s", (example_id,))
+            example_data = cursor.fetchone()
+
+        if not example_data:
+            return jsonify({'error': 'Community example not found'}), 404
+
+        s3_key = example_data[0]
+
+        # --- Supabase Storage using Boto3 (Custom Endpoint) ---
+        s3_client = boto3.client(
+            's3',
+            region_name=os.environ.get('SUPABASE_S3_REGION'),
+            endpoint_url=os.environ.get('SUPABASE_S3_ENDPOINT'),
+            aws_access_key_id=os.environ.get('SUPABASE_S3_ACCESS_KEY'),
+            aws_secret_access_key=os.environ.get('SUPABASE_S3_SECRET_KEY')
+        )
+
+        response = s3_client.get_object(Bucket=os.environ.get('SUPABASE_BUCKET_NAME'), Key=s3_key)
+        # print(response)
+        file_content = response['Body'].read()
+
+        return jsonify(json.loads(file_content.decode('utf-8')))
+
+    except ClientError as e:
+        print(f"S3 Error: {e}")
+        return jsonify({'error': 'Failed to retrieve scene from Supabase Storage'}), 500
+    except Exception as e:
+        print(f"Error getting community example: {e}")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn is not None:
+            conn.close()
+
+
 @scene_bp.route('/scenes', methods=['GET'])
 @login_required
 def get_user_scenes():
@@ -203,16 +306,21 @@ def get_user_scenes():
             return jsonify({'error': 'Database connection failed'}), 500
 
         with conn.cursor() as cursor:
-            cursor.execute("SELECT scene_id, scene_name FROM Scenes WHERE user_id = %s", (user.id,))
+            cursor.execute("SELECT scene_id, scene_name, updated_at FROM Scenes WHERE user_id = %s ORDER BY updated_at DESC", (user.id,))
             scenes = cursor.fetchall()
-
+            
+        ist = pytz.timezone('Asia/Kolkata')
         scene_list = []
         for scene in scenes:
+            last_updated = scene[2]
+            if last_updated.tzinfo is None:
+                last_updated = ist.localize(last_updated) 
+
             scene_list.append({
                 "scene_id": scene[0],
-                "scene_name": scene[1]
+                "scene_name": scene[1],
+                "last_updated": timeago.format(last_updated, datetime.now(ist))
             })
-
         return jsonify(scene_list), 200
 
     except Exception as e:

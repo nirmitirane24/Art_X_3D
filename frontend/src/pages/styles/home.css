@@ -1,7 +1,7 @@
 /* General */
 body {
     margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
     color: #ffffff;
     background-color: #1a192d;
 }
@@ -38,20 +38,20 @@ body::-webkit-scrollbar-corner {
 }
 /* Sidebar */
 .sidebar-home {
-    height: 50vh; /* Keep this to cover the full content height */
-    width: 240px;
-    background-color: transparent;
+    height: 100vh; /* Keep this to cover the full content height */
+    width: 220px;
+    background-color: #00000028;
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    /* padding: 20px; */
     position: sticky; /* Makes the sidebar sticky */
     top: 0; /* Sticks it to the top of the viewport */
 }
 
 .profile-section {
+    margin: 20px;
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
 }
 
 .profile-icon {
@@ -68,6 +68,7 @@ body::-webkit-scrollbar-corner {
 }
 
 .menu {
+    margin:0px 20px ;
     flex-grow: 1;
 }
 
@@ -87,7 +88,7 @@ body::-webkit-scrollbar-corner {
 
 /* Upgrade Section */
 .upgrade-section {
-    margin-top: 10px;
+    margin: 10px;
 }
 
 .upgrade-button {
@@ -114,10 +115,9 @@ body::-webkit-scrollbar-corner {
 .generate-button,
 .new-file-button {
     font-family: inherit;
-    padding: 10px 20px;
+
     border-radius: 10px;
     border: none;
-    margin: 10px; /* Adds space around each button */
     background-color: #6866b1;
     font-weight: bold;
     cursor: pointer;
@@ -155,34 +155,63 @@ body::-webkit-scrollbar-corner {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
+    min-height: 280px; /* Add a minimum height */
+
 }
 
 .project-card {
-    background-color: #333;
-    border-radius: 10px;
-    padding: 10px;
+    width: 280px;
+    background-color: #33333346;
+    border-radius: 15px;
     text-align: center;
+    padding: 10px;
     height: 280px;
+    transition: ease-in-out 0.3s;
+    display: flex;          /* Use flexbox */
+    flex-direction: column; /* Stack children vertically */
 }
+.project-card:hover {
+    transition: ease-in-out 0.3s;
+    background-color: #333333c8;
 
+}
 .project-thumbnail {
-    height: 200px;
+    overflow: hidden;
+    /* height: 200px; */
     background-color: #444;
     border-radius: 10px;
     margin-bottom: 10px;
-}
+    flex-grow: 1;      /* Allow thumbnail to grow */
+    display: flex;    /* Make thumbnail a flex container */
+    align-items: center; /* Center vertically */
+    justify-content: center; /*Center horizontally*/
 
+}
+.project-thumbnail img {
+    /* height: 200px; Removed fixed height*/
+    max-width: 100%; /*Ensure image fits within container*/
+    max-height: 100%; /* Ensure image fits*/
+    border-radius: 5px;
+    object-fit: cover; /* Important for consistent sizing */
+    height: 200px;
+
+}
 .project-thumbnail.pink {
     background-color: #726f75;
-    
+
 }
 
 .project-title {
-    color: #fff;
+     /* Removed fixed positioning */
+    margin-top: 0px;
+    margin-left: 3px;
+    align-self: flex-start;
+    color: #eeeeee;
     font-weight: bold;
 }
 
 .project-date {
+    align-self: flex-start;
     color: #aaa;
     font-size: 14px;
 }
@@ -192,17 +221,44 @@ body::-webkit-scrollbar-corner {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
+    min-height: 280px; /* Add minimum height */
 }
 
 .tutorial-card {
-    background-color: #333;
-    border-radius: 10px;
+    width: 280px;
+    overflow: hidden;
+    background-color: #33333346;
+    border-radius: 15px;
     text-align: center;
     padding: 10px;
     height: 280px;
+    transition: ease-in-out 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+.tutorial-card:hover {
+    transition: ease-in-out 0.3s;
+    background-color: #333333c8;
 }
 
 .tutorial-card img {
+    transform: scale(1.05);
+    transition: ease-in-out 0.3s;
+    max-width: 100%;
+    max-height: 100%; /* Ensure image fits*/
+    border-radius: 5px;
+    object-fit: cover; /* Important for consistent sizing */
+    height: 200px;
+}
+.tutorial-card .project-thumbnail{
+    flex-grow: 1;      /* Allow thumbnail to grow */
+    display: flex;    /* Make thumbnail a flex container */
+    align-items: center; /* Center vertically */
+    justify-content: center; /*Center horizontally*/
+}
+.tutorial-card img:hover {
+    transform: scale(1.1);
+    transition: ease-in-out 1;
     max-width: 100%;
     border-radius: 5px;
 }
@@ -250,22 +306,22 @@ body::-webkit-scrollbar-corner {
     cursor: pointer;
     transition: background-color 0.3s, border-color 0.3s;
   }
-  
+
   .project-card.new-file:hover {
     background-color: #3a3a5b;
     border-color: #ffffff;
   }
 
   .skeleton-loading {
-    background: linear-gradient(90deg, 
-      hsla(199, 20%, 70%, 0.155) 25%, 
-      hsla(202, 22%, 90%, 0.617) 50%, 
+    background:  linear-gradient(90deg,
+      hsla(199, 20%, 70%, 0.155) 25%,
+      hsl(203, 100%, 87%) 50%,
       hsla(199, 20%, 70%, 0.155) 75%
     );
     background-size: 200% 100%;
-    animation: skeleton-loading 1.5s infinite linear;
+    animation: skeleton-loading 2s infinite linear;
   }
-  
+
   @keyframes skeleton-loading {
     0% {
       background-position: -200% 0;
@@ -274,4 +330,18 @@ body::-webkit-scrollbar-corner {
       background-position: 200% 0;
     }
   }
-  
+  #home-hr-tag{
+        border: none;
+        height: 1px;
+        background-color: #525252;
+  }
+  .lastupdated{
+    align-items: flex-start;
+    justify-content: flex-start;
+    justify-self: flex-start;
+    font-size: 10px;
+    color: #aaaaaa;
+    margin-left: 3px;
+    margin-top: -17px;
+    align-self: flex-start;
+  }

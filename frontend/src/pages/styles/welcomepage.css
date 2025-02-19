@@ -25,11 +25,12 @@ body::-webkit-scrollbar-thumb:hover {
 body::-webkit-scrollbar-corner {
   background-color: #1a192d; /* Matches the track */
 }
-
+body{
+  font-family: "Futura, 'Trebuchet MS', Arial, sans-serif";
+}
 
 /* Main Container */
 .main-container {
-  font-family:inherit;
   background-color: #1a192d;
   display: flex;
   flex-direction: column;
@@ -45,7 +46,6 @@ body::-webkit-scrollbar-corner {
 
 /* Button Styling */
 .welcomeBTN {
-  font-family: Arial, Helvetica, sans-serif;
   padding: 17px 40px;
   border-radius: 10px;
   width: 40%;
@@ -71,7 +71,6 @@ body::-webkit-scrollbar-corner {
 
 /* Navbar Styles */
 .navbar {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   position: relative; /* Keep the navbar fixed at the top */
   top: 7%;
   left: 25%;
@@ -163,12 +162,11 @@ body::-webkit-scrollbar-corner {
 .features li {
   align-items: center;
   justify-content: center;
-  font-family: Arial, sans-serif;
   padding: 9px 9px;
   border-radius: 12px;
   cursor:default;
 }
 .features li:hover{
-  background-color: #1a192d;
-  color: rgb(83, 84, 83);
+  background-color: #ffffff;
+  color: rgba(255, 255, 255, 0.285);
 }

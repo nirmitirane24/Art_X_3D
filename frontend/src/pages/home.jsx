@@ -1,3 +1,5 @@
+// --- home.jsx ---
+
 import React, { useState, useEffect } from "react";
 import { FaTimes, FaFileAlt, FaSignOutAlt } from "react-icons/fa";
 import "./styles/home.css";
@@ -14,28 +16,33 @@ const Home = () => {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
   const [projects, setProjects] = useState([]);
-  const [projectsLoading, setProjectsLoading] = useState(false); // Add loading state for projects
+  const [projectsLoading, setProjectsLoading] = useState(false);
+  const [communityExamples, setCommunityExamples] = useState([]);
+  const [communityLoading, setCommunityLoading] = useState(false);
+  const [projectsGridRef, setProjectsGridRef] = useState(null); // Ref for projects grid
+  const [tutorialsGridRef, setTutorialsGridRef] = useState(null); // Ref for tutorials grid
+  const [projectsGridHeight, setProjectsGridHeight] = useState(0); // Height of projects grid
+  const [tutorialsGridHeight, setTutorialsGridHeight] = useState(0); // Height of tutorials grid
+
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Use the /auth/check endpoint, as it was designed for this.
         const response = await axios.get("http://localhost:5050/auth/check", {
           withCredentials: true,
         });
-        // Get the username from the *response* of /auth/check.
         console.log("User authenticated:", response.data);
-        if(response.data.username === undefined || response.data.username === null){
+        if (response.data.username === undefined || response.data.username === null) {
           navigate("/");
         }
         setUsername(response.data.username);
         fetchProjects();
+        fetchCommunityExamples();
       } catch (error) {
         if (error.response && error.response.status === 401) {
           navigate("/");
         } else {
           console.error("Error checking authentication:", error);
-          // Optionally show an error message to the user
         }
       } finally {
         setLoading(false);
@@ -46,21 +53,53 @@ const Home = () => {
   }, [navigate]);
 
   const fetchProjects = async () => {
-    setProjectsLoading(true); // Start loading projects
+    setProjectsLoading(true);
     try {
       const response = await axios.get("http://localhost:5050/scenes", {
         withCredentials: true,
       });
       if (response.status === 200) {
-        setProjects(response.data);
-        console.log("Projects fetched successfully:", response.data);
+        const projectsWithThumbnails = await Promise.all(
+          response.data.map(async (project) => {
+            if (project.thumbnail_url) {
+              try {
+                const thumbResponse = await axios.get(
+                  `http://localhost:5050/get-thumbnail-url?sceneId=${project.scene_id}`,
+                  { withCredentials: true }
+                );
+                if (thumbResponse.status === 200) {
+                  return { ...project, thumbnail_url: thumbResponse.data.thumbnailUrl };
+                }
+              } catch (error) {
+                console.error("Error fetching thumbnail:", project.scene_id, error);
+                return project;
+              }
+            }
+            return project;
+          })
+        );
+        setProjects(projectsWithThumbnails);
       } else {
         console.error("Failed to fetch projects:", response);
       }
     } catch (error) {
       console.error("Error fetching projects:", error);
     } finally {
-      setProjectsLoading(false); // Stop loading projects, regardless of success/failure
+      setProjectsLoading(false);
+    }
+  };
+
+  const fetchCommunityExamples = async () => {
+    setCommunityLoading(true);
+    try {
+      const response = await axios.get("http://localhost:5050/community-examples", {
+        withCredentials: true,
+      });
+      setCommunityExamples(response.data);
+    } catch (error) {
+      console.error("Error fetching community examples:", error);
+    } finally {
+      setCommunityLoading(false);
     }
   };
 
@@ -118,18 +157,14 @@ const Home = () => {
       formData.append("username", username);
       formData.append("sceneFile", file);
 
-      const response = await axios.post(
-        "http://localhost:5050/save",
-        formData,
-        {
-          withCredentials: true,
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      const response = await axios.post("http://localhost:5050/save", formData, {
+        withCredentials: true,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       if (response.status === 200) {
-        console.log("File uploaded successfully:", response.data);
-        alert("File uploaded and scene created successfully.");
+        console.log("File uploaded:", response.data);
+        alert("File uploaded and scene created.");
         fetchProjects();
         navigate(`/editor?sceneId=${response.data.sceneId}`);
       } else {
@@ -138,18 +173,15 @@ const Home = () => {
       }
     } catch (error) {
       console.error("Error uploading file:", error);
-      alert(`Error uploading file: ${error.message}`);
+      alert(`Error: ${error.message}`);
     } finally {
       setLoading(false);
     }
   };
+
   const handleLogout = async () => {
     try {
-      await axios.post(
-        "http://localhost:5050/auth/logout",
-        {},
-        { withCredentials: true }
-      );
+      await axios.post("http://localhost:5050/auth/logout", {}, { withCredentials: true });
       logoutUser();
       navigate("/");
     } catch (error) {
@@ -157,6 +189,23 @@ const Home = () => {
     }
   };
 
+  const handleLoadExample = (exampleId) => {
+    navigate(`/editor?exampleId=${exampleId}`);
+  };
+
+    // UseEffect to measure and set grid heights after loading
+  useEffect(() => {
+    if (!projectsLoading && projectsGridRef) {
+      setProjectsGridHeight(projectsGridRef.clientHeight);
+    }
+    if (!communityLoading && tutorialsGridRef) {
+      setTutorialsGridHeight(tutorialsGridRef.clientHeight);
+    }
+  }, [projectsLoading, communityLoading, projectsGridRef, tutorialsGridRef]);
+
+  const handleWelcome = () => {
+    navigate("/welcome");
+  }
   if (loading) {
     return <LoadingPage />;
   }
@@ -166,7 +215,7 @@ const Home = () => {
       <aside className="sidebar-home">
         <div className="profile-section">
           <div className="profile-icon">
-            <img style={{ height: "30px" }} src="/cube2.svg" alt="" />
+            <img style={{ height: "30px" }} src="/cube2.svg" alt="" onClick={{handleWelcome}} />
           </div>
           <span>{username}</span>
         </div>
@@ -195,28 +244,16 @@ const Home = () => {
         </nav>
         <div className="upgrade-section">
           <button className="upgrade-button">Upgrade</button>
-          <button
-            className="upgrade-button"
-            onClick={handleLogout}
-            style={{ marginTop: "10px" }}
-          >
+          <button className="upgrade-button" onClick={handleLogout} style={{ marginTop: "10px" }}>
             <FaSignOutAlt style={{ marginRight: "5px" }} />
             Logout
           </button>
         </div>
       </aside>
+
       <main className="main-content">
         <header className="top-bar">
           <h1>Welcome to the 3D space</h1>
-          <button className="import-button" onClick={handleImportButtonClick}>
-            Import
-          </button>
-          <button
-            className="generate-button"
-            onClick={handleGenerateButtonClick}
-          >
-            Generate
-          </button>
         </header>
 
         {isImportPanelOpen && (
@@ -225,19 +262,11 @@ const Home = () => {
               <h2>Import or Drag & Drop</h2>
               <FaTimes className="close-icon" onClick={handleClosePanel} />
             </div>
-            <div
-              className={`drag-drop-area ${dragOver ? "drag-over" : ""}`}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-            >
+            <div className={`drag-drop-area ${dragOver ? "drag-over" : ""}`} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
               <p>Drag & Drop files here or choose an option below</p>
             </div>
             <div className="import-options">
-              <button
-                className="import-option"
-                onClick={() => handleFileInput(".gltf,.glb,.stl,.fbx,.obj")}
-              >
+              <button className="import-option" onClick={() => handleFileInput(".gltf,.glb,.stl,.fbx,.obj")}>
                 3D Model (GLTF, STL, FBX, OBJ)
               </button>
             </div>
@@ -251,16 +280,10 @@ const Home = () => {
               <FaTimes className="close-icon" onClick={handleClosePanel} />
             </div>
             <div className="import-options">
-              <button
-                className="import-option"
-                onClick={() => navigate("/2dimageto3dmodel")}
-              >
+              <button className="import-option" onClick={() => navigate("/2dimageto3dmodel")}>
                 2D Image to 3D Model
               </button>
-              <button
-                className="import-option"
-                onClick={() => navigate("/polymodel")}
-              >
+              <button className="import-option" onClick={() => navigate("/polymodel")}>
                 Polymodel Conversion
               </button>
               <button className="import-option" onClick={() => navigate("#")}>
@@ -277,16 +300,12 @@ const Home = () => {
         )}
 
         <section className="projects">
-          <h2>Projects</h2>
-          <div className="projects-grid">
-            <div
-              onClick={() => navigate("/editor")}
-              className="project-card new-file"
-            >
+          <h2>Your Projects</h2>
+          <div className="projects-grid" ref={setProjectsGridRef}  style={{ minHeight: projectsGridHeight }}>
+            <div onClick={() => navigate("/editor")} className="project-card new-file">
               <FaFileAlt style={{ marginRight: "8px" }} />
               <p>New File</p>
             </div>
-            {/* Skeleton Loading */}
             {projectsLoading ? (
               <>
                 <div className="project-card skeleton-loading">
@@ -308,16 +327,16 @@ const Home = () => {
               </>
             ) : (
               projects.map((project) => (
-                <div
-                  key={project.scene_id}
-                  className="project-card"
-                  onClick={() =>
-                    navigate(`/editor?sceneId=${project.scene_id}`)
-                  }
-                >
-                  <div className="project-thumbnail"></div>
+                <div key={project.scene_id} className="project-card" onClick={() => navigate(`/editor?sceneId=${project.scene_id}`)}>
+                  <div className="project-thumbnail">
+                    {project.thumbnail_url ? (
+                      <img src={project.thumbnail_url} alt={project.scene_name} />
+                    ) : (
+                      <div className="project-thumbnail"></div>
+                    )}
+                  </div>
                   <p className="project-title">{project.scene_name}</p>
-                  <p>3D Space</p>
+                  <p className="lastupdated">Last updated {project.last_updated}</p>
                 </div>
               ))
             )}
@@ -325,34 +344,48 @@ const Home = () => {
         </section>
 
         <section className="tutorials">
-          <h2>Tutorials</h2>
-          <div className="tutorials-grid">
-            {/* Placeholder tutorial cards - replace with dynamic content */}
-            <div className="tutorial-card">
-              <div className="project-thumbnail"></div>
-              <p className="project-title">Untitled</p>
-              <span className="project-date"></span>
-              <p></p>
+            <h2>Community Examples</h2>
+            <div className="tutorials-grid" ref={setTutorialsGridRef} style={{minHeight: tutorialsGridHeight}}>
+                {communityLoading ? (
+                    <>
+                        <div className="tutorial-card skeleton-loading">
+                            <div className="project-thumbnail skeleton-loading"></div>
+                            <p className="project-title skeleton-loading"></p>
+                        </div>
+                        <div className="tutorial-card skeleton-loading">
+                            <div className="project-thumbnail skeleton-loading"></div>
+                            <p className="project-title skeleton-loading"></p>
+                        </div>
+                        <div className="tutorial-card skeleton-loading">
+                            <div className="project-thumbnail skeleton-loading"></div>
+                            <p className="project-title skeleton-loading"></p>
+                        </div>
+                        <div className="tutorial-card skeleton-loading">
+                            <div className="project-thumbnail skeleton-loading"></div>
+                            <p className="project-title skeleton-loading"></p>
+                        </div>
+                    </>
+                ) : (
+                    communityExamples.map((example) => (
+                        <div key={example.example_id} className="tutorial-card"
+                             onClick={() => handleLoadExample(example.example_id)}>
+                            <div className="project-thumbnail">
+                                {example.thumbnail_s3_key ? (
+                                     <img
+                                        src={`${example.thumbnail_s3_key}`}
+                                        alt={example.example_name}
+                                        className="example-thumbnail"
+                                      />
+                                ) : (
+                                    <div className="project-thumbnail"></div> // Keep this for consistent layout
+                                )}
+                            </div>
+                            <p className="project-title">{example.example_name}</p>
+                            <p>{example.description}</p>
+                        </div>
+                    ))
+                )}
             </div>
-            <div className="tutorial-card">
-              <div className="project-thumbnail"></div>
-              <p className="project-title">Untitled</p>
-              <span className="project-date"></span>
-              <p></p>
-            </div>
-            <div className="tutorial-card">
-              <div className="project-thumbnail"></div>
-              <p className="project-title">Untitled</p>
-              <span className="project-date"></span>
-              <p></p>
-            </div>
-            <div className="tutorial-card">
-              <div className="project-thumbnail"></div>
-              <p className="project-title">Untitled</p>
-              <span className="project-date"></span>
-              <p></p>
-            </div>
-          </div>
         </section>
       </main>
     </div>

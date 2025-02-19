@@ -38,7 +38,7 @@ const dropdownStyle = {
 };
 
 return (
-  <nav className="navbar" style={{ marginTop: '-30px', position: 'relative' }}>
+  <nav className="navbar" style={{ marginTop: '-30px', position: 'relative',fontFamily: "Futura, 'Trebuchet MS', Arial, sans-serif" }}>
     <Link to={'/'}>
       <img
         src="/cube2.svg"
@@ -191,16 +191,14 @@ const [isAuthenticated, setIsAuthenticated] = useState(false);
 
 useEffect(() => {
   const checkAuth = async () => {
-    // IMPORTANT: Check if authentication has ALREADY been determined
     if (isAuthenticated === false) {
       try {
-        // Try accessing a protected route.
         await axios.get("http://localhost:5050/user/logs", { withCredentials: true });
-        setIsAuthenticated(true); // Update the state ONLY on success
+        setIsAuthenticated(true);
       } catch (error) {
-        setIsAuthenticated(false); // And ONLY on failure
+        setIsAuthenticated(false);
       } finally {
-        setLoading(false); // Loading is finished regardless
+        setLoading(false)
       }
     } else {
         setLoading(false)
@@ -208,7 +206,7 @@ useEffect(() => {
 
   };
   checkAuth();
-}, [isAuthenticated]); // Add isAuthenticated to the dependency array
+}, [isAuthenticated]); 
 
 const handleGetStarted = () => {
   if (isAuthenticated) {
@@ -226,7 +224,7 @@ return (
   <div className="main-container" style={{ display: 'flex', height: '140vh', flexDirection: 'column' }}>
     <Navbar isAuthenticated={isAuthenticated} />
 
-    <div className='features' style={{ marginTop: '90px' }}>
+    <div className='features' style={{ marginTop: '70px' }}>
       <li>✓ web-based</li>
       <li>✓ real-time</li>
       <li>✓ interactive 3D</li>
@@ -235,7 +233,7 @@ return (
     <div className="content-container" style={{ display: 'flex', height: '50%' }}>
       <div className="overlay" style={{ flex: 1, padding: '50px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <h1 style={{ fontSize: "78px", letterSpacing: '1.8px' }}>Explore the World of 3D</h1>
-        <p style={{ fontSize: "20px", opacity: "70%", fontFamily: "cursive", marginTop: '-50px' }}>ArtX3d, a place to design and generate 3D models.</p>
+        <p style={{ fontSize: "20px", opacity: "70%", fontFamily: "Futura, 'Trebuchet MS', Arial, sans-serif", marginTop: '-50px' }}>ArtX3d, a place to design and generate 3D models.</p>
         <button className="welcomeBTN" style={{ fontSize: "30px", marginTop: '2px', padding: '10px 20px' }} onClick={handleGetStarted}>Start Here → </button>
       </div>
 
@@ -260,7 +258,7 @@ const Footer = () => {
       padding: "20px 50px",
       textAlign: "center",
       marginTop: "auto",
-      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      fontFamily: " Futura, 'Trebuchet MS', Arial, sans-serif",
   };
 
   const linkStyle = {
