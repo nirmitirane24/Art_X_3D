@@ -59,22 +59,23 @@ const HierarchyPanel = ({
   };
 
 
-    const handleSave = async () => {
-        setIsSaving(true);
-        try {
-            await saveScene(sceneObjects, sceneSettings, currentSceneName, currentSceneId);
-            setShowTick(true);
-            setTimeout(() => {
-                setShowTick(false);
-                setIsSaving(false);
-            }, 1000);
+  const handleSave = async () => {
+      setIsSaving(true);
+      try {
+        console.log("Saving scene with ID:", currentSceneId);
+          await saveScene(sceneObjects, sceneSettings, currentSceneName, currentSceneId);
+          setShowTick(true);
+          setTimeout(() => {
+              setShowTick(false);
+              setIsSaving(false);
+          }, 1000);
 
-        } catch (error) {
-            console.error("Save failed:", error);
-            setIsSaving(false);
-            alert(`Save failed: ${error.message}`);
-        }
-    };
+      } catch (error) {
+          console.error("Save failed:", error);
+          setIsSaving(false);
+          alert(`Save failed: ${error.message}`);
+      }
+  };
 
   const handleSceneSelect = (sceneId) => {
     if (!sceneId) {
@@ -94,7 +95,7 @@ const HierarchyPanel = ({
       })
       .then((response) => {
         if (response.status === 200) {
-          onSceneNameChange(response.data.sceneName); // Use onSceneNameChange
+          onSceneNameChange(response.data.sceneName);
         }
       })
       .catch((error) => console.error("Error fetching scene name:", error));
@@ -110,15 +111,15 @@ const HierarchyPanel = ({
       <div style={{ display: "inline-flex", marginLeft: "-20px" }}>
         <button
           onClick={goBack}
-          style={{ marginRight: "-5px", marginTop: "-2px" }}
+          style={{ marginRight: "-5px", marginTop: "-2px", backgroundColor: "transparent", border: "none", color: "white", cursor: "pointer" }}
         >
           ←
         </button>
         <input
           type="text"
           id="sceneName"
-          value={currentSceneName} // Use currentSceneName
-          onChange={(e) => onSceneNameChange(e.target.value)} // Use onSceneNameChange
+          value={currentSceneName}
+          onChange={(e) => onSceneNameChange(e.target.value)} 
           className="scene-name-input"
           placeholder="Scene Name"
         />

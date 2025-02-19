@@ -1,15 +1,13 @@
 // --- saveAndLoad.js ---
-// (No changes *needed* here, but review for consistency)
+
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-// Helper function (only textureToBase64 is needed now)
 const textureToBase64 = (texture) => {
   if (!texture || !texture.image) {
     return null;
@@ -28,7 +26,7 @@ const textureToBase64 = (texture) => {
 };
 
 const saveScene = async (sceneObjects, sceneSettings, sceneName, sceneId) => { //added sceneId
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
   const dataToSave = {
     sceneSettings: { ...sceneSettings },
     objects: [],
@@ -122,11 +120,12 @@ const saveScene = async (sceneObjects, sceneSettings, sceneName, sceneId) => { /
 
   const sessionUsername = localStorage.getItem("username");
   if (!sessionUsername) {
-    navigate("/login");
+    console.error("Error saving scene: No user logged in.");
     return;
   }
   // Send JSON directly
   try {
+    console.log("Saving scene:", dataToSave);
     const response = await axios.post(
       "http://localhost:5050/save",
       {
@@ -156,9 +155,12 @@ const saveScene = async (sceneObjects, sceneSettings, sceneName, sceneId) => { /
     if (response.data.sceneId) {
       console.log("Scene ID:", response.data.sceneId);
     }
+    return response.data; // IMPORTANT: Return the response data
+
   } catch (error) {
     console.error("Error saving scene:", error);
-    navigate('/error');
+    // navigate('/error');
+    throw error; // Re-throw the error so the caller can handle it
   }
 };
 
@@ -288,7 +290,7 @@ const loadScene = async (sceneId, setSceneObjects, setSceneSettings) => {
     setSceneSettings({ ...loadedData.sceneSettings });
   } catch (error) {
     console.error("Error loading scene:", error);
-    navigate('/error');
+    // navigate('/error');
   }
 };
 

@@ -1,4 +1,4 @@
-// --- editorManager.jsx --- (showing relevant changes)
+// --- editorManager.jsx ---
 
 import React, { useState, useRef, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
@@ -12,14 +12,14 @@ import AIChat from "./components/AIChat";
 import PropertiesCopyPaste from "./components/PropertiesCopyPaste";
 import "./styles/editorManager.css";
 import * as THREE from "three";
-import UndoRedo from "./components/EditorManagerComponents/undoredo.jsx"; // Import
+import UndoRedo from "./components/EditorManagerComponents/undoredo.jsx";
 import KeyboardShortcuts from "./components/EditorManagerComponents/keyshortcuts.jsx";
 import CopyPaste from "./components/EditorManagerComponents/copypaste.jsx";
 import LightComponent from "./components/Light/LightComponent.jsx";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import LoadingPage from "../pages/loading.jsx";
-import { loadScene } from "./components/saveAndLoad";
+import { loadScene, saveScene } from "./components/saveAndLoad"; // Import saveScene
 
 const EditorManager = () => {
   const navigate = useNavigate();
@@ -31,20 +31,29 @@ const EditorManager = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        await axios.get("http://localhost:5050/user/logs", {
+        // Use the /auth/check endpoint, as it was designed for this.
+        const response = await axios.get("http://localhost:5050/auth/check", {
           withCredentials: true,
         });
-        setUsername(localStorage.getItem("username"));
+        // Get the username from the *response* of /auth/check.
+        console.log("User authenticated:", response.data);
+        if(response.data.username === undefined || response.data.username === null){
+          navigate("/");
+        }
+        setUsername(response.data.username);
+        fetchProjects();
       } catch (error) {
         if (error.response && error.response.status === 401) {
           navigate("/");
         } else {
           console.error("Error checking authentication:", error);
+          // Optionally show an error message to the user
         }
       } finally {
         setLoading(false);
       }
     };
+
     checkAuth();
   }, [navigate]);
 
@@ -168,8 +177,8 @@ const EditorManager = () => {
     // First, save the current state to the undo stack.  BEFORE changing the scene.
     saveToUndoStack(sceneObjects, sceneSettings);
 
-    setCurrentSceneId(null);
-    setCurrentSceneName("");
+    //setCurrentSceneId(null); //Dont set sceneId null
+    //setCurrentSceneName(""); //dont null the name
     const newObject = {
       id: Date.now(),
       type,
@@ -194,8 +203,8 @@ const EditorManager = () => {
     // First, save the current state to the undo stack. BEFORE changing the scene.
     saveToUndoStack(sceneObjects, sceneSettings);
 
-    setCurrentSceneId(null);
-    setCurrentSceneName("");
+   // setCurrentSceneId(null);
+    //setCurrentSceneName("");
     const lightId = Math.floor(10000 + Math.random() * 90000);
     const lightProps = {
       id: lightId,
@@ -271,8 +280,26 @@ const EditorManager = () => {
   };
 
   const handleSceneNameChange = (newName) => {
+    localStorage.setItem("currentSceneName", newName);
     setCurrentSceneName(newName);
   };
+// --- Inside EditorManager component
+    const handleSave = async () => {
+    try {
+        const response = await saveScene(sceneObjects, sceneSettings, currentSceneName, currentSceneId);
+        // Update currentSceneId *after* a successful save
+        if (response && response.sceneId) {
+            setCurrentSceneId(response.sceneId);
+            localStorage.setItem("currentSceneId", response.sceneId);
+            console.log("Current Scene ID", response.sceneId)
+        }
+        // You could also show a success message here, if desired.
+    } catch (error) {
+        // Handle errors (e.g., show an error message to the user)
+        console.error("Save failed:", error);
+    }
+};
+
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -288,6 +315,8 @@ const EditorManager = () => {
         .then((response) => {
           if (response.status === 200) {
             setCurrentSceneName(response.data.sceneName); // Set name
+            localStorage.setItem("currentSceneName", response.data.sceneName);
+            localStorage.setItem("currentSceneId", sceneId);
             setLoading(false);
           }
         })
@@ -309,6 +338,7 @@ const EditorManager = () => {
         undoDisabled={undoStack.length === 0}
         redoDisabled={redoStack.length === 0}
         selectedObjects={selectedObjects}
+        onSave={handleSave} // Pass the save handler
       />
       <div className="main-area">
         <div className="sidebar">

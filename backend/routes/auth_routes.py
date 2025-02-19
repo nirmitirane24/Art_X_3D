@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, session
 from werkzeug.security import check_password_hash
-from models import User  # Absolute import
-from utils.decorators import login_required  # Absolute import
+from models import User
+from utils.decorators import login_required
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -25,8 +25,8 @@ def register():
         return jsonify({'message': 'User registered successfully'}), 201
     else:
         return jsonify({'message': 'Registration failed'}), 500
-    
-    
+
+
 @auth_bp.route('/signin', methods=['POST'])
 def signin():
     data = request.get_json()
@@ -43,10 +43,18 @@ def signin():
         return jsonify({'message': 'Login successful', 'username': user.username}), 200
     else:
         return jsonify({'message': 'Invalid credentials'}), 401
-    
-    
+
+
 @auth_bp.route('/logout', methods=['POST'])
-@login_required
+@login_required  
 def logout():
     session.pop('username', None)
     return jsonify({'message': 'Logged out successfully'}), 200
+
+# NEW ENDPOINT: Check Authentication
+@auth_bp.route('/check', methods=['GET'])
+def check_auth():
+    if 'username' in session:
+        return jsonify({'username': session['username']}), 200
+    else:
+        return jsonify({'message': 'Unauthorized'}), 401

@@ -9,16 +9,16 @@ user_bp = Blueprint('user', __name__, url_prefix='/user')
 def get_user_logs():
     username = session['username']
     user = User.get_user_by_username(username)
-    if not user: #user should never be none due to @login_required, but good to check
+    if not user:
         return jsonify({'message': 'User not found'}), 404
     logs = UserLog.get_logs_by_user_id(user.id)
-    #serialize the log objects into a list of dictionaries
     log_list = [
         {
             'log_id': log.log_id,
             'user_id': log.user_id,
             'activity': log.activity,
-            'timestamp': log.timestamp.isoformat() #convert datetime to string
+            'timestamp': log.timestamp.isoformat(),
+            'username': username
         } for log in logs
     ]
     return jsonify(log_list), 200

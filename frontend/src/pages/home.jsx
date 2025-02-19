@@ -19,21 +19,29 @@ const Home = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        await axios.get("http://localhost:5050/user/logs", {
+        // Use the /auth/check endpoint, as it was designed for this.
+        const response = await axios.get("http://localhost:5050/auth/check", {
           withCredentials: true,
         });
-        setUsername(localStorage.getItem("username"));
+        // Get the username from the *response* of /auth/check.
+        console.log("User authenticated:", response.data);
+        if(response.data.username === undefined || response.data.username === null){
+          navigate("/");
+        }
+        setUsername(response.data.username);
         fetchProjects();
       } catch (error) {
         if (error.response && error.response.status === 401) {
           navigate("/");
         } else {
           console.error("Error checking authentication:", error);
+          // Optionally show an error message to the user
         }
       } finally {
         setLoading(false);
       }
     };
+
     checkAuth();
   }, [navigate]);
 
@@ -160,7 +168,7 @@ const Home = () => {
           <div className="profile-icon">
             <img style={{ height: "30px" }} src="/cube2.svg" alt="" />
           </div>
-          <span>{username || "Dummy Profile"}</span>
+          <span>{username}</span>
         </div>
         <nav className="menu">
           <Link to="/" className="menu-item active">
