@@ -1,4 +1,4 @@
-// --- saveAndLoad.js ---
+// --- saveAndLoad.js --- (Revised)
 
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
@@ -25,144 +25,129 @@ const textureToBase64 = (texture) => {
   return canvas.toDataURL("image/png").split(",")[1];
 };
 
-const saveScene = async (sceneObjects, sceneSettings, sceneName, sceneId) => { //added sceneId
-    // const navigate = useNavigate();
-  const dataToSave = {
+const saveScene = async (sceneObjects, sceneSettings, sceneName, sceneId, thumbnailBlob) => {
+  const formData = new FormData();
+
+  // Append scene data as JSON string
+  formData.append('sceneData', JSON.stringify({
     sceneSettings: { ...sceneSettings },
-    objects: [],
-    sceneId: sceneId || null, // Include sceneId (null if new scene)
-  };
-
-  for (const obj of sceneObjects) {
-    const objectData = {
-      id: obj.id,
-      type: obj.type,
-      displayId: obj.displayId,
-      position: obj.position,
-      rotation: obj.rotation,
-      scale: obj.scale,
-    };
-
-    // --- Material Handling ---
-    if (obj.material) {
-      const mat = obj.material;
-      objectData.material = {
-        color:
-          typeof mat.color === "string"
-            ? mat.color
-            : mat.color?.getHexString
-            ? `#${mat.color.getHexString()}`
-            : "#ffffff", // Handle string colors
-        emissive:
-          typeof mat.emissive === "string"
-            ? mat.emissive
-            : mat.emissive?.getHexString
-            ? `#${mat.emissive.getHexString()}`
-            : "#000000", // Handle string colors
-        metalness: mat.metalness ?? 0,
-        roughness: mat.roughness ?? 0.5,
-        opacity: mat.opacity ?? 1,
-        reflectivity: mat.reflectivity ?? 0,
-        shininess: mat.shininess ?? 30,
-        transmission: mat.transmission ?? 0,
-        clearcoat: mat.clearcoat ?? 0,
-        clearcoatRoughness: mat.clearcoatRoughness ?? 0,
-        sheen: mat.sheen ?? 0,
-        sheenRoughness: mat.sheenRoughness ?? 0,
-        ior: mat.ior ?? 1.5,
-        thickness: mat.thickness ?? 0,
-        wireframe: mat.wireframe ?? false,
-        flatShading: mat.flatShading ?? false,
-        castShadow: mat.castShadow ?? false,
-        receiveShadow: mat.receiveShadow ?? false,
-        side:
-          mat.side === THREE.FrontSide
-            ? "front"
-            : mat.side === THREE.BackSide
-            ? "back"
-            : "double",
+    objects: sceneObjects.map(obj => {
+      const objectData = {
+        id: obj.id,
+        type: obj.type,
+        displayId: obj.displayId,
+        position: obj.position,
+        rotation: obj.rotation,
+        scale: obj.scale,
       };
+       // --- Material Handling ---
+        if (obj.material) {
+        const mat = obj.material;
+        objectData.material = {
+            color:
+            typeof mat.color === "string"
+                ? mat.color
+                : mat.color?.getHexString
+                ? `#${mat.color.getHexString()}`
+                : "#ffffff",
+            emissive:
+            typeof mat.emissive === "string"
+                ? mat.emissive
+                : mat.emissive?.getHexString
+                ? `#${mat.emissive.getHexString()}`
+                : "#000000",
+            metalness: mat.metalness ?? 0,
+            roughness: mat.roughness ?? 0.5,
+            opacity: mat.opacity ?? 1,
+            reflectivity: mat.reflectivity ?? 0,
+            shininess: mat.shininess ?? 30,
+            transmission: mat.transmission ?? 0,
+            clearcoat: mat.clearcoat ?? 0,
+            clearcoatRoughness: mat.clearcoatRoughness ?? 0,
+            sheen: mat.sheen ?? 0,
+            sheenRoughness: mat.sheenRoughness ?? 0,
+            ior: mat.ior ?? 1.5,
+            thickness: mat.thickness ?? 0,
+            wireframe: mat.wireframe ?? false,
+            flatShading: mat.flatShading ?? false,
+            castShadow: mat.castShadow ?? false,
+            receiveShadow: mat.receiveShadow ?? false,
+            side:
+            mat.side === THREE.FrontSide
+                ? "front"
+                : mat.side === THREE.BackSide
+                ? "back"
+                : "double",
+        };
 
-      // Save texture and normal map (Base64)
-      objectData.material.texture = await textureToBase64(obj.material.map);
-      objectData.material.normalMap = await textureToBase64(
-        obj.material.normalMap
-      );
-    }
+        }
 
-    // --- Light-Specific Properties ---
-    if (
-      obj.type === "pointLight" ||
-      obj.type === "spotLight" ||
-      obj.type === "directionalLight"
-    ) {
-      objectData.color = obj.color;
-      objectData.intensity = obj.intensity;
-      if (obj.type === "spotLight") {
-        objectData.angle = obj.angle;
-        objectData.penumbra = obj.penumbra;
-        objectData.distance = obj.distance;
-        objectData.decay = obj.decay;
-      }
-      if (obj.type === "spotLight" || obj.type === "directionalLight") {
-        objectData.target = obj.target;
-      }
-    }
+        // --- Light-Specific Properties ---
+        if (
+        obj.type === "pointLight" ||
+        obj.type === "spotLight" ||
+        obj.type === "directionalLight"
+        ) {
+        objectData.color = obj.color;
+        objectData.intensity = obj.intensity;
+        if (obj.type === "spotLight") {
+            objectData.angle = obj.angle;
+            objectData.penumbra = obj.penumbra;
+            objectData.distance = obj.distance;
+            objectData.decay = obj.decay;
+        }
+        if (obj.type === "spotLight" || obj.type === "directionalLight") {
+            objectData.target = obj.target;
+        }
+        }
 
-    // --- Imported Object Handling ---
-    if (obj.mesh && obj.mesh.userData && obj.mesh.userData.originalFile) {
-      const originalFile = obj.mesh.userData.originalFile;
-      objectData.originalFileName = originalFile.name;
-      // objectData.fileData = await fileToBase64(originalFile); //removed for consistency
-    }
-    dataToSave.objects.push(objectData);
+        // --- Imported Object Handling ---
+        if (obj.mesh && obj.mesh.userData && obj.mesh.userData.originalFile) {
+        const originalFile = obj.mesh.userData.originalFile;
+        objectData.originalFileName = originalFile.name;
+        // objectData.fileData = await fileToBase64(originalFile); //removed for consistency
+        }
+
+      return objectData;
+    }),
+    sceneId: sceneId || null,
+  }));
+
+  // Append thumbnail file
+  if (thumbnailBlob) {
+    formData.append('thumbnail', thumbnailBlob, `thumbnail_${sceneId}.jpg`); // Use a filename
   }
 
-  const sessionUsername = localStorage.getItem("username");
-  if (!sessionUsername) {
-    console.error("Error saving scene: No user logged in.");
-    return;
-  }
-  // Send JSON directly
+    formData.append('sceneName', sceneName);
+
+
   try {
-    console.log("Saving scene:", dataToSave);
-    const response = await axios.post(
-      "http://localhost:5050/save",
-      {
-        objects: dataToSave.objects,
-        sceneSettings: dataToSave.sceneSettings,
-        sceneName,
-        sceneId: dataToSave.sceneId, //send sceneId
-      }, // Send the actual data
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    console.log(formData);
+    const response = await axios.post("http://localhost:5050/save", formData, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'multipart/form-data', // IMPORTANT: Set correct content type
+      },
+    });
 
-    console.log("Response:", response); // Log the entire response
+    console.log("Response:", response);
 
-    if (response.status !== 201 && response.status !== 200) { //check for both create and update
-      throw new Error(
-        `Failed to save scene: ${response.status} - ${response.data}`
-      );
+    if (response.status !== 201 && response.status !== 200) {
+      throw new Error(`Failed to save scene: ${response.status} - ${response.data}`);
     }
-
 
     console.log("Scene saved successfully:", response.data);
-    if (response.data.sceneId) {
-      console.log("Scene ID:", response.data.sceneId);
+      if (response.data.sceneId) {
+        console.log("Scene ID:", response.data.sceneId);
     }
-    return response.data; // IMPORTANT: Return the response data
+    return response.data;
 
   } catch (error) {
     console.error("Error saving scene:", error);
-    // navigate('/error');
-    throw error; // Re-throw the error so the caller can handle it
+    throw error;
   }
 };
+
 
 const loadScene = async (sceneId, setSceneObjects, setSceneSettings, type) => {
   try {

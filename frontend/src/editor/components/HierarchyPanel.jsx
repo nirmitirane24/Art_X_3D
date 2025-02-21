@@ -1,4 +1,4 @@
-// --- HierarchyPanel.jsx ---
+// --- HierarchyPanel.jsx --- (Revised)
 import React, { useState } from "react";
 import "../styles/hierarchyPanel.css";
 import { FaTrash, FaFileExport, FaFileImport, FaSave, FaCheck } from "react-icons/fa";
@@ -22,6 +22,7 @@ const HierarchyPanel = ({
   onSceneNameChange, // Receive onSceneNameChange
   currentSceneId,
   setCurrentSceneId,
+  canvasRef,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -60,23 +61,49 @@ const HierarchyPanel = ({
 
 
   const handleSave = async () => {
-      setIsSaving(true);
+    setIsSaving(true); // Set loading state to true
+    let thumbnailBlob;
+    if (canvasRef.current) {
       try {
-        console.log("Saving scene with ID:", currentSceneId);
-          await saveScene(sceneObjects, sceneSettings, currentSceneName, currentSceneId);
-          setShowTick(true);
-          setTimeout(() => {
-              setShowTick(false);
-              setIsSaving(false);
-          }, 1000);
-
+        thumbnailBlob = await new Promise((resolve) => {
+          canvasRef.current.toBlob(resolve, "image/png", 1); // Quality set to 0.9
+        });
       } catch (error) {
-          console.error("Save failed:", error);
-          setIsSaving(false);
-          alert(`Save failed: ${error.message}`);
+        console.error("Error creating thumbnail blob:", error);
+        setIsSaving(false); // Reset loading state
+        alert("Failed to create thumbnail.");
+        return; // Exit if thumbnail creation fails
+      }
+    }
+
+    try {
+        const response = await saveScene(
+          sceneObjects,
+          sceneSettings,
+          currentSceneName,
+          currentSceneId,
+          thumbnailBlob
+        );
+        if (response && response.sceneId) {
+          setCurrentSceneId(response.sceneId); // Update scene ID
+          localStorage.setItem("currentSceneId", response.sceneId);
+          onSceneNameChange(currentSceneName); //Keep the UI updated
+          localStorage.setItem("currentSceneName", currentSceneName);
+          setShowTick(true); // Show success tick
+          setTimeout(() => {
+            setShowTick(false);
+            setIsSaving(false); // Reset loading state after delay
+          }, 1000);
+        }
+      } catch (error) {
+        console.error("Save failed:", error);
+        setIsSaving(false);  // Make sure to reset loading if it fails.
+        alert(`Save failed: ${error.message}`);
       }
   };
 
+
+  
   const handleSceneSelect = (sceneId) => {
     if (!sceneId) {
       console.error("Invalid sceneId:", sceneId);

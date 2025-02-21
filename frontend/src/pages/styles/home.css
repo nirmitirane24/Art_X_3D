@@ -187,15 +187,23 @@ body::-webkit-scrollbar-corner {
     justify-content: center; /*Center horizontally*/
 
 }
+
 .project-thumbnail img {
     /* height: 200px; Removed fixed height*/
-    max-width: 100%; /*Ensure image fits within container*/
-    max-height: 100%; /* Ensure image fits*/
+    height: 100%;
     border-radius: 5px;
     object-fit: cover; /* Important for consistent sizing */
-    height: 200px;
+    transition: ease-in-out 0.3s;
 
 }
+
+.project-thumbnail img:hover {
+    transform: scale(1.05);
+    transition: ease-in-out 0.3s;
+    max-width: 100%;
+    border-radius: 5px;
+}
+
 .project-thumbnail.pink {
     background-color: #726f75;
 

@@ -1,4 +1,4 @@
-# --- scene_routes.py ---
+# --- scene_routes.py --- (Revised)
 from flask import Blueprint, request, jsonify, session
 import boto3
 import json
@@ -13,6 +13,8 @@ from urllib.parse import urlparse
 from datetime import datetime, timezone
 import timeago
 import pytz
+import base64
+import tempfile  # Import tempfile
 
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / '.env')
 
@@ -23,6 +25,22 @@ AWS_REGION = os.environ.get('AWS_REGION')
 S3_BUCKET_NAME = os.environ.get('S3_BUCKET_NAME')
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+
+SUPABASE_S3_REGION = os.environ.get('SUPABASE_S3_REGION')
+SUPABASE_S3_ENDPOINT = os.environ.get('SUPABASE_S3_ENDPOINT')
+SUPABASE_S3_ACCESS_KEY = os.environ.get('SUPABASE_S3_ACCESS_KEY')
+SUPABASE_S3_SECRET_KEY = os.environ.get('SUPABASE_S3_SECRET_KEY')
+SUPABASE_BUCKET_NAME = os.environ.get('SUPABASE_BUCKET_NAME')
+SUPABASE_API_KEY = os.environ.get('SUPABASE_SERVICE_ROLE_KEY')
+SUPABASE_URL = os.environ.get('SUPABASE_URL')
+
+CLOUDFLARE_ACCESS_KEY = os.environ.get('CLOUDFLARE_ACCESS_KEY')
+CLOUDFLARE_SECRET_KEY = os.environ.get('CLOUDFLARE_SECRET_KEY')
+CLOUDFLARE_TOKEN = os.environ.get('CLOUDFLARE_TOKEN')
+CLOUDFLARE_ENDPOINT = os.environ.get('CLOUDFLARE_ENDPOINT')
+CLOUDFLARE_R2_REGION = "auto"
+CLOUDFLARE_BUCKET_NAME = os.environ.get('CLOUDFLARE_BUCKET_NAME')
+
 
 if not AWS_REGION:
     raise ValueError("AWS_REGION environment variable not set.")
@@ -39,6 +57,17 @@ if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
 else:
     s3_client = boto3.client('s3', region_name=AWS_REGION)
 
+if not SUPABASE_S3_ENDPOINT or not SUPABASE_API_KEY or not SUPABASE_BUCKET_NAME:
+    raise ValueError("Supabase environment variables (URL, KEY, BUCKET_NAME) are not set.")
+
+# Initialize Cloudflare R2 Client
+cloudflare_r2_client = boto3.client(
+    's3',
+    region_name=CLOUDFLARE_R2_REGION,
+    endpoint_url=CLOUDFLARE_ENDPOINT,
+    aws_access_key_id=CLOUDFLARE_ACCESS_KEY,
+    aws_secret_access_key=CLOUDFLARE_SECRET_KEY
+)
 
 
 @scene_bp.route('/save', methods=['POST'])
@@ -46,14 +75,15 @@ else:
 def save_scene():
     conn = None
     try:
-        data = request.get_json()
-        scene_name = data.get('sceneName')
-        objects = data.get('objects')
-        scene_settings = data.get('sceneSettings')
-        scene_id = data.get('sceneId')  # Get scene_id from the request
+        scene_data_json = request.form.get('sceneData')
+        scene_name = request.form.get('sceneName')
+        if not scene_data_json or not scene_name:
+            return jsonify({'error': 'Missing required data'}), 400
+        scene_data = json.loads(scene_data_json)
 
-        if not scene_name or not objects or not scene_settings:
-            return jsonify({'error': 'Missing required data (sceneName, objects, or sceneSettings)'}), 400
+        objects = scene_data.get('objects')
+        scene_settings = scene_data.get('sceneSettings')
+        scene_id = scene_data.get('sceneId')
 
         username = session.get('username')
         if not username:
@@ -64,60 +94,85 @@ def save_scene():
             return jsonify({'error': 'User not found'}), 404
         user_id = user.id
 
-        # Combine scene data
-        scene_data = {
-            'objects': objects,
-            'sceneSettings': scene_settings
-        }
-        conn = get_db_connection()
-        # --- S3 UPLOAD (Both Save and Update) ---
-        # 1. Generate the object key.  Use scene_id if it exists (update).
-        if scene_id:
-            object_key = f"{user_id}/{scene_id}-{scene_name}-{username}.json"
-        else:
-            object_key = f"{user_id}/{scene_name}-{username}.json"  # No scene_id for new scenes
-
-
-        # 2. Convert data to JSON.
-        json_data = json.dumps(scene_data)
-
-        # 3. Upload to S3 (always overwrite).
-        s3_client.put_object(Bucket=S3_BUCKET_NAME, Key=object_key, Body=json_data, ContentType='application/json')
-        print(f"Uploaded to S3: {object_key}")
-
-        # --- DATABASE (Save or Update) ---
         conn = get_db_connection()
         if conn is None:
             return jsonify({'error': 'Database connection failed'}), 500
 
         with conn.cursor() as cursor:
             if scene_id:
-                # UPDATE existing scene
+                object_key = f"{user_id}/{scene_id}-{scene_name}-{username}.json"
                 cursor.execute(
-                    "UPDATE Scenes SET s3_bucket_name = %s, scene_name = %s, s3_key = %s WHERE scene_id = %s AND user_id = %s",
-                    (S3_BUCKET_NAME, scene_name, object_key, scene_id, user_id)  # Include user_id for security
+                    "UPDATE Scenes SET s3_bucket_name = %s, scene_name = %s, s3_key = %s, updated_at = NOW() WHERE scene_id = %s AND user_id = %s",
+                    (S3_BUCKET_NAME, scene_name, object_key, scene_id, user_id)
                 )
-                if cursor.rowcount == 0:  # Check if update was successful
+                if cursor.rowcount == 0:
                     conn.rollback()
-                    return jsonify({'error': 'Scene not found or unauthorized'}), 404 #or 403
-                conn.commit()
-                return jsonify({'message': 'Scene updated successfully', 'sceneId': scene_id}), 200  # Return 200 for update
-
+                    return jsonify({'error': 'Scene not found or unauthorized'}), 404
             else:
-                # INSERT new scene
+                object_key = f"{user_id}/{scene_name}-{username}.json"
                 cursor.execute(
                     "INSERT INTO Scenes (user_id, s3_bucket_name, scene_name, s3_key) VALUES (%s, %s, %s, %s) RETURNING scene_id",
                     (user_id, S3_BUCKET_NAME, scene_name, object_key)
                 )
                 scene_id = cursor.fetchone()[0]
-                conn.commit()
-                return jsonify({'message': 'Scene saved successfully', 'sceneId': scene_id}), 201  # Return 201 for create
+
+            json_data = json.dumps({'objects': objects, 'sceneSettings': scene_settings})
+            s3_client.put_object(Bucket=S3_BUCKET_NAME, Key=object_key, Body=json_data, ContentType='application/json')
+            print(f"Uploaded scene data to S3: {object_key}")
+
+            thumbnail_file = request.files.get('thumbnail')
+            if thumbnail_file:
+                thumbnail_path = f"Thumbnails/{user_id}/{scene_id}.png"
+                try:
+                    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                        thumbnail_file.save(temp_file.name)
+                        temp_file_path = temp_file.name
+
+                    with open(temp_file_path, 'rb') as f:
+                        cloudflare_r2_client.put_object(
+                            Bucket=CLOUDFLARE_BUCKET_NAME,
+                            Key=thumbnail_path,
+                            Body=f,
+                            ContentType='image/png'
+                        )
+                    print(f"Uploaded thumbnail to Cloudflare R2: {thumbnail_path}")
+
+                except ClientError as e:
+                    print(f"Cloudflare R2 Error: {e}")
+                    conn.rollback()
+                    return jsonify({'error': f'Failed to upload thumbnail to Cloudflare R2: {str(e)}'}), 500
+                except Exception as e:
+                    print(f"General Error uploading thumbnail: {e}")
+                    conn.rollback()
+                    return jsonify({'error': 'Failed to upload thumbnail'}), 500
+                finally:
+                    if 'temp_file_path' in locals() and os.path.exists(temp_file_path):
+                        os.remove(temp_file_path)
+
+                cursor.execute("SELECT id FROM scene_thumbnails WHERE scene_id = %s", (scene_id,))
+                existing_thumbnail = cursor.fetchone()
+
+                if existing_thumbnail:
+                    cursor.execute(
+                        "UPDATE scene_thumbnails SET image_url = %s WHERE scene_id = %s",
+                        (thumbnail_path, scene_id)
+                    )
+                else:
+                    cursor.execute(
+                        "INSERT INTO scene_thumbnails (scene_id, image_url) VALUES (%s, %s)",
+                        (scene_id, thumbnail_path)
+                    )
+
+
+            conn.commit()  # Commit *before* generating the signed URL
+
+            return jsonify({'message': 'Scene saved successfully', 'sceneId': scene_id}), 200 if scene_id else 201
 
     except ClientError as e:
         if conn:
             conn.rollback()
         print(f"S3 Error: {e}")
-        return jsonify({'error': 'Failed to upload to S3'}), 500
+        return jsonify({'error': 'Failed to upload scene data to S3'}), 500
     except Exception as e:
         if conn:
             conn.rollback()
@@ -126,7 +181,6 @@ def save_scene():
     finally:
         if conn:
             conn.close()
-
 
 @scene_bp.route('/get-scene-url', methods=['GET'])
 @login_required
@@ -293,6 +347,7 @@ def get_community_example():
             conn.close()
 
 
+
 @scene_bp.route('/scenes', methods=['GET'])
 @login_required
 def get_user_scenes():
@@ -306,21 +361,41 @@ def get_user_scenes():
             return jsonify({'error': 'Database connection failed'}), 500
 
         with conn.cursor() as cursor:
-            cursor.execute("SELECT scene_id, scene_name, updated_at FROM Scenes WHERE user_id = %s ORDER BY updated_at DESC", (user.id,))
+            cursor.execute("""
+                SELECT s.scene_id, s.scene_name, s.updated_at, st.image_url 
+                FROM Scenes s 
+                LEFT JOIN scene_thumbnails st ON s.scene_id = st.scene_id 
+                WHERE s.user_id = %s 
+                ORDER BY s.updated_at DESC
+            """, (user.id,))
             scenes = cursor.fetchall()
-            
-        ist = pytz.timezone('Asia/Kolkata')
+
+        ist = pytz.timezone('Europe/London')
         scene_list = []
+
         for scene in scenes:
             last_updated = scene[2]
             if last_updated.tzinfo is None:
-                last_updated = ist.localize(last_updated) 
+                last_updated = ist.localize(last_updated)
+
+            thumbnail_url = None  # Default None if no thumbnail exists
+            if scene[3]:  
+                try:
+                    thumbnail_url = cloudflare_r2_client.generate_presigned_url(
+                        'get_object',
+                        Params={'Bucket': CLOUDFLARE_BUCKET_NAME, 'Key': scene[3]},
+                        ExpiresIn=3600  # URL valid for 1 hour
+                    )
+                except Exception as e:
+                    print(f"Error generating signed URL for scene {scene[0]}: {e}")
 
             scene_list.append({
                 "scene_id": scene[0],
                 "scene_name": scene[1],
-                "last_updated": timeago.format(last_updated, datetime.now(ist))
+                "last_updated": timeago.format(last_updated, datetime.now(ist)),
+                "thumbnail_url": thumbnail_url  
             })
+
         return jsonify(scene_list), 200
 
     except Exception as e:
