@@ -31,14 +31,14 @@ const EditorManager = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      try{
+      try {
         // Use the /auth/check endpoint, as it was designed for this.
         const response = await axios.get("http://localhost:5050/auth/check", {
           withCredentials: true,
         });
         // Get the username from the *response* of /auth/check.
         console.log("User authenticated:", response.data);
-        if(response.data.username === undefined || response.data.username === null){
+        if (response.data.username === undefined || response.data.username === null) {
           navigate("/");
         }
         setUsername(response.data.username);
@@ -203,7 +203,7 @@ const EditorManager = () => {
     // First, save the current state to the undo stack. BEFORE changing the scene.
     saveToUndoStack(sceneObjects, sceneSettings);
 
-   // setCurrentSceneId(null);
+    // setCurrentSceneId(null);
     //setCurrentSceneName("");
     const lightId = Math.floor(10000 + Math.random() * 90000);
     const lightProps = {
@@ -283,36 +283,36 @@ const EditorManager = () => {
     localStorage.setItem("currentSceneName", newName);
     setCurrentSceneName(newName);
   };
-// --- Inside EditorManager component
-    const handleSave = async () => {
-      const canvas = document.getElementById("r3f-canvas");
-      if(!canvas){
-        console.error("Canvas element not found");
+  // --- Inside EditorManager component
+  const handleSave = async () => {
+    const canvas = document.getElementById("r3f-canvas");
+    if (!canvas) {
+      console.error("Canvas element not found");
+      return;
+    }
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) {
+        console.error("Failed to create blob from canvas");
         return;
       }
-      
-      canvas.toBlob(async (blob) => {
-        if(!blob){
-          console.error("Failed to create blob from canvas");
-          return;
+      try {
+        const response = await saveScene(
+          sceneObjects,
+          sceneSettings,
+          currentSceneName,
+          currentSceneId,
+          blob
+        );
+        if (response && response.sceneId) {
+          setCurrentSceneId(response.sceneId);
+          localStorage.setItem("currentSceneId", response.sceneId);
         }
-        try {
-          const response = await saveScene(
-            sceneObjects,
-            sceneSettings,
-            currentSceneName,
-            currentSceneId,
-            blob
-          );
-          if (response && response.sceneId) {
-            setCurrentSceneId(response.sceneId);
-            localStorage.setItem("currentSceneId", response.sceneId);
-          }
-        } catch(error) {
-            console.error("Save failed:", error);
-        }
-      }, "image/jpeg");
-};
+      } catch (error) {
+        console.error("Save failed:", error);
+      }
+    }, "image/jpeg");
+  };
 
 
 
@@ -323,28 +323,28 @@ const EditorManager = () => {
 
     if (sceneId) {
       // Load user's scene
-      loadScene(sceneId, setSceneObjects, setSceneSettings,1);
+      loadScene(sceneId, setSceneObjects, setSceneSettings, 1);
       setCurrentSceneId(sceneId);
       localStorage.setItem('currentSceneId', sceneId);
       setLoading(true);
       axios.get(`http://localhost:5050/get-scene-url?sceneId=${sceneId}`, { withCredentials: true })
-          .then(response => {
-              if (response.status === 200) {
-                  setCurrentSceneName(response.data.sceneName);
-                  localStorage.setItem('currentSceneName', response.data.sceneName);
-                  setLoading(false);
-              }
-          })
-          .catch(error => console.error("Error getting scene name", error));
+        .then(response => {
+          if (response.status === 200) {
+            setCurrentSceneName(response.data.sceneName);
+            localStorage.setItem('currentSceneName', response.data.sceneName);
+            setLoading(false);
+          }
+        })
+        .catch(error => console.error("Error getting scene name", error));
 
-  } else if (exampleId) {
+    } else if (exampleId) {
       // Load community example
       setLoading(true);
       loadScene(exampleId, setSceneObjects, setSceneSettings, 2);
-  } else {
+    } else {
       setLoading(false);
-  }
-}, []);
+    }
+  }, []);
 
   const getSceneContext = () => {
     const { gl, scene, camera } = useThree(); // Correct: Use useThree inside a component
@@ -352,202 +352,201 @@ const EditorManager = () => {
   }
 
 
-if (loading) {
-  return <LoadingPage />;
-}
+  if (loading) {
+    return <LoadingPage />;
+  }
 
-return (
-  <div className="editor-container" onClick={deselectAllObjects}>
-    <Toolbar
-      onAddModel={addModel}
-      onAddLight={addLight}
-      onUndo={undo}
-      onRedo={redo}
-      undoDisabled={undoStack.length === 0}
-      redoDisabled={redoStack.length === 0}
-      selectedObjects={selectedObjects}
-      onSave={handleSave} // Pass the save handler
-    />
-    <div className="main-area">
-      <div className="sidebar">
-        <HierarchyPanel
-          sceneObjects={sceneObjects}
-          onObjectSelect={handleObjectSelect}
-          selectedObjects={selectedObjects}
-          onObjectDelete={handleDeleteObject}
-          scene={sceneRef.current}
-          setSceneObjects={setSceneObjects}
-          setSceneSettings={setSceneSettings}
-          sceneSettings={sceneSettings}
-          currentSceneName={currentSceneName}
-          onSceneNameChange={handleSceneNameChange}
-          currentSceneId={currentSceneId}
-          setCurrentSceneId={setCurrentSceneId}
-          canvasRef={canvasRef}
-        />
-        <PropertiesPanel
-          selectedObjects={selectedObjects ?? []}
-          sceneObjects={sceneObjects ?? []}
-          updateObject={updateObject}
-          sceneSettings={sceneSettings}
-        />
-      </div>
-      <div className="viewport">
-        <Canvas
-          shadows
-          camera={{ position: [0, 5, 10], fov: 45 }}
-          style={{ backgroundColor: sceneSettings.backgroundColor }}
-          id="r3f-canvas"
-          gl={{ preserveDrawingBuffer: true }}
-          onCreated={({ gl }) => {
-            canvasRef.current = gl.domElement;
-          }}
-        >
-          <SceneContent
-            sceneSettings={sceneSettings}
-            sceneRef={sceneRef}
+  return (
+    <div className="editor-container" onClick={deselectAllObjects}>
+      <Toolbar
+        onAddModel={addModel}
+        onAddLight={addLight}
+        onUndo={undo}
+        onRedo={redo}
+        undoDisabled={undoStack.length === 0}
+        redoDisabled={redoStack.length === 0}
+        selectedObjects={selectedObjects}
+        onSave={handleSave} // Pass the save handler
+      />
+      <div className="main-area">
+        <div className="sidebar">
+          <HierarchyPanel
             sceneObjects={sceneObjects}
+            onObjectSelect={handleObjectSelect}
             selectedObjects={selectedObjects}
-            updateObject={updateObject}
-            handleObjectSelect={handleObjectSelect}
-            dirLightRef={dirLightRef}
+            onObjectDelete={handleDeleteObject}
+            scene={sceneRef.current}
+            setSceneObjects={setSceneObjects}
+            setSceneSettings={setSceneSettings}
+            sceneSettings={sceneSettings}
+            currentSceneName={currentSceneName}
+            onSceneNameChange={handleSceneNameChange}
+            currentSceneId={currentSceneId}
+            setCurrentSceneId={setCurrentSceneId}
+            canvasRef={canvasRef}
           />
-          <CameraControls enabled={cameraEnabled} />
-        </Canvas>
+          <PropertiesPanel
+            selectedObjects={selectedObjects ?? []}
+            sceneObjects={sceneObjects ?? []}
+            updateObject={updateObject}
+            sceneSettings={sceneSettings}
+          />
+        </div>
+        <div className="viewport">
+          <Canvas
+            shadows
+            camera={{ position: [0, 5, 10], fov: 45 }}
+            style={{ backgroundColor: sceneSettings.backgroundColor }}
+            id="r3f-canvas"
+            gl={{ preserveDrawingBuffer: true }}
+            onCreated={({ gl }) => {
+              canvasRef.current = gl.domElement;
+            }}
+          >
+            <SceneContent
+              sceneSettings={sceneSettings}
+              sceneRef={sceneRef}
+              sceneObjects={sceneObjects}
+              selectedObjects={selectedObjects}
+              updateObject={updateObject}
+              handleObjectSelect={handleObjectSelect}
+              dirLightRef={dirLightRef}
+            />
+            <CameraControls enabled={cameraEnabled} />
+          </Canvas>
+        </div>
       </div>
-    </div>
-    <KeyboardShortcuts
-      selectedObjects={selectedObjects}
-      deleteSelectedObjects={deleteSelectedObjects}
-      undo={() => {
-        undo();
-        undoPaste();
-      }}
-      redo={() => {
-        redo();
-        redoPaste();
-      }}
-      copySelectedObjects={copySelectedObjects}
-      pasteCopiedObjects={pasteCopiedObjects}
-      handleArrowKeyMovement={handleArrowKeyMovement}
-    />
+      <KeyboardShortcuts
+        selectedObjects={selectedObjects}
+        deleteSelectedObjects={deleteSelectedObjects}
+        undo={() => {
+          undo();
+          undoPaste();
+        }}
+        redo={() => {
+          redo();
+          redoPaste();
+        }}
+        copySelectedObjects={copySelectedObjects}
+        pasteCopiedObjects={pasteCopiedObjects}
+        handleArrowKeyMovement={handleArrowKeyMovement}
+      />
 
-    <AIChat />
-    <PropertiesCopyPaste
-      sceneObjects={sceneObjects}
-      selectedObjects={selectedObjects}
-      setSceneObjects={setSceneObjects}
-      saveToUndoStack={saveToUndoStack}
-    />
-  </div>
-);
+      <AIChat />
+      <PropertiesCopyPaste
+        sceneObjects={sceneObjects}
+        selectedObjects={selectedObjects}
+        setSceneObjects={setSceneObjects}
+        saveToUndoStack={saveToUndoStack}
+      />
+    </div>
+  );
 };
 
 function SceneContent({
-sceneSettings,
-sceneRef,
-sceneObjects,
-selectedObjects,
-updateObject,
-handleObjectSelect,
-dirLightRef,
-}) {
-const { gl } = useThree();
-
-useEffect(() => {
-  if (gl && sceneSettings.backgroundColor) {
-    gl.setClearColor(sceneSettings.backgroundColor);
-  }
-  if (dirLightRef.current) {
-    dirLightRef.current.shadow.mapSize.width = sceneSettings.shadowMapSize;
-    dirLightRef.current.shadow.mapSize.height = sceneSettings.shadowMapSize;
-    dirLightRef.current.shadow.camera.near = sceneSettings.shadowCameraNear;
-    dirLightRef.current.shadow.camera.far = sceneSettings.shadowCameraFar;
-    dirLightRef.current.shadow.camera.left = sceneSettings.shadowCameraLeft;
-    dirLightRef.current.shadow.camera.right = sceneSettings.shadowCameraRight;
-    dirLightRef.current.shadow.camera.top = sceneSettings.shadowCameraTop;
-    dirLightRef.current.shadow.camera.bottom =
-      sceneSettings.shadowCameraBottom;
-    dirLightRef.current.shadow.camera.updateProjectionMatrix();
-  }
-}, [
-  sceneSettings.backgroundColor,
-  gl,
-  sceneSettings.shadowMapSize,
-  sceneSettings.shadowCameraNear,
-  sceneSettings.shadowCameraFar,
-  sceneSettings.shadowCameraLeft,
-  sceneSettings.shadowCameraRight,
-  sceneSettings.shadowCameraTop,
-  sceneSettings.shadowCameraBottom,
+  sceneSettings,
+  sceneRef,
+  sceneObjects,
+  selectedObjects,
+  updateObject,
+  handleObjectSelect,
   dirLightRef,
-]);
+}) {
+  const { gl } = useThree();
 
-return (
-  <>
-    <ambientLight
-      intensity={
-        sceneSettings.ambientShadowsEnabled
-          ? sceneSettings.ambientIntensity
-          : 0
-      }
-    />
-    {sceneSettings.lightShadows ? (
-      <pointLight
-        ref={dirLightRef}
-        position={[
-          sceneSettings.lightX,
-          sceneSettings.lightY,
-          sceneSettings.lightZ,
-        ]}
-        intensity={sceneSettings.lightIntensity}
-        color={sceneSettings.lightColor}
-        castShadow
-      />
-    ) : null}
-    {sceneSettings.fogEnabled && (
-      <fog
-        attach="fog"
-        args={[
-          sceneSettings.fogColor,
-          sceneSettings.fogNear,
-          sceneSettings.fogFar,
-        ]}
-      />
-    )}
-    <gridHelper args={[10, 10]} />
-    <GroundPlane />
-    <group ref={sceneRef}>
-      {sceneObjects.map((object) => {
-        if (
-          object.type === "pointLight" ||
-          object.type === "spotLight" ||
-          object.type === "directionalLight"
-        ) {
-          return (
-            <React.Fragment key={object.id}>
-              <LightComponent
-                object={object}
-                selectedObjects={selectedObjects}
-                sceneRef={sceneRef}
-              />
-            </React.Fragment>
-          );
-        } else {
-          return (
-            <Model
-              key={object.id}
-              object={object}
-              isSelected={selectedObjects.includes(object.id)}
-              onSelect={() => handleObjectSelect([object.id])}
-              onUpdateObject={updateObject}
-            />
-          );
+  useEffect(() => {
+    if (gl && sceneSettings.backgroundColor) {
+      gl.setClearColor(sceneSettings.backgroundColor);
+    }
+    if (dirLightRef.current) {
+      dirLightRef.current.shadow.mapSize.width = sceneSettings.shadowMapSize;
+      dirLightRef.current.shadow.mapSize.height = sceneSettings.shadowMapSize;
+      dirLightRef.current.shadow.camera.near = sceneSettings.shadowCameraNear;
+      dirLightRef.current.shadow.camera.far = sceneSettings.shadowCameraFar;
+      dirLightRef.current.shadow.camera.left = sceneSettings.shadowCameraLeft;
+      dirLightRef.current.shadow.camera.right = sceneSettings.shadowCameraRight;
+      dirLightRef.current.shadow.camera.top = sceneSettings.shadowCameraTop;
+      dirLightRef.current.shadow.camera.bottom =
+        sceneSettings.shadowCameraBottom;
+      dirLightRef.current.shadow.camera.updateProjectionMatrix();
+    }
+  }, [
+    sceneSettings.backgroundColor,
+    gl,
+    sceneSettings.shadowMapSize,
+    sceneSettings.shadowCameraNear,
+    sceneSettings.shadowCameraFar,
+    sceneSettings.shadowCameraLeft,
+    sceneSettings.shadowCameraRight,
+    sceneSettings.shadowCameraTop,
+    sceneSettings.shadowCameraBottom,
+    dirLightRef,
+  ]);
+
+  return (
+    <>
+      <ambientLight
+        intensity={
+          sceneSettings.ambientShadowsEnabled
+            ? sceneSettings.ambientIntensity
+            : 0
         }
-      })}
-    </group>
-  </>
-);
+      />
+      {sceneSettings.lightShadows ? (
+        <pointLight
+          ref={dirLightRef}
+          position={[
+            sceneSettings.lightX,
+            sceneSettings.lightY,
+            sceneSettings.lightZ,
+          ]}
+          intensity={sceneSettings.lightIntensity}
+          color={sceneSettings.lightColor}
+          castShadow
+        />
+      ) : null}
+      {sceneSettings.fogEnabled && (
+        <fog
+          attach="fog"
+          args={[
+            sceneSettings.fogColor,
+            sceneSettings.fogNear,
+            sceneSettings.fogFar,
+          ]}
+        />
+      )}
+      
+      <group ref={sceneRef}>
+        {sceneObjects.map((object) => {
+          if (
+            object.type === "pointLight" ||
+            object.type === "spotLight" ||
+            object.type === "directionalLight"
+          ) {
+            return (
+              <React.Fragment key={object.id}>
+                <LightComponent
+                  object={object}
+                  selectedObjects={selectedObjects}
+                  sceneRef={sceneRef}
+                />
+              </React.Fragment>
+            );
+          } else {
+            return (
+              <Model
+                key={object.id}
+                object={object}
+                isSelected={selectedObjects.includes(object.id)}
+                onSelect={() => handleObjectSelect([object.id])}
+                onUpdateObject={updateObject}
+              />
+            );
+          }
+        })}
+      </group>
+    </>
+  );
 }
 
 export default EditorManager;

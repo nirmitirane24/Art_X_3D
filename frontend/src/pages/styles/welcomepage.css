@@ -1,6 +1,6 @@
 /* Style for the whole scrollbar */
 body::-webkit-scrollbar {
-  width: 12px; /* Width of the scrollbar */
+  width: 0px; /* Width of the scrollbar */
 }
 
 /* Style for the track (background of the scrollbar) */
@@ -26,7 +26,12 @@ body::-webkit-scrollbar-corner {
   background-color: #1a192d; /* Matches the track */
 }
 body{
-  font-family: "Futura, 'Trebuchet MS', Arial, sans-serif";
+  font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+*{
+  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 /* Main Container */
@@ -145,28 +150,101 @@ body{
   transition: ease-in-out 0.3s;
   background-color: rgba(255, 255, 255, 0.1);
 }
-/* Features Section */
-.features {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  list-style-type: none;
-  overflow: hidden;
+
+.tools-section {
+  text-align: center;
+  margin: 30px auto;
   color: white;
-  opacity: 60%;
-  gap: 10px;
-  margin-right: 20px;
-  margin-top: 80px;
 }
 
-.features li {
-  align-items: center;
-  justify-content: center;
-  padding: 9px 9px;
-  border-radius: 12px;
-  cursor:default;
+.tools-title {
+  font-size: 30px;
+  font-weight: bold;
 }
-.features li:hover{
-  background-color: #ffffff;
-  color: rgba(255, 255, 255, 0.285);
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Ensures 2 cards per row */
+  column-gap: 80px;
+  row-gap: 10px;
+  justify-content: center;
+  align-items: center;
+  justify-items: center;
+  width: 100%;
+}
+
+.tool-card {
+  background: #2d2d43;
+  border-radius: 10px;
+  padding: 30px;
+  text-align: center;
+  width: 100%;
+  height: 85%;
+}
+
+.tool-card img {
+  width: 380px;
+  height: 300px;
+  justify-content: center;
+  justify-items: center;
+  transition: transform 0.5s step-start;
+}
+
+.tool-card p {
+  font-size: 20px;
+  opacity: 0.5;
+  margin-top: -10px;
+}
+
+.tool-card img:hover {
+  transform: scale(1.05);
+}
+
+.more-section {
+  text-align: center;
+  margin: 30px auto;
+  color: white;
+}
+
+.more-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.more-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Ensures 2 cards per row */
+  column-gap: 75px;
+  row-gap: 25px;
+  justify-content: center;
+  align-items: center;
+  justify-items: center;
+  width: 100%;
+}
+
+.more-card {
+  background: transparent;
+  border-radius: 10px;
+  padding: 30px;
+  text-align: center;
+  width: 100%;
+  height: 80%;
+}
+
+.more-card img {
+  width: 100px;
+  height: 100px;
+  justify-content: center;
+  justify-items: center;
+  transition: transform 0.5s step-start;
+}
+
+.more-card p {
+  font-size: 20px;
+  opacity: 0.5;
+}
+
+.more-card img:hover {
+  transform: scale(1.05);
 }
