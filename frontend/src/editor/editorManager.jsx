@@ -515,6 +515,9 @@ function SceneContent({
           ]}
         />
       )}
+
+      <gridHelper args={[10, 10]} />
+      <GroundPlane />
       
       <group ref={sceneRef}>
         {sceneObjects.map((object) => {
