@@ -6,10 +6,10 @@ load_dotenv()
 
 class Config:
     """Base configuration."""
-    SECRET_KEY = os.getenv('SECRET_KEY', 'your_fallback_secret_key') #important to change
+    SECRET_KEY = os.getenv('SECRET_KEY', 'your_fallback_secret_key') 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    PERMANENT_SESSION_LIFETIME = timedelta(days=7)
-    DEBUG = False  # Default to False, override in DevelopmentConfig
+    PERMANENT_SESSION_LIFETIME = timedelta(days=1)
+    DEBUG = False  
     DB_HOST = os.getenv('DB_HOST')
     DB_USER = os.getenv('DB_USER')
     DB_PASSWORD = os.getenv('DB_PASSWORD')
@@ -22,5 +22,4 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     """Production configuration."""
-    # Add any production-specific settings here (e.g., logging)
     pass

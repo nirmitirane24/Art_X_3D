@@ -7,3 +7,4 @@ boto3
 pako
 requests
 timeago
+Flask-Caching

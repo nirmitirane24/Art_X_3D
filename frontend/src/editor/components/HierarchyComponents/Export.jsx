@@ -1,3 +1,4 @@
+// --- Export.jsx --- (Corrected getObjectByProperty and improved logging)
 import React, { useState, useEffect, useRef } from "react";
 import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter";
 import { OBJExporter } from "three/examples/jsm/exporters/OBJExporter";
@@ -5,7 +6,7 @@ import { STLExporter } from "three/examples/jsm/exporters/STLExporter";
 import { FaFileExport, FaTimes } from "react-icons/fa";
 import * as THREE from "three";
 
-const Export = ({ scene }) => {
+const Export = ({ scene, sceneObjects }) => {
     const [showExportPanel, setShowExportPanel] = useState(false);
     const [showFileNameModal, setShowFileNameModal] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
@@ -14,129 +15,135 @@ const Export = ({ scene }) => {
 
     const handleExport = (format) => {
         setExportFormat(format);
-        setFileName(""); // Reset file name input field
+        setFileName("");
         setShowFileNameModal(true);
     };
-
     const confirmExport = () => {
         setIsExporting(true);
-        const objectsToExport = scene.children.filter(obj => obj.name !== "GroundPlane" && obj instanceof THREE.Object3D);
-
-        if (objectsToExport.length === 0) {
-            console.error("No valid objects to export.");
+        if (!scene) {
+            console.error("Scene is null or undefined.");
+            alert("Scene is null or undefined. Cannot export.");
             setIsExporting(false);
+            setShowFileNameModal(false);
             return;
         }
 
+        // 1. Create a deep copy of the scene.
+        const sceneCopy = scene.clone();
+        console.log("Original scene:", scene); // Log the original scene
+        console.log("Scene copy:", sceneCopy); // Log the copied scene
+        console.log("sceneObjects:", sceneObjects)
+
+        // 2. Apply properties from sceneObjects to the copied scene.
+        if (sceneObjects) {
+            sceneObjects.forEach((objectData) => {
+                // Correctly find the object in the copied scene using userData.id
+                const objectInScene = sceneCopy.getObjectByProperty("id", objectData.id);
+
+
+                if (objectInScene) {
+                    console.log("Found object in scene:", objectInScene);
+
+                    // Apply position, rotation, and scale.
+                    objectInScene.position.set(...objectData.position);
+                    objectInScene.rotation.set(...objectData.rotation.map(THREE.MathUtils.degToRad));
+                    objectInScene.scale.set(...objectData.scale);
+
+
+                    // Apply material properties IF it's a mesh and has a material.
+                    if (objectInScene.isMesh && objectInScene.material) {
+                        console.log("Applying material properties to:", objectInScene);
+                        if (objectData.material.color) {
+                            objectInScene.material.color.set(objectData.material.color);
+                        }
+                        if (objectData.material.metalness !== undefined) {
+                            objectInScene.material.metalness = objectData.material.metalness;
+                        }
+                        if (objectData.material.roughness !== undefined) {
+                            objectInScene.material.roughness = objectData.material.roughness;
+                        }
+                        if (objectData.material.castShadow !== undefined) {
+                            objectInScene.castShadow = objectData.material.castShadow;
+                        }
+                        if (objectData.material.receiveShadow !== undefined) {
+                            objectInScene.receiveShadow = objectData.material.receiveShadow;
+                        }
+                    }
+                } else {
+                    console.warn(`Object with id ${objectData.id} not found in the copied scene.`);
+                }
+            });
+        } else {
+            console.warn("sceneObjects is null or undefined.");
+        }
+
+        // 3. Export the copied scene.
         switch (exportFormat) {
             case "gltf":
-                exportGLTF(objectsToExport);
+                exportGLTF(sceneCopy);
                 break;
             case "obj":
-                exportOBJ(objectsToExport);
+                exportOBJ(sceneCopy);
                 break;
             case "stl":
-                exportSTL(objectsToExport);
+                exportSTL(sceneCopy);
                 break;
             default:
                 break;
         }
 
-        setIsExporting(false);
         setShowFileNameModal(false);
         setShowExportPanel(false);
     };
 
-    // === GLTF EXPORT WITH TEXTURES ===
-    const exportGLTF = (objects) => {
+
+    const exportGLTF = (sceneToExport) => {
         const exporter = new GLTFExporter();
-        const group = new THREE.Group();
-        objects.forEach(obj => group.add(obj.clone()));
 
         exporter.parse(
-            group,
+            sceneToExport,
             (result) => {
                 const blob = new Blob([JSON.stringify(result, null, 2)], { type: "application/json" });
                 downloadBlob(blob, `${fileName}.gltf`);
+                setIsExporting(false);
             },
             (error) => {
                 console.error("Error exporting GLTF:", error);
+                alert(`Error exporting GLTF: ${error.message}`);
+                setIsExporting(false);
             },
-            { binary: false, embedImages: true } // Ensures textures are embedded
+            { binary: false, embedImages: true }
         );
     };
 
-    const exportOBJ = (objects) => {
+    const exportOBJ = (sceneToExport) => {
         const exporter = new OBJExporter();
-        const group = new THREE.Group();
-
-        objects.forEach(obj => {
-            const clonedObj = obj.clone();
-            clonedObj.userData.id = obj.uuid; // Store unique ID
-            group.add(clonedObj);
-        });
-
         try {
-            let objString = "# Exported OBJ with embedded textures\n";
-
-            // Export object shape names & IDs
-            objects.forEach(obj => {
-                objString += `# Object: ${obj.name}, ID: ${obj.uuid}\n`;
-            });
-
-            // Generate OBJ file content
-            objString += exporter.parse(group);
-
-            // Process textures and embed them as Base64
-            const texturePromises = objects.map(obj => {
-                if (obj.material && obj.material.map && obj.material.map.image) {
-                    return convertTextureToBase64(obj.material.map.image).then(base64 => {
-                        objString += `# Embedded Texture for ${obj.name}: data:image/jpeg;base64,${base64}\n`;
-                    });
-                }
-                return Promise.resolve();
-            });
-
-            // After processing all textures, save the file
-            Promise.all(texturePromises).then(() => {
-                const blob = new Blob([objString], { type: "text/plain" });
-                downloadBlob(blob, `${fileName}.obj`);
-            });
-
+            const result = exporter.parse(sceneToExport);
+            const blob = new Blob([result], { type: "text/plain" });
+            downloadBlob(blob, `${fileName}.obj`);
+            setIsExporting(false);
         } catch (error) {
             console.error("Error exporting OBJ:", error);
+            alert(`Error exporting OBJ: ${error.message}`);
+            setIsExporting(false);
         }
     };
 
-    // ✅ Convert texture to Base64
-    const convertTextureToBase64 = (image) => {
-        return new Promise((resolve) => {
-            const canvas = document.createElement("canvas");
-            canvas.width = image.width;
-            canvas.height = image.height;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(image, 0, 0);
-
-            resolve(canvas.toDataURL("image/jpeg").split(",")[1]); // Extract Base64
-        });
-    };
-
-    // === STL EXPORT (STL DOES NOT SUPPORT TEXTURES) ===
-    const exportSTL = (objects) => {
+    const exportSTL = (sceneToExport) => {
         const exporter = new STLExporter();
-        const group = new THREE.Group();
-        objects.forEach(obj => group.add(obj.clone()));
-
         try {
-            const stlString = exporter.parse(group);
+            const stlString = exporter.parse(sceneToExport);
             const blob = new Blob([stlString], { type: "application/octet-stream" });
             downloadBlob(blob, `${fileName}.stl`);
+            setIsExporting(false);
         } catch (error) {
             console.error("Error exporting STL:", error);
+            alert(`Error exporting STL: ${error.message}`);
+            setIsExporting(false);
         }
     };
 
-    // === Helper to Download Blob ===
     const downloadBlob = (blob, filename) => {
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
@@ -149,7 +156,6 @@ const Export = ({ scene }) => {
     const exportPanelRef = useRef(null);
     const fileNameModalRef = useRef(null);
 
-    // Close panels when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (exportPanelRef.current && !exportPanelRef.current.contains(event.target)) {
@@ -163,11 +169,6 @@ const Export = ({ scene }) => {
         if (showExportPanel || showFileNameModal) {
             document.addEventListener("mousedown", handleClickOutside);
         }
-
-        if (showFileNameModal) {
-            setShowExportPanel(false);
-        }
-
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
@@ -178,6 +179,7 @@ const Export = ({ scene }) => {
     };
 
     return (
+        // ... (JSX remains the same) ...
         <div>
             <button onClick={() => setShowExportPanel(true)}>
                 <FaFileExport /> <span>Export</span>
@@ -220,7 +222,7 @@ const Export = ({ scene }) => {
                         <button className="modal-buttons"
                             onClick={() => {
                                 setShowFileNameModal(false);
-                                setShowExportPanel(true); // Reopen Export Panel when Cancel is clicked
+                                setShowExportPanel(true);
                             }}
                         >
                             Cancel

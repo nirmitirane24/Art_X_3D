@@ -97,10 +97,9 @@ class UserLog:
             return []
 
         try:
-            with conn.cursor() as cursor:  # Use default cursor
+            with conn.cursor() as cursor:  
                 cursor.execute("SELECT * FROM user_logs WHERE user_id = %s ORDER BY timestamp DESC", (user_id,))
                 logs_data = cursor.fetchall()
-                # Convert tuples to UserLog objects
                 logs = [UserLog(log[0], log[1], log[2], log[3]) for log in logs_data]
                 return logs
         except psycopg2.Error as e:

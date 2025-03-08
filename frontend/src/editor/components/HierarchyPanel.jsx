@@ -23,6 +23,7 @@ const HierarchyPanel = ({
   currentSceneId,
   setCurrentSceneId,
   canvasRef,
+  onImportScene,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -227,9 +228,9 @@ const HierarchyPanel = ({
       )}
 
       <div className="panel-buttons" style={{ marginLeft: "-10px" }}>
-        <Import />
-        <Library />
-        <Export />
+        <Import onImportScene={onImportScene} />
+        <Library onImportScene={onImportScene} />
+        <Export scene={scene} sceneObjects={sceneObjects} />
 
         <button onClick={handleSave} className="custom-button" disabled={isSaving}>
           {showTick ? <FaCheck /> : <FaSave />} Save

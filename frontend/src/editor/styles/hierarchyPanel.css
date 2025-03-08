@@ -267,41 +267,7 @@
   background-color: #333;
 }
 
-.library-content {
-  max-height: 300px;
-  overflow-y: auto;
-  padding-right: 5px;
-}
 
-.library-section {
-  margin-bottom: 20px;
-}
-
-.library-section h4 {
-  text-align: left;
-  margin-bottom: 10px;
-  font-size: 1.2em;
-}
-
-.library-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-
-.library-item {
-  padding: 15px;
-  background-color: #222;
-  border-radius: 6px;
-  text-align: center;
-  color: #eee;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.library-item:hover {
-  background-color: #333;
-}
 
 .modal-buttons.close-button {
   margin-top: 15px;

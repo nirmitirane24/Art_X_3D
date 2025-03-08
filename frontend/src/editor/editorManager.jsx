@@ -315,7 +315,71 @@ const EditorManager = () => {
   };
 
 
+  const handleImportScene = (loadedScene) => {
+    saveToUndoStack([...sceneObjects], { ...sceneSettings });
+  
+    const sceneGroup = loadedScene.scene || loadedScene;
+    const childMeshes = [];
+  
+    sceneGroup.traverse((child) => {
+      if (child.isMesh) {
+        let shapeName = child.name && !child.name.startsWith("mesh_") ? child.name : null;
+  
+        if (!shapeName && child.geometry.parameters) {
+          if (child.geometry.parameters.width !== undefined) shapeName = "Box";
+          else if (child.geometry.parameters.radius !== undefined) shapeName = "Sphere";
+          else if (child.geometry.parameters.radiusTop !== undefined) shapeName = "Cylinder";
+          else if (child.geometry.parameters.innerRadius !== undefined) shapeName = "Torus";
+        }
+  
+        if (!shapeName) shapeName = "UnknownShape";
+  
+        const childBoundingBox = new THREE.Box3().setFromObject(child);
+        const childCenter = childBoundingBox.getCenter(new THREE.Vector3());
+        const childSize = childBoundingBox.getSize(new THREE.Vector3());
+  
+        // Extract Material and Texture Information Properly
+        let materialData = { name: "standard", color: "ffffff", texture: null };
+  
+        if (Array.isArray(child.material)) {
+          // Handle multi-material meshes
+          materialData = child.material.map((mat) => ({
+            name: mat.name || "standard",
+            color: mat.color ? `#${mat.color.getHexString()}` : "#ffffff",
+            texture: mat.map ? mat.map.image?.src || null : null,
+          }));
+        } else if (child.material) {
+          materialData = {
+            name: child.material.name || "standard",
+            color: child.material.color ? `#${child.material.color.getHexString()}` : "#ffffff",
+            texture: child.material.map ? child.material.map.image?.src || null : null,
+          };
+        }
+  
+        const childObject = {
+          id: Date.now() + Math.random(),
+          type: shapeName,
+          mesh: child,
+          position: [child.position.x, child.position.y, child.position.z],
+          rotation: [child.rotation.x, child.rotation.y, child.rotation.z],
+          scale: [child.scale.x, child.scale.y, child.scale.z],
+          material: materialData,
+          boundingBox: {
+            min: [childBoundingBox.min.x, childBoundingBox.min.y, childBoundingBox.min.z],
+            max: [childBoundingBox.max.x, childBoundingBox.max.y, childBoundingBox.max.z],
+            center: [childCenter.x, childCenter.y, childCenter.z],
+            size: [childSize.x, childSize.y, childSize.z],
+          },
+        };
+  
+        childMeshes.push(childObject);
+      }
+    });
+  
+    setSceneObjects((prevObjects) => [...prevObjects, ...childMeshes]);
+  };
 
+  
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const sceneId = urlParams.get('sceneId');
@@ -384,6 +448,7 @@ const EditorManager = () => {
             currentSceneId={currentSceneId}
             setCurrentSceneId={setCurrentSceneId}
             canvasRef={canvasRef}
+            onImportScene={handleImportScene}
           />
           <PropertiesPanel
             selectedObjects={selectedObjects ?? []}

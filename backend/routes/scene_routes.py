@@ -60,7 +60,6 @@ else:
 if not SUPABASE_S3_ENDPOINT or not SUPABASE_API_KEY or not SUPABASE_BUCKET_NAME:
     raise ValueError("Supabase environment variables (URL, KEY, BUCKET_NAME) are not set.")
 
-# Initialize Cloudflare R2 Client
 cloudflare_r2_client = boto3.client(
     's3',
     region_name=CLOUDFLARE_R2_REGION,
