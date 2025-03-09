@@ -23,7 +23,7 @@ const Home = () => {
   const [tutorialsGridRef, setTutorialsGridRef] = useState(null); // Ref for tutorials grid
   const [projectsGridHeight, setProjectsGridHeight] = useState(0); // Height of projects grid
   const [tutorialsGridHeight, setTutorialsGridHeight] = useState(0); // Height of tutorials grid
-
+  const [activeMenu, setActiveMenu] = useState("Home"); // Keep track of the active menu item
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -206,6 +206,11 @@ const Home = () => {
   const handleWelcome = () => {
     navigate("/welcome");
   }
+
+  const handleMenuClick = (menuItem) => {
+    setActiveMenu(menuItem);
+  };
+
   if (loading) {
     return <LoadingPage />;
   }
@@ -215,48 +220,52 @@ const Home = () => {
       <aside className="sidebar-home">
         <div className="profile-section">
           <div className="profile-icon">
-            <img style={{ height: "30px" }} src="/cube2.svg" alt="" onClick={{handleWelcome}} />
+            <img style={{ height: "38px" }} src="/3d/1logo.png" alt="" onClick={{handleWelcome}} />
           </div>
           <span>{username}</span>
         </div>
         <nav className="menu">
-          <Link to="/" className="menu-item active">
+          <Link to className={`menu-item ${activeMenu === "Home" ? "active" : ""}`} onClick={() => handleMenuClick("Home")}>
             Home
           </Link>
-          <Link to="/myfiles" className="menu-item">
+          <Link to className={`menu-item ${activeMenu === "My Files" ? "active" : ""}`} onClick={() => handleMenuClick("My Files")}>
             My Files
           </Link>
-          <Link to="/sharedwithme" className="menu-item">
+          <Link to="/sharedwithme" className={`menu-item ${activeMenu === "Shared with Me" ? "active" : ""}`} onClick={() => handleMenuClick("Shared with Me")}>
             Shared with Me
           </Link>
-          <Link to="/community" className="menu-item">
+          <Link to className={`menu-item ${activeMenu === "Community" ? "active" : ""}`} onClick={() => handleMenuClick("Community")}>
             Community
           </Link>
-          <Link to="/tutorials" className="menu-item">
+          <Link to="/tutorials" className={`menu-item ${activeMenu === "Tutorials" ? "active" : ""}`} onClick={() => handleMenuClick("Tutorials")}>
             Tutorials
           </Link>
-          <Link to="/library" className="menu-item">
+          <Link to="/library" className={`menu-item ${activeMenu === "Library" ? "active" : ""}`} onClick={() => handleMenuClick("Library")}>
             Library
           </Link>
-          <Link to="/inbox" className="menu-item">
+          <Link to="/inbox" className={`menu-item ${activeMenu === "Inbox" ? "active" : ""}`} onClick={() => handleMenuClick("Inbox")}>
             Inbox
           </Link>
         </nav>
         <div className="upgrade-section">
           <button className="upgrade-button">Upgrade</button>
-          <button className="upgrade-button" onClick={handleLogout} style={{ marginTop: "10px" }}>
-            <FaSignOutAlt style={{ marginRight: "5px" }} />
-            Logout
-          </button>
+
         </div>
       </aside>
 
       <main className="main-content">
-        <header className="top-bar">
+        <header className="top-bar" style={{ display: activeMenu === 'Home' ? 'flex' : 'none', justifyContent: 'space-between', alignItems: 'center' }}>
           <h1>Welcome to the 3D space</h1>
+          <div className="logbtn">
+            <button className="upgrade-button" onClick={handleLogout}>
+              <FaSignOutAlt style={{ marginRight: "5px" }} />
+              Logout
+            </button>
+          </div>
         </header>
 
-        {isImportPanelOpen && (
+
+        {isImportPanelOpen && activeMenu === 'Home' && (
           <div className="import-home">
             <div className="import-panel-header">
               <h2>Import or Drag & Drop</h2>
@@ -273,7 +282,7 @@ const Home = () => {
           </div>
         )}
 
-        {isGeneratePanelOpen && (
+        {isGeneratePanelOpen && activeMenu === 'Home' &&(
           <div className="import-panel">
             <div className="import-panel-header">
               <h2>Generate</h2>
@@ -299,94 +308,98 @@ const Home = () => {
           </div>
         )}
 
-        <section className="projects">
-          <h2>Your Projects</h2>
-          <div className="projects-grid" ref={setProjectsGridRef}  style={{ minHeight: projectsGridHeight }}>
-            <div onClick={() => navigate("/editor")} className="project-card new-file">
-              <FaFileAlt style={{ marginRight: "8px" }} />
-              <p>New File</p>
-            </div>
-            {projectsLoading ? (
-              <>
-                <div className="project-card skeleton-loading">
-                  <div className="project-thumbnail skeleton-loading"></div>
-                  <p className="project-title skeleton-loading"></p>
-                </div>
-                <div className="project-card skeleton-loading">
-                  <div className="project-thumbnail skeleton-loading"></div>
-                  <p className="project-title skeleton-loading"></p>
-                </div>
-                <div className="project-card skeleton-loading">
-                  <div className="project-thumbnail skeleton-loading"></div>
-                  <p className="project-title skeleton-loading"></p>
-                </div>
-                <div className="project-card skeleton-loading">
-                  <div className="project-thumbnail skeleton-loading "></div>
-                  <p className="project-title skeleton-loading"></p>
-                </div>
-              </>
-            ) : (
-              projects.map((project) => (
-                <div key={project.scene_id} className="project-card" onClick={() => navigate(`/editor?sceneId=${project.scene_id}`)}>
-                  <div className="project-thumbnail">
-                    {project.thumbnail_url ? (
-                      <img src={project.thumbnail_url} alt={project.scene_name} />
-                    ) : (
-                      <div className="project-thumbnail"></div>
-                    )}
+        {/* Show Projects and Community Examples when Home is active */}
+        {(activeMenu === "Home" || activeMenu === 'My Files') && (
+          <section className="projects">
+            <h2>Your Projects</h2>
+            <div className="projects-grid" ref={setProjectsGridRef} style={{ minHeight: projectsGridHeight }}>
+              <div onClick={() => navigate("/editor")} className="project-card new-file">
+                <FaFileAlt style={{ marginRight: "8px" }} />
+                <p>New File</p>
+              </div>
+              {projectsLoading ? (
+                <>
+                  <div className="project-card skeleton-loading">
+                    <div className="project-thumbnail skeleton-loading"></div>
+                    <p className="project-title skeleton-loading"></p>
                   </div>
-                  <p className="project-title">{project.scene_name}</p>
-                  <p className="lastupdated">Last updated {project.last_updated}</p>
-                </div>
-              ))
-            )}
-          </div>
-        </section>
-
-        <section className="tutorials">
-            <h2>Community Examples</h2>
-            <div className="tutorials-grid" ref={setTutorialsGridRef} style={{minHeight: tutorialsGridHeight}}>
-                {communityLoading ? (
-                    <>
-                        <div className="tutorial-card skeleton-loading">
-                            <div className="project-thumbnail skeleton-loading"></div>
-                            <p className="project-title skeleton-loading"></p>
-                        </div>
-                        <div className="tutorial-card skeleton-loading">
-                            <div className="project-thumbnail skeleton-loading"></div>
-                            <p className="project-title skeleton-loading"></p>
-                        </div>
-                        <div className="tutorial-card skeleton-loading">
-                            <div className="project-thumbnail skeleton-loading"></div>
-                            <p className="project-title skeleton-loading"></p>
-                        </div>
-                        <div className="tutorial-card skeleton-loading">
-                            <div className="project-thumbnail skeleton-loading"></div>
-                            <p className="project-title skeleton-loading"></p>
-                        </div>
-                    </>
-                ) : (
-                    communityExamples.map((example) => (
-                        <div key={example.example_id} className="tutorial-card"
-                             onClick={() => handleLoadExample(example.example_id)}>
-                            <div className="project-thumbnail">
-                                {example.thumbnail_s3_key ? (
-                                     <img
-                                        src={`${example.thumbnail_s3_key}`}
-                                        alt={example.example_name}
-                                        className="example-thumbnail"
-                                      />
-                                ) : (
-                                    <div className="project-thumbnail"></div> // Keep this for consistent layout
-                                )}
-                            </div>
-                            <p className="project-title">{example.example_name}</p>
-                            <p>{example.description}</p>
-                        </div>
-                    ))
-                )}
+                  <div className="project-card skeleton-loading">
+                    <div className="project-thumbnail skeleton-loading"></div>
+                    <p className="project-title skeleton-loading"></p>
+                  </div>
+                  <div className="project-card skeleton-loading">
+                    <div className="project-thumbnail skeleton-loading"></div>
+                    <p className="project-title skeleton-loading"></p>
+                  </div>
+                  <div className="project-card skeleton-loading">
+                    <div className="project-thumbnail skeleton-loading "></div>
+                    <p className="project-title skeleton-loading"></p>
+                  </div>
+                </>
+              ) : (
+                projects.map((project) => (
+                  <div key={project.scene_id} className="project-card" onClick={() => navigate(`/editor?sceneId=${project.scene_id}`)}>
+                    <div className="project-thumbnail">
+                      {project.thumbnail_url ? (
+                        <img src={project.thumbnail_url} alt={project.scene_name} />
+                      ) : (
+                        <div className="project-thumbnail"></div>
+                      )}
+                    </div>
+                    <p className="project-title">{project.scene_name}</p>
+                    <p className="lastupdated">Last updated {project.last_updated}</p>
+                  </div>
+                ))
+              )}
             </div>
-        </section>
+          </section>
+        )}
+
+        {(activeMenu === "Home" || activeMenu === 'Community') && (
+          <section className="tutorials">
+            <h2>Community Examples</h2>
+            <div className="tutorials-grid" ref={setTutorialsGridRef} style={{ minHeight: tutorialsGridHeight }}>
+              {communityLoading ? (
+                <>
+                  <div className="tutorial-card skeleton-loading">
+                    <div className="project-thumbnail skeleton-loading"></div>
+                    <p className="project-title skeleton-loading"></p>
+                  </div>
+                  <div className="tutorial-card skeleton-loading">
+                    <div className="project-thumbnail skeleton-loading"></div>
+                    <p className="project-title skeleton-loading"></p>
+                  </div>
+                  <div className="tutorial-card skeleton-loading">
+                    <div className="project-thumbnail skeleton-loading"></div>
+                    <p className="project-title skeleton-loading"></p>
+                  </div>
+                  <div className="tutorial-card skeleton-loading">
+                    <div className="project-thumbnail skeleton-loading"></div>
+                    <p className="project-title skeleton-loading"></p>
+                  </div>
+                </>
+              ) : (
+                communityExamples.map((example) => (
+                  <div key={example.example_id} className="tutorial-card" onClick={() => handleLoadExample(example.example_id)}>
+                    <div className="project-thumbnail">
+                      {example.thumbnail_s3_key ? (
+                        <img
+                          src={`${example.thumbnail_s3_key}`}
+                          alt={example.example_name}
+                          className="example-thumbnail"
+                        />
+                      ) : (
+                        <div className="project-thumbnail"></div> // Keep this for consistent layout
+                      )}
+                    </div>
+                    <p className="project-title">{example.example_name}</p>
+                    <p>{example.description}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );
