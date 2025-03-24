@@ -80,6 +80,16 @@ const saveScene = async (sceneObjects, sceneSettings, sceneName, sceneId, thumbn
                 : "double",
         };
 
+          // Texture handling
+          if (mat.map) {
+            const base64Texture = textureToBase64(mat.map);
+            objectData.material.texture = base64Texture;
+          }
+          if (mat.normalMap) {
+            const base64NormalMap = textureToBase64(mat.normalMap);
+            objectData.material.normalMap = base64NormalMap;
+          }
+
         }
 
         // --- Light-Specific Properties ---
@@ -240,7 +250,12 @@ const loadScene = async (sceneId, setSceneObjects, setSceneSettings, type) => {
         if (mat.texture) {
           const textureLoader = new THREE.TextureLoader();
           const textureData = `data:image/png;base64,${mat.texture}`;
-          newObject.material.map = textureLoader.load(textureData);
+          console.log("Loading texture from:", textureData.substring(0, 100) + "..."); // Log URL
+          newObject.material.map = textureLoader.load(textureData, () => {
+            console.log("Texture loaded successfully");
+          }, undefined, (error) => {
+            console.error("Error loading texture:", error);
+          });
         }
         // --- Load Normal Map ---
         if (mat.normalMap) {

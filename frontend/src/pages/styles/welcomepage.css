@@ -41,6 +41,10 @@ body {
 
 * {
   font-family: Arial, sans-serif;
+  user-select: none; /* Disable text selection */
+  -webkit-user-drag: none; /* Disable dragging images */
+  touch-action: manipulation; /* Disable pinch zoom */
+  -ms-touch-action: manipulation;
 }
 
 /* Main Container */

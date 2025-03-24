@@ -317,30 +317,30 @@ const EditorManager = () => {
 
   const handleImportScene = (loadedScene) => {
     saveToUndoStack([...sceneObjects], { ...sceneSettings });
-  
+
     const sceneGroup = loadedScene.scene || loadedScene;
     const childMeshes = [];
-  
+
     sceneGroup.traverse((child) => {
       if (child.isMesh) {
         let shapeName = child.name && !child.name.startsWith("mesh_") ? child.name : null;
-  
+
         if (!shapeName && child.geometry.parameters) {
           if (child.geometry.parameters.width !== undefined) shapeName = "Box";
           else if (child.geometry.parameters.radius !== undefined) shapeName = "Sphere";
           else if (child.geometry.parameters.radiusTop !== undefined) shapeName = "Cylinder";
           else if (child.geometry.parameters.innerRadius !== undefined) shapeName = "Torus";
         }
-  
+
         if (!shapeName) shapeName = "UnknownShape";
-  
+
         const childBoundingBox = new THREE.Box3().setFromObject(child);
         const childCenter = childBoundingBox.getCenter(new THREE.Vector3());
         const childSize = childBoundingBox.getSize(new THREE.Vector3());
-  
+
         // Extract Material and Texture Information Properly
         let materialData = { name: "standard", color: "ffffff", texture: null };
-  
+
         if (Array.isArray(child.material)) {
           // Handle multi-material meshes
           materialData = child.material.map((mat) => ({
@@ -355,7 +355,7 @@ const EditorManager = () => {
             texture: child.material.map ? child.material.map.image?.src || null : null,
           };
         }
-  
+
         const childObject = {
           id: Date.now() + Math.random(),
           type: shapeName,
@@ -371,15 +371,15 @@ const EditorManager = () => {
             size: [childSize.x, childSize.y, childSize.z],
           },
         };
-  
+
         childMeshes.push(childObject);
       }
     });
-  
+
     setSceneObjects((prevObjects) => [...prevObjects, ...childMeshes]);
   };
 
-  
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const sceneId = urlParams.get('sceneId');
@@ -419,6 +419,29 @@ const EditorManager = () => {
   if (loading) {
     return <LoadingPage />;
   }
+
+  // 🔹 Disable keyboard zoom (Ctrl + Scroll, Ctrl + +, Ctrl + -)
+  document.addEventListener("keydown", function (event) {
+    if (
+      event.ctrlKey &&
+      (event.key === "=" || event.key === "-" || event.key === "0" || event.key === "PageUp" || event.key === "PageDown")
+    ) {
+      event.preventDefault();
+    }
+  }, false);
+
+  // 🔹 Disable pinch zoom on touch devices
+  document.addEventListener("wheel", function (event) {
+    if (event.ctrlKey) {
+      event.preventDefault();
+    }
+  }, { passive: false });
+
+  // 🔹 Disable double-tap zoom on mobile
+  document.addEventListener("dblclick", function (event) {
+    event.preventDefault();
+  }, false);
+
 
   return (
     <div className="editor-container" onClick={deselectAllObjects}>
@@ -504,6 +527,7 @@ const EditorManager = () => {
         setSceneObjects={setSceneObjects}
         saveToUndoStack={saveToUndoStack}
       />
+
     </div>
   );
 };
@@ -582,8 +606,6 @@ function SceneContent({
       )}
 
       <gridHelper args={[10, 10]} />
-      <GroundPlane />
-      
       <group ref={sceneRef}>
         {sceneObjects.map((object) => {
           if (
