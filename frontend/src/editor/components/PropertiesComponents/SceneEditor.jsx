@@ -293,15 +293,6 @@ const SceneEditor = ({ sceneSettings, updateObject, sceneObjects, selectedObject
                 </div>
             </div>
             <hr className="style-six" ></hr>
-            <div>
-                <h4>Play Camera</h4>
-                <div>
-                    <select style={{ marginTop: "7px" }}>
-                        <option value="default">Personal...</option>
-                    </select>
-                </div>
-            </div>
-            <hr className="style-six" ></hr>
             {/* --- Original Scene Light Controls --- */}
             <div className="light-section">
                 <h4>Light</h4>
@@ -408,33 +399,6 @@ const SceneEditor = ({ sceneSettings, updateObject, sceneObjects, selectedObject
                     /></>
                 )}
             </div>
-            {/* <hr className="style-six" ></hr>
-            <div style={{ width: "90%" }}>
-                        <h4>Select Light:</h4>
-                        <br />
-                        <select value={selectedLightId || ''} onChange={handleLightSelect} className="light-dropdown" >
-                        <br />
-                            <option value="" style={{ width: "100px" }}>Select a Light</option>
-                            {lightObjects.map((light) => (
-                                <option key={light.id} value={light.id}  >
-                                    {light.displayId.slice(0, 10) || light.type}
-                                </option>
-                            ))}
-                        </select>
-                    </div> */}
-             {/* Light Selection and Properties (Conditional) */}
-             {/* {activeObject && (activeObject.type === 'pointLight' || activeObject.type === 'spotLight' || activeObject.type === 'directionalLight') && (
-                <>
-                    <LightProperties
-                        selectedObject={activeObject}  // Pass the *actual* selected object
-                        updateObject={updateObject}
-                        handleInputChange={() => {}} // Dummy handlers
-                        startDrag={() => {}}
-                        inputValue={{}}
-                    />
-                </>
-            )} */}
-
         </div>
     );
 };

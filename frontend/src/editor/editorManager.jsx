@@ -471,7 +471,7 @@ const EditorManager = () => {
             setCurrentSceneId={setCurrentSceneId}
             canvasRef={canvasRef}
             onImportScene={handleImportScene}
-            saveToUndoStack={saveToUndoStack} // Pass it here
+            saveToUndoStack={saveToUndoStack}
           />
           <PropertiesPanel
             selectedObjects={selectedObjects ?? []}

@@ -1,7 +1,7 @@
 // --- home.jsx ---
 
 import React, { useState, useEffect } from "react";
-import { FaTimes, FaFileAlt, FaSignOutAlt } from "react-icons/fa";
+import { FaTimes, FaFileAlt, FaSignOutAlt, FaTrash } from "react-icons/fa";
 import "./styles/home.css";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
@@ -348,6 +348,15 @@ const Home = () => {
                       )}
                     </div>
                     <p className="project-title">{project.scene_name}</p>
+                    <FaTrash
+                      style={{
+                        position: "absolute",
+                        marginLeft: "248px",
+                        marginTop: "245px",
+                        color: "rgba(255, 255, 255, 0.93)",
+                        cursor: "pointer",
+                      }}
+                    />
                     <p className="lastupdated">Last updated {project.last_updated}</p>
                   </div>
                 ))

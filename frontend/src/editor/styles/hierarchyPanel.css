@@ -132,28 +132,134 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
-.export-panel{
+.export-panel {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color:#16161acc; /* Semi-transparent dark background - as requested */
-  padding: 25px; /* Slightly reduced padding */
-  border-radius: 12px;
-  color: #eee; /* Light text color - as requested */
+  background-color: #16161acc;
+  padding: 20px;
+  border-radius: 8px;
+  color: #eee;
   text-align: center;
   z-index: 1000;
-  width: 380px; /* Slightly reduced width for panel */
-  max-width: 90vw; /* Responsive width */
+  width: 350px;
+  max-width: 90vw;
   border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .export-panel h3 {
-  margin-top: 0;
-  margin-bottom: 20px; /* Slightly reduced margin */
-  font-size: 1.4em; /* Slightly smaller font - was 1.6em */
-  font-weight: bold; /* Make heading bold */
-  color: #eee; /* Light text color - as requested, ensure heading also uses it */
+  margin: 0 0 20px 0;
+  font-size: 1.3em;
+  font-weight: 500;
+  color: #fff;
+}
+
+.export-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.export-options button {
+  background-color: #2a2a2a;
+  color: #eee;
+  border: none;
+  padding: 12px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+}
+
+.export-options button:hover {
+  background-color: #3a3a3a;
+}
+
+.export-options button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.close-icon {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 1.2em;
+  transition: color 0.2s;
+}
+
+.close-icon:hover {
+  color: #fff;
+}
+
+.file-name-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #16161a;
+  padding: 20px;
+  border-radius: 8px;
+  z-index: 1001;
+  width: 300px;
+  max-width: 90vw;
+  border: 1px solid #333;
+}
+
+.file-name-modal h3 {
+  margin: 0 0 15px 0;
+  font-size: 1.2em;
+  color: #fff;
+}
+
+.file-name-modal input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  background-color: #2a2a2a;
+  border: 1px solid #333;
+  border-radius: 4px;
+  color: #eee;
+}
+
+.file-name-modal .modal-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.file-name-modal button {
+  background-color: #2a2a2a;
+  color: #eee;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  flex: 1;
+  margin: 0 5px;
+}
+
+.file-name-modal button:hover {
+  background-color: #3a3a3a;
+}
+
+.file-name-modal button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loading-indicator {
+  padding: 20px;
+  color: #eee;
 }
 
 .import-panel{

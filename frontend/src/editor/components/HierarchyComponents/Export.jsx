@@ -1,11 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState , useEffect} from "react";
 import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter";
 import { OBJExporter } from "three/examples/jsm/exporters/OBJExporter";
 import { STLExporter } from "three/examples/jsm/exporters/STLExporter";
 import { FaFileExport, FaTimes } from "react-icons/fa";
 import * as THREE from "three";
 
-const Export = ({ scene, sceneObjects, camera, renderer }) => {
+const Export = ({ scene, sceneObjects }) => {
     const [showExportPanel, setShowExportPanel] = useState(false);
     const [showFileNameModal, setShowFileNameModal] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
@@ -54,13 +54,12 @@ const Export = ({ scene, sceneObjects, camera, renderer }) => {
             console.error("Export failed:", error);
             alert("Export failed. Please try again.");
         } finally {
-            setIsExporting(false);  // ✅ Ensure exporting state resets properly
+            setIsExporting(false);
             setShowFileNameModal(false);
             setShowExportPanel(false);
         }
     };
 
-    // ✅ Apply object transformations before export
     const applySceneObjectProperties = (sceneCopy) => {
         if (sceneObjects) {
             sceneObjects.forEach((objectData) => {
@@ -82,25 +81,49 @@ const Export = ({ scene, sceneObjects, camera, renderer }) => {
         }
     };
 
-    // ✅ Export as PNG
     const exportPNG = async () => {
-        if (!renderer || !camera) {
-            console.error("Renderer or camera is not available.");
-            return;
+        try {
+            // Get the canvas from the DOM
+            const canvas = document.querySelector('canvas');
+            if (!canvas) {
+                throw new Error("Canvas element not found");
+            }
+
+            // Create a new renderer if needed
+            const renderer = new THREE.WebGLRenderer({
+                canvas,
+                preserveDrawingBuffer: true,
+                antialias: true
+            });
+
+            // Get the camera from the scene
+            const camera = new THREE.PerspectiveCamera(90, canvas.width / canvas.height, 0.1, 1000);
+            camera.position.copy(scene.position);
+            camera.position.z += 10;
+            camera.lookAt(scene.position);
+
+            // Configure renderer
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.setClearColor(scene.background || 0x000000);
+            renderer.clear();
+
+            // Render scene
+            renderer.render(scene, camera);
+
+            // Create and download the image
+            const dataURL = canvas.toDataURL('image/png');
+            const a = document.createElement("a");
+            a.href = dataURL;
+            a.download = `${fileName || 'scene'}.png`;
+            a.click();
+        } catch (error) {
+            console.error("Error exporting PNG:", error);
+            throw error;
         }
-
-        // Render the scene to an offscreen canvas
-        renderer.render(scene, camera);
-        const dataURL = renderer.domElement.toDataURL("image/png");
-
-        // Download the image
-        const a = document.createElement("a");
-        a.href = dataURL;
-        a.download = `${fileName}.png`;
-        a.click();
     };
 
-    // ✅ GLTF Export
+    // Rest of the component remains exactly the same...
     const exportGLTF = async (sceneToExport) => {
         const exporter = new GLTFExporter();
         exporter.parse(sceneToExport, (result) => {
@@ -109,7 +132,6 @@ const Export = ({ scene, sceneObjects, camera, renderer }) => {
         }, { binary: false, embedImages: true });
     };
 
-    // ✅ OBJ Export
     const exportOBJ = async (sceneToExport) => {
         const exporter = new OBJExporter();
         const result = exporter.parse(sceneToExport);
@@ -117,7 +139,6 @@ const Export = ({ scene, sceneObjects, camera, renderer }) => {
         downloadBlob(blob, `${fileName}.obj`);
     };
 
-    // ✅ STL Export
     const exportSTL = async (sceneToExport) => {
         const exporter = new STLExporter();
         const stlString = exporter.parse(sceneToExport);
@@ -125,7 +146,6 @@ const Export = ({ scene, sceneObjects, camera, renderer }) => {
         downloadBlob(blob, `${fileName}.stl`);
     };
 
-    // ✅ Download helper function
     const downloadBlob = (blob, filename) => {
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
@@ -144,7 +164,6 @@ const Export = ({ scene, sceneObjects, camera, renderer }) => {
             {showExportPanel && (
                 <div className="export-panel">
                     <h3>Export Scene</h3>
-                    {/* ✅ Fix: Close button now works */}
                     <FaTimes className="close-icon" onClick={() => setShowExportPanel(false)} />
 
                     {isExporting ? (
@@ -163,9 +182,18 @@ const Export = ({ scene, sceneObjects, camera, renderer }) => {
             {showFileNameModal && (
                 <div className="file-name-modal">
                     <h3>Enter File Name</h3>
-                    <input type="text" value={fileName} onChange={(e) => setFileName(e.target.value)} />
-                    <button onClick={confirmExport} disabled={isExporting}>Export</button>
-                    <button onClick={() => setShowFileNameModal(false)} disabled={isExporting}>Cancel</button>
+                    <input 
+                        type="text" 
+                        value={fileName} 
+                        onChange={(e) => setFileName(e.target.value)} 
+                        placeholder="Enter file name"
+                    />
+                    <button onClick={confirmExport} disabled={isExporting || !fileName.trim()}>
+                        {isExporting ? "Exporting..." : "Export"}
+                    </button>
+                    <button onClick={() => setShowFileNameModal(false)} disabled={isExporting}>
+                        Cancel
+                    </button>
                 </div>
             )}
         </div>
