@@ -43,8 +43,8 @@ const HierarchyPanel = ({
 
   const filteredObjects = sceneObjects
     ? sceneObjects.filter((obj) =>
-        obj.type.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      obj.type.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     : [];
 
   const handleDelete = (obj) => {
@@ -78,33 +78,31 @@ const HierarchyPanel = ({
     }
 
     try {
-        const response = await saveScene(
-          sceneObjects,
-          sceneSettings,
-          currentSceneName,
-          currentSceneId,
-          thumbnailBlob
-        );
-        if (response && response.sceneId) {
-          setCurrentSceneId(response.sceneId); // Update scene ID
-          localStorage.setItem("currentSceneId", response.sceneId);
-          onSceneNameChange(currentSceneName); //Keep the UI updated
-          localStorage.setItem("currentSceneName", currentSceneName);
-          setShowTick(true); // Show success tick
-          setTimeout(() => {
-            setShowTick(false);
-            setIsSaving(false); // Reset loading state after delay
-          }, 1000);
-        }
-      } catch (error) {
-        console.error("Save failed:", error);
-        setIsSaving(false);  // Make sure to reset loading if it fails.
-        alert(`Save failed: ${error.message}`);
+      const response = await saveScene(
+        sceneObjects,
+        sceneSettings,
+        currentSceneName,
+        currentSceneId,
+        thumbnailBlob
+      );
+      if (response && response.sceneId) {
+        setCurrentSceneId(response.sceneId); // Update scene ID
+        localStorage.setItem("currentSceneId", response.sceneId);
+        onSceneNameChange(currentSceneName); //Keep the UI updated
+        localStorage.setItem("currentSceneName", currentSceneName);
+        setShowTick(true); // Show success tick
+        setTimeout(() => {
+          setShowTick(false);
+          setIsSaving(false); // Reset loading state after delay
+        }, 1000);
       }
+    } catch (error) {
+      console.error("Save failed:", error);
+      setIsSaving(false);  // Make sure to reset loading if it fails.
+      alert(`Save failed: ${error.message}`);
+    }
   };
 
-
-  
   const handleSceneSelect = (sceneId) => {
     if (!sceneId) {
       console.error("Invalid sceneId:", sceneId);
@@ -147,7 +145,7 @@ const HierarchyPanel = ({
           type="text"
           id="sceneName"
           value={currentSceneName}
-          onChange={(e) => onSceneNameChange(e.target.value)} 
+          onChange={(e) => onSceneNameChange(e.target.value)}
           className="scene-name-input"
           placeholder="Scene Name"
         />

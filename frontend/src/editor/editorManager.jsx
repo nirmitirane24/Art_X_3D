@@ -96,7 +96,7 @@ const EditorManager = () => {
     setSelectedObjects,
   });
 
-  const { copySelectedObjects, pasteCopiedObjects, undoPaste, redoPaste } =
+  const { copySelectedObjects, pasteCopiedObjects} =
     CopyPaste({
       sceneObjects,
       selectedObjects,
@@ -379,7 +379,6 @@ const EditorManager = () => {
     setSceneObjects((prevObjects) => [...prevObjects, ...childMeshes]);
   };
 
-
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const sceneId = urlParams.get('sceneId');
@@ -472,6 +471,7 @@ const EditorManager = () => {
             setCurrentSceneId={setCurrentSceneId}
             canvasRef={canvasRef}
             onImportScene={handleImportScene}
+            saveToUndoStack={saveToUndoStack} // Pass it here
           />
           <PropertiesPanel
             selectedObjects={selectedObjects ?? []}
@@ -507,14 +507,8 @@ const EditorManager = () => {
       <KeyboardShortcuts
         selectedObjects={selectedObjects}
         deleteSelectedObjects={deleteSelectedObjects}
-        undo={() => {
-          undo();
-          undoPaste();
-        }}
-        redo={() => {
-          redo();
-          redoPaste();
-        }}
+        undo={undo} // Just pass the main undo function
+        redo={redo} // Just pass the main redo function
         copySelectedObjects={copySelectedObjects}
         pasteCopiedObjects={pasteCopiedObjects}
         handleArrowKeyMovement={handleArrowKeyMovement}

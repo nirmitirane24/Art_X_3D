@@ -10,7 +10,7 @@ import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import "./libraryloading.css";
 
-const Library = ({ onImportScene }) => {
+const Library = ({ onImportScene, savetoUndoStack }) => {
     const [showLibraryPanel, setShowLibraryPanel] = useState(false);
     const [libraryModels, setLibraryModels] = useState([]);  // Store model data
     const [searchTerm, setSearchTerm] = useState("");
@@ -76,35 +76,38 @@ const Library = ({ onImportScene }) => {
     }, [showLibraryPanel, selectedCategory, fetchModels]); // Include fetchModels in dependency array
 
 
-    const handleImport = async (modelId) => {
+    const handleImport = async (modelId, modelName) => {
         setIsLoading(true);
-
-        // Check if the model is already in the cache
+    
+        if (savetoUndoStack) {
+            savetoUndoStack(); // Save current state
+        }
+    
+        // Check if the model is already in cache
         if (modelCache[modelId]) {
-            onImportScene(modelCache[modelId].clone()); // IMPORTANT: Clone the cached object
+            onImportScene({ ...modelCache[modelId], displayId: modelName });
             setShowLibraryPanel(false);
             setIsLoading(false);
             return;
         }
-
-
+    
         try {
             const urlResponse = await fetch(`http://localhost:5050/library/models/${modelId}/signed_url`);
             if (!urlResponse.ok) {
                 throw new Error(`Failed to get signed URL: ${urlResponse.status} ${urlResponse.statusText}`);
             }
             const { signed_url } = await urlResponse.json();
-
+    
             if (!signed_url) {
                 throw new Error("Received an empty signed URL.");
             }
-
+    
             console.log("Attempting to load model from:", signed_url);
-
+    
             const url = new URL(signed_url);
             const pathname = url.pathname;
             const extension = pathname.split(".").pop().toLowerCase();
-
+    
             let loader;
             switch (extension) {
                 case "gltf":
@@ -129,95 +132,32 @@ const Library = ({ onImportScene }) => {
                     setIsLoading(false);
                     return;
             }
-
+    
             loader.load(signed_url, (loadedData) => {
-                let scene;
-                let geometries = [];
-
-                if (extension === 'stl') {
-                    const geometry = loadedData;
-                    const material = geometry.hasAttribute('color')
-                        ? new THREE.MeshStandardMaterial({ vertexColors: true })
-                        : new THREE.MeshStandardMaterial({ color: 0x888888 });
-                    scene = new THREE.Mesh(geometry, material);
-                } else {
-                    scene = loadedData.scene || loadedData;
-                    scene.traverse((child) => {
-                        if (child.isMesh) {
-                            geometries.push(child.geometry);
-                        }
-                    });
-                }
-
-
-                let finalMesh; // Store the final mesh/scene here
-
-                if (geometries.length > 1) {
-                    try {
-                        const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(geometries, false);
-                        const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
-                        finalMesh = new THREE.Mesh(mergedGeometry, material);
-
-
-                    } catch (error) {
-                        console.error("Error merging geometries:", error);
-                        alert("Failed to merge geometries within the model.");
-                        // Fallback: Use original scene.
-                         finalMesh = scene;
-                    }
-                } else if (geometries.length === 1) {
-                    let originalMaterial;
-                    scene.traverse(child => {
-                      if (child.isMesh && child.geometry === geometries[0]) {
-                        originalMaterial = child.material;
-                      }
-                    });
-
-                    const material = originalMaterial ? originalMaterial.clone() : new THREE.MeshStandardMaterial({ color: 0xffffff });
-                    finalMesh = new THREE.Mesh(geometries[0], material);
-                  }
-                 else {
-                    // No meshes found.  Use the original scene.
-                    console.warn("No meshes found in loaded model.");
-                    finalMesh = scene;
-                }
-
-                const boundingBox = new THREE.Box3().setFromObject(finalMesh);
-                const size = boundingBox.getSize(new THREE.Vector3());
-                const maxSize = Math.max(size.x, size.y, size.z);
-                const scaleFactor = maxSize > 5 ? 5 / maxSize : 1;
-                finalMesh.scale.set(scaleFactor, scaleFactor, scaleFactor);
-
-
-                // Cache the loaded model
-                setModelCache(prevCache => ({ ...prevCache, [modelId]: finalMesh }));
-                onImportScene(finalMesh);
+                let scene = loadedData.scene || loadedData;
+                
+                // Assign model name for hierarchy
+                scene.displayId = modelName;
+    
+                // Cache model
+                setModelCache(prevCache => ({ ...prevCache, [modelId]: scene }));
+                
+                onImportScene(scene);
                 setShowLibraryPanel(false);
                 setIsLoading(false);
-
-            },
-                (xhr) => {
-                    console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-                },
-                (error) => {
-                    console.error('An error happened during model loading:', error);
-                    alert(`Failed to load model. Check the console for details. Error: ${error.message}`);
-                    setIsLoading(false);
-                });
-
-            //Dispose dracoLoader to prevent memory leaks.
-            if (loader && loader.dracoLoader) {
-                loader.dracoLoader.dispose();
-            }
-
+            }, undefined, (error) => {
+                console.error('An error happened during model loading:', error);
+                alert(`Failed to load model: ${error.message}`);
+                setIsLoading(false);
+            });
+    
         } catch (error) {
             console.error("Error importing model:", error);
             alert(`Failed to import model: ${error.message}`);
             setIsLoading(false);
         }
     };
-
-
+    
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
     };
@@ -265,7 +205,7 @@ const Library = ({ onImportScene }) => {
                             {!isLoading && filteredModels.length > 0 && (
                                 <div className="library-grid">
                                     {filteredModels.map((model) => (
-                                        <div key={model.id} className="library-item" onClick={() => handleImport(model.id)}>
+                                        <div key={model.id} className="library-item" onClick={() => handleImport(model.id, model.model_name)}>
                                             <img src={model.model_image} alt={model.model_name} style={{ width: "150px", height: "150px", marginTop: "-20px" }} />
                                             <p style={{ marginTop: '-25px' }}>{model.model_name}</p>
                                         </div>

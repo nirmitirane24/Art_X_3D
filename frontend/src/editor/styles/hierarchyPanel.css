@@ -145,7 +145,7 @@
   z-index: 1000;
   width: 380px; /* Slightly reduced width for panel */
   max-width: 90vw; /* Responsive width */
-  border: 5px solid #16161aed; /* Add a subtle border for definition */
+  border: none;
 }
 
 .export-panel h3 {
@@ -219,7 +219,7 @@
   z-index: 1000;
   width: 480px;
   max-width: 90vw;
-  border: 5px solid #16161aed;
+  border: none;
 }
 
 .library-panel h3 {

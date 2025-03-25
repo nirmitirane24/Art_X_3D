@@ -24,6 +24,7 @@ const Home = () => {
   const [projectsGridHeight, setProjectsGridHeight] = useState(0); // Height of projects grid
   const [tutorialsGridHeight, setTutorialsGridHeight] = useState(0); // Height of tutorials grid
   const [activeMenu, setActiveMenu] = useState("Home"); // Keep track of the active menu item
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -193,7 +194,7 @@ const Home = () => {
     navigate(`/editor?exampleId=${exampleId}`);
   };
 
-    // UseEffect to measure and set grid heights after loading
+  // UseEffect to measure and set grid heights after loading
   useEffect(() => {
     if (!projectsLoading && projectsGridRef) {
       setProjectsGridHeight(projectsGridRef.clientHeight);
@@ -220,7 +221,7 @@ const Home = () => {
       <aside className="sidebar-home">
         <div className="profile-section">
           <div className="profile-icon">
-            <img style={{ height: "38px" }} src="/3d/1logo.png" alt="" onClick={{handleWelcome}} />
+            <img style={{ height: "38px" }} src="/3d/1logo.png" alt="" onClick={{ handleWelcome }} />
           </div>
           <span>{username}</span>
         </div>
@@ -282,7 +283,7 @@ const Home = () => {
           </div>
         )}
 
-        {isGeneratePanelOpen && activeMenu === 'Home' &&(
+        {isGeneratePanelOpen && activeMenu === 'Home' && (
           <div className="import-panel">
             <div className="import-panel-header">
               <h2>Generate</h2>
