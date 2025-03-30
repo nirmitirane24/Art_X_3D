@@ -27,7 +27,7 @@ const textureToBase64 = (texture) => {
 
 const saveScene = async (sceneObjects, sceneSettings, sceneName, sceneId, thumbnailBlob) => {
   const formData = new FormData();
-
+  const API_BASE_URL = import.meta.env.VITE_API_URL
   // Append scene data as JSON string
   formData.append('sceneData', JSON.stringify({
     sceneSettings: { ...sceneSettings },
@@ -133,7 +133,7 @@ const saveScene = async (sceneObjects, sceneSettings, sceneName, sceneId, thumbn
 
   try {
     console.log(formData);
-    const response = await axios.post("http://localhost:5050/save", formData, {
+    const response = await axios.post(`${API_BASE_URL}/save`, formData, {
       withCredentials: true,
       headers: {
         'Content-Type': 'multipart/form-data', // IMPORTANT: Set correct content type
@@ -164,7 +164,7 @@ const loadScene = async (sceneId, setSceneObjects, setSceneSettings, type) => {
     let response
     if(type==1){
       response = await axios.get(
-        `http://localhost:5050/get-scene?sceneId=${sceneId}`,
+        `${API_BASE_URL}/get-scene?sceneId=${sceneId}`,
         {
           responseType: "json", // Expect JSON
           withCredentials: true,
@@ -173,7 +173,7 @@ const loadScene = async (sceneId, setSceneObjects, setSceneSettings, type) => {
     }
     if(type==2){
       response = await axios.get(
-        `http://localhost:5050/get-community-example?exampleId=${sceneId}`,
+        `${API_BASE_URL}/get-community-example?exampleId=${sceneId}`,
         {
           responseType: "json", // Expect JSON
           withCredentials: true,

@@ -19,7 +19,7 @@ function Register() {
     const [passwordStrength, setPasswordStrength] = useState('');
     const [passwordMatch, setPasswordMatch] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
-
+    const API_BASE_URL = import.meta.env.VITE_API_URL
     const togglePasswordVisibility = () => {
         setShowPassword((prevState) => !prevState);
     };
@@ -58,7 +58,7 @@ function Register() {
         let registrationSuccess = false;
         try {
             // Include email in the request body
-            const response = await axios.post('http://localhost:5050/auth/register', { username, password, email }, { withCredentials: true });
+            const response = await axios.post(`${API_BASE_URL}/auth/register`, { username, password, email }, { withCredentials: true });
             if (response.status === 201) {
                 toast.success('Registration Successful!  Please log in.', { position: toast.POSITION.TOP_CENTER });
                 localStorage.setItem('username', username); // Store the username
@@ -94,7 +94,7 @@ function Register() {
                     <FaArrowLeft style={styles.backIcon} />
                 </Link>
                 <form onSubmit={handleSubmit} style={styles.form}>
-                    <Link to={'/'}><img src="/cube2.svg" style={styles.logo} alt="Logo" /></Link>
+                    <Link to={'/'}><img src="./3d/1logo.png" style={styles.logo} alt="Logo" /></Link>
                     <h2 style={styles.title}>Welcome to ARTX3D</h2>
                     {/* Username Input */}
                     <div style={styles.formGroup}>
@@ -278,9 +278,8 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: '5px',
-        border: '2px solid white',
         borderRadius: '20px',
-        padding: '7px'
+        padding: '0px'
     },
 };
 

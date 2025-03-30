@@ -19,7 +19,8 @@ const Library = ({ onImportScene, savetoUndoStack }) => {
     const libraryPanelRef = useRef(null);
     const [modelCache, setModelCache] = useState({});  // Cache for loaded models
     const [modelInfoCache, setModelInfoCache] = useState({}); //Cache for model information.
-
+    const API_BASE_URL = import.meta.env.VITE_API_URL;
+    
     // Fetch models (using useCallback for memoization)
     const fetchModels = useCallback(async (category) => {
         setIsLoading(true);
@@ -31,7 +32,7 @@ const Library = ({ onImportScene, savetoUndoStack }) => {
                 return;
             }
 
-            let url = 'http://localhost:5050/library/models';
+            let url = `${API_BASE_URL}/library/models`;
             if (category && category !== "All") {
                 url += `?category=${category}`;
             }
@@ -92,7 +93,7 @@ const Library = ({ onImportScene, savetoUndoStack }) => {
         }
     
         try {
-            const urlResponse = await fetch(`http://localhost:5050/library/models/${modelId}/signed_url`);
+            const urlResponse = await fetch(`${API_BASE_URL}/library/models/${modelId}/signed_url`);
             if (!urlResponse.ok) {
                 throw new Error(`Failed to get signed URL: ${urlResponse.status} ${urlResponse.statusText}`);
             }
@@ -111,9 +112,14 @@ const Library = ({ onImportScene, savetoUndoStack }) => {
             let loader;
             switch (extension) {
                 case "gltf":
+                    loader = new GLTFLoader();
+                    var dracoLoader = new DRACOLoader();
+                    dracoLoader.setDecoderPath('/draco/');
+                    loader.setDRACOLoader(dracoLoader);
+                    break;
                 case "glb":
                     loader = new GLTFLoader();
-                    const dracoLoader = new DRACOLoader();
+                    var dracoLoader = new DRACOLoader();
                     dracoLoader.setDecoderPath('/draco/');
                     loader.setDRACOLoader(dracoLoader);
                     break;

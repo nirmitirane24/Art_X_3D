@@ -4,10 +4,10 @@ import React, { useState, useRef, useEffect, useContext } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import Toolbar from "./components/Toolbar";
 import HierarchyPanel from "./components/HierarchyPanel.jsx";
-import PropertiesPanel from "./components/PropertiesPanel";
-import CameraControls, { SceneContext } from "./components/CameraControls";
+import PropertiesPanel from "./components/PropertiesPanel.jsx";
+import CameraControls, { SceneContext } from "./components/cameraControls.jsx";
 import GroundPlane from "./components/GroundPlane";
-import Model from "./components/Model";
+import Model from "./components/model.jsx";
 import AIChat from "./components/AIChat";
 import PropertiesCopyPaste from "./components/PropertiesCopyPaste";
 import "./styles/editorManager.css";
@@ -28,12 +28,13 @@ const EditorManager = () => {
   const [currentSceneId, setCurrentSceneId] = useState(null);
   const [currentSceneName, setCurrentSceneName] = useState("");
   const canvasRef = useRef();
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
         // Use the /auth/check endpoint, as it was designed for this.
-        const response = await axios.get("http://localhost:5050/auth/check", {
+        const response = await axios.get(`${API_BASE_URL}/auth/check`, {
           withCredentials: true,
         });
         // Get the username from the *response* of /auth/check.
@@ -390,7 +391,7 @@ const EditorManager = () => {
       setCurrentSceneId(sceneId);
       localStorage.setItem('currentSceneId', sceneId);
       setLoading(true);
-      axios.get(`http://localhost:5050/get-scene-url?sceneId=${sceneId}`, { withCredentials: true })
+      axios.get(`${API_BASE_URL}/get-scene-url?sceneId=${sceneId}`, { withCredentials: true })
         .then(response => {
           if (response.status === 200) {
             setCurrentSceneName(response.data.sceneName);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './shadowControls.css'; // Import the new CSS file
+import './ShadowControls.css'; // Import the new CSS file
 
 const ShadowControls = ({ object, updateObject }) => {
     const [castShadow, setCastShadow] = useState(false);

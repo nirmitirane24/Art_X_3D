@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import './sceneEditor.css';
+import './SceneEditor.css';
 import { SketchPicker } from 'react-color';
 import LightProperties from '../PropertiesComponents/LightProperties'; // Import LightProperties
 

@@ -1,7 +1,7 @@
 // --- START OF FILE MaterialEditor.jsx ---
 //No changes needed
 import React, { useState, useRef, useEffect } from 'react';
-import './materialEditor.css';
+import './MaterialEditor.css';
 import { SketchPicker } from 'react-color';
 
 const MaterialEditor = ({ material, onChange, onClose }) => {

@@ -8,7 +8,7 @@ const LoadingPage = ({ onLoaded }) => {
     const timer = setTimeout(() => {
       setVisible(false);
       if (onLoaded) onLoaded();
-    }, 4000); // 2 seconds
+    }, 5000); // 2 seconds
 
     return () => clearTimeout(timer);
   }, []);

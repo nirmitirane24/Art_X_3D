@@ -15,7 +15,8 @@ const Navbar = ({ isAuthenticated, scrollToFooter, scrollToProductSection }) => 
 
     const handleMouseEnter = (item) => setHoveredItem(item);
     const handleMouseLeave = () => setHoveredItem(null);
-
+    const API_BASE_URL = import.meta.env.VITE_API_URL;
+    
     return (
         <nav className="navbar">
             <Link to={'/'}>
@@ -81,7 +82,7 @@ const Navbar = ({ isAuthenticated, scrollToFooter, scrollToProductSection }) => 
 
 // PlaneModel Component
 const PlaneModel = () => {
-    const fbx = useLoader(FBXLoader, '/3d/earth low poly.fbx');
+    const fbx = useLoader(FBXLoader, '/3d/earth_welcomepage.fbx');
     const planeRef = useRef();
     const mouseRef = useRef({ x: 0, y: 0 });
 
@@ -127,7 +128,7 @@ const WelcomePage = () => {
         const checkAuth = async () => {
             if (isAuthenticated === false) {
                 try {
-                    await axios.get("http://localhost:5050/user/logs", { withCredentials: true });
+                    await axios.get(`${API_BASE_URL}/user/logs`, { withCredentials: true });
                     setIsAuthenticated(true);
                 } catch (error) {
                     setIsAuthenticated(false);

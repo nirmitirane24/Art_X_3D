@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './visibilityControls.css'; // Import the new CSS file
+import './VisibilityControls.css'; // Import the new CSS file
 
 const VisibilityControls = ({ object, updateObject }) => {
   const [wireframe, setWireframe] = useState(false);

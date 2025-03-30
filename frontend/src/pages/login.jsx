@@ -12,14 +12,16 @@ function Login() {
   const [error, setError] = useState(null);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const API_BASE_URL = import.meta.env.VITE_API_URL
+//   console.log(API_BASE_URL)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     let loginSuccess = false;
     try {
-      const response = await axios.post('http://localhost:5050/auth/signin', { username: username, password }, { withCredentials: true });
-      localStorage.setItem('username', username); // Store username
+      await axios.post(`${API_BASE_URL}/auth/signin`, { username: username, password }, { withCredentials: true });
+      localStorage.setItem('username', username);
       loginSuccess = true;
       if (loginSuccess) {
         navigate('/home');
@@ -62,7 +64,7 @@ function Login() {
                     <FaArrowLeft style={styles.backIcon} />
                 </Link>
                 <form onSubmit={handleSubmit} style={styles.form}>
-                    <Link to={'/'}><img src="/cube2.svg" style={{ height: '60px', marginTop: '5px', border: '2px solid white', borderRadius: '20px', padding: '7px' }} alt="Logo" /></Link>
+                    <Link to={'/'}><img src="3d/1logo.png" style={{ height: '100px', marginTop: '5px', borderRadius: '20px', padding: '0px' }} alt="Logo" /></Link>
                     <h2 style={styles.title}>Welcome Back!</h2>
                     <div style={styles.formGroup}>
                         <FaEnvelope style={styles.icon} />

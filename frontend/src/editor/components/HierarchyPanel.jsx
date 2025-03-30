@@ -35,7 +35,7 @@ const HierarchyPanel = ({
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   const [showTick, setShowTick] = useState(false);
-
+  const API_BASE_URL = import.meta.env.VITE_API_URL
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -116,7 +116,7 @@ const HierarchyPanel = ({
     setCurrentSceneId(sceneId);
 
     axios
-      .get(`http://localhost:5050/get-scene-url?sceneId=${sceneId}`, {
+      .get(`${API_BASE_URL}/get-scene-url?sceneId=${sceneId}`, {
         withCredentials: true,
       })
       .then((response) => {
@@ -230,9 +230,15 @@ const HierarchyPanel = ({
         <Library onImportScene={onImportScene} />
         <Export scene={scene} sceneObjects={sceneObjects} />
 
+
+        {/*     
         <button onClick={handleSave} className="custom-button" disabled={isSaving}>
           {showTick ? <FaCheck /> : <FaSave />} Save
-        </button>
+        </button> 
+        */}
+
+
+
 
         {showFileNameModal && (
           <div className="file-name-modal">

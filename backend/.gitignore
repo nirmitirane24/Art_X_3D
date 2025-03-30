@@ -6,3 +6,4 @@ utils/__pycache__
 utils/*.pyc
 routes/__pycache__
 routes/*.pyc
+.vercel

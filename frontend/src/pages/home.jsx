@@ -1,6 +1,4 @@
-// --- home.jsx ---
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FaTimes, FaFileAlt, FaSignOutAlt, FaTrash } from "react-icons/fa";
 import "./styles/home.css";
 import { useNavigate, Link } from "react-router-dom";
@@ -19,44 +17,28 @@ const Home = () => {
   const [projectsLoading, setProjectsLoading] = useState(false);
   const [communityExamples, setCommunityExamples] = useState([]);
   const [communityLoading, setCommunityLoading] = useState(false);
-  const [projectsGridRef, setProjectsGridRef] = useState(null); // Ref for projects grid
-  const [tutorialsGridRef, setTutorialsGridRef] = useState(null); // Ref for tutorials grid
-  const [projectsGridHeight, setProjectsGridHeight] = useState(0); // Height of projects grid
-  const [tutorialsGridHeight, setTutorialsGridHeight] = useState(0); // Height of tutorials grid
-  const [activeMenu, setActiveMenu] = useState("Home"); // Keep track of the active menu item
+  const [projectsGridRef, setProjectsGridRef] = useState(null);
+  const [tutorialsGridRef, setTutorialsGridRef] = useState(null);
+  const [tutorialsVideoGridRef, setTutorialsVideoGridRef] = useState(null);
+  const [projectsGridHeight, setProjectsGridHeight] = useState(0);
+  const [tutorialsGridHeight, setTutorialsGridHeight] = useState(0);
+  const [tutorialsVideoGridHeight, setTutorialsVideoGridHeight] = useState(0);
+  const [activeMenu, setActiveMenu] = useState("Home");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
+  const [tutorials, setTutorials] = useState([
+    {
+      id: 1,
+      title: "Solar system tutorial",
+      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      description: "Learn the basics of navigating and creating in our 3D environment.",
+    },
+  ]);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await axios.get("http://localhost:5050/auth/check", {
-          withCredentials: true,
-        });
-        console.log("User authenticated:", response.data);
-        if (response.data.username === undefined || response.data.username === null) {
-          navigate("/");
-        }
-        setUsername(response.data.username);
-        fetchProjects();
-        fetchCommunityExamples();
-      } catch (error) {
-        if (error.response && error.response.status === 401) {
-          navigate("/");
-        } else {
-          console.error("Error checking authentication:", error);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, [navigate]);
-
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     setProjectsLoading(true);
     try {
-      const response = await axios.get("http://localhost:5050/scenes", {
+      const response = await axios.get(`${API_BASE_URL}/scenes`, {
         withCredentials: true,
       });
       if (response.status === 200) {
@@ -65,7 +47,7 @@ const Home = () => {
             if (project.thumbnail_url) {
               try {
                 const thumbResponse = await axios.get(
-                  `http://localhost:5050/get-thumbnail-url?sceneId=${project.scene_id}`,
+                  `${API_BASE_URL}/get-thumbnail-url?sceneId=${project.scene_id}`,
                   { withCredentials: true }
                 );
                 if (thumbResponse.status === 200) {
@@ -88,12 +70,12 @@ const Home = () => {
     } finally {
       setProjectsLoading(false);
     }
-  };
+  }, [API_BASE_URL]);
 
-  const fetchCommunityExamples = async () => {
+  const fetchCommunityExamples = useCallback(async () => {
     setCommunityLoading(true);
     try {
-      const response = await axios.get("http://localhost:5050/community-examples", {
+      const response = await axios.get(`${API_BASE_URL}/community-examples`, {
         withCredentials: true,
       });
       setCommunityExamples(response.data);
@@ -102,7 +84,68 @@ const Home = () => {
     } finally {
       setCommunityLoading(false);
     }
-  };
+  }, [API_BASE_URL]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const checkAuth = async () => {
+      try {
+        console.log("Attempting /auth/check request...");
+        const response = await axios.get(`${API_BASE_URL}/auth/check`, {
+          withCredentials: true,
+        });
+        console.log("/auth/check response data:", response.data);
+
+        if (isMounted && response.data && response.data.username) {
+          console.log("User authenticated:", response.data.username);
+          setUsername(response.data.username);
+          fetchProjects();
+          fetchCommunityExamples();
+
+        } else {
+          console.log("Auth check OK but no username, or component unmounted.");
+          if (isMounted) {
+            navigate("/login");
+          }
+        }
+      } catch (error) {
+        console.error("Error during /auth/check:", error);
+
+        if (isMounted) {
+          if (error.response) {
+            console.error("Error response status:", error.response.status);
+            console.error("Error response data:", error.response.data);
+            if (error.response.status === 401) {
+              console.log("Authentication failed (401), navigating to login.");
+              navigate("/login");
+            } else {
+              console.log(`Server error (${error.response.status}), navigating to login.`);
+              navigate("/login");
+            }
+          } else if (error.request) {
+            console.error("No response received for /auth/check:", error.request);
+            navigate("/login");
+          } else {
+            console.error('Error setting up request:', error.message);
+            navigate("/login");
+          }
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    setLoading(true);
+    checkAuth();
+
+    return () => {
+      isMounted = false;
+      console.log("Auth check effect unmounting.");
+    };
+
+  }, [navigate, setUsername, fetchProjects, fetchCommunityExamples, API_BASE_URL]);
+
 
   const handleFileInput = (acceptType) => {
     const input = document.createElement("input");
@@ -158,7 +201,7 @@ const Home = () => {
       formData.append("username", username);
       formData.append("sceneFile", file);
 
-      const response = await axios.post("http://localhost:5050/save", formData, {
+      const response = await axios.post(`${API_BASE_URL}/save`, formData, {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -182,7 +225,7 @@ const Home = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post("http://localhost:5050/auth/logout", {}, { withCredentials: true });
+      await axios.post(`${API_BASE_URL}/auth/logout`, {}, { withCredentials: true });
       logoutUser();
       navigate("/");
     } catch (error) {
@@ -194,7 +237,10 @@ const Home = () => {
     navigate(`/editor?exampleId=${exampleId}`);
   };
 
-  // UseEffect to measure and set grid heights after loading
+  const handleTutorialClick = (videoUrl) => {
+    window.open(videoUrl, '_blank');
+  };
+
   useEffect(() => {
     if (!projectsLoading && projectsGridRef) {
       setProjectsGridHeight(projectsGridRef.clientHeight);
@@ -202,11 +248,14 @@ const Home = () => {
     if (!communityLoading && tutorialsGridRef) {
       setTutorialsGridHeight(tutorialsGridRef.clientHeight);
     }
-  }, [projectsLoading, communityLoading, projectsGridRef, tutorialsGridRef]);
+    if (tutorialsVideoGridRef) {
+      setTutorialsVideoGridHeight(tutorialsVideoGridRef.clientHeight);
+    }
+  }, [projectsLoading, communityLoading, projectsGridRef, tutorialsGridRef, tutorialsVideoGridRef]);
 
   const handleWelcome = () => {
     navigate("/welcome");
-  }
+  };
 
   const handleMenuClick = (menuItem) => {
     setActiveMenu(menuItem);
@@ -221,7 +270,7 @@ const Home = () => {
       <aside className="sidebar-home">
         <div className="profile-section">
           <div className="profile-icon">
-            <img style={{ height: "38px" }} src="/3d/1logo.png" alt="" onClick={{ handleWelcome }} />
+            <img style={{ height: "38px" }} src="/3d/1logo.png" alt="" onClick={handleWelcome} />
           </div>
           <span>{username}</span>
         </div>
@@ -250,7 +299,6 @@ const Home = () => {
         </nav>
         <div className="upgrade-section">
           <button className="upgrade-button">Upgrade</button>
-
         </div>
       </aside>
 
@@ -264,7 +312,6 @@ const Home = () => {
             </button>
           </div>
         </header>
-
 
         {isImportPanelOpen && activeMenu === 'Home' && (
           <div className="import-home">
@@ -296,20 +343,10 @@ const Home = () => {
               <button className="import-option" onClick={() => navigate("/polymodel")}>
                 Polymodel Conversion
               </button>
-              <button className="import-option" onClick={() => navigate("#")}>
-                Dummy Button 1
-              </button>
-              <button className="import-option" onClick={() => navigate("#")}>
-                Dummy Button 2
-              </button>
-              <button className="import-option" onClick={() => navigate("#")}>
-                Dummy Button 3
-              </button>
             </div>
           </div>
         )}
 
-        {/* Show Projects and Community Examples when Home is active */}
         {(activeMenu === "Home" || activeMenu === 'My Files') && (
           <section className="projects">
             <h2>Your Projects</h2>
@@ -399,7 +436,7 @@ const Home = () => {
                           className="example-thumbnail"
                         />
                       ) : (
-                        <div className="project-thumbnail"></div> // Keep this for consistent layout
+                        <div className="project-thumbnail"></div>
                       )}
                     </div>
                     <p className="project-title">{example.example_name}</p>
@@ -407,6 +444,29 @@ const Home = () => {
                   </div>
                 ))
               )}
+            </div>
+          </section>
+        )}
+
+        {(activeMenu === "Home" || activeMenu === 'Tutorials') && (
+          <section className="tutorials-video">
+            <h2>Tutorials</h2>
+            <div className="tutorials-grid" ref={tutorialsVideoGridRef} style={{ minHeight: tutorialsVideoGridHeight }}>
+              {tutorials.map((tutorial) => (
+                <div key={tutorial.id} className="tutorial-card" onClick={() => handleTutorialClick(tutorial.videoUrl)}>
+                  <iframe
+                    width="100%"
+                    height="200"
+                    src={tutorial.videoUrl}
+                    title={tutorial.title}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                  <p className="project-title">{tutorial.title}</p>
+                  <p>{tutorial.description}</p>
+                </div>
+              ))}
             </div>
           </section>
         )}
