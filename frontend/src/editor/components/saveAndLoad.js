@@ -27,7 +27,7 @@ const textureToBase64 = (texture) => {
 
 const saveScene = async (sceneObjects, sceneSettings, sceneName, sceneId, thumbnailBlob) => {
   const formData = new FormData();
-  const API_BASE_URL = import.meta.env.VITE_API_URL
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
   // Append scene data as JSON string
   formData.append('sceneData', JSON.stringify({
     sceneSettings: { ...sceneSettings },
@@ -160,6 +160,7 @@ const saveScene = async (sceneObjects, sceneSettings, sceneName, sceneId, thumbn
 
 
 const loadScene = async (sceneId, setSceneObjects, setSceneSettings, type) => {
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
   try {
     let response
     if(type==1){

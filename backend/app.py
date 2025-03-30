@@ -1,15 +1,14 @@
 import os
-from flask import Flask
+from flask import Flask, render_template
 from flask_cors import CORS
-from config import DevelopmentConfig, ProductionConfig #
-from routes.auth_routes import auth_bp             
-from routes.user_routes import user_bp             
-from routes.scene_routes import scene_bp           
-from routes.library_routes import library_bp         
+from config import DevelopmentConfig, ProductionConfig
+from routes.auth_routes import auth_bp
+from routes.user_routes import user_bp
+from routes.scene_routes import scene_bp
+from routes.library_routes import library_bp
 
-def create_app(config_class=DevelopmentConfig):
-
-    app = Flask(__name__)
+def create_app(config_class):
+    app = Flask(__name__, static_folder="static", template_folder="templates")
     app.config.from_object(config_class)
     app.config.update(
         SESSION_COOKIE_SECURE=True,
@@ -17,9 +16,9 @@ def create_app(config_class=DevelopmentConfig):
         SESSION_COOKIE_SAMESITE='None',
         SESSION_PERMANENT=True
     )
-    CORS(app,
-         resources={r"/*": {"origins": "https://artx3d.vercel.app"}}, 
-         supports_credentials=True) 
+
+    origins = ["https://artx3d.vercel.app"] if os.getenv('VERCEL_ENV') == 'production' else ["http://localhost:5173"]
+    CORS(app, resources={r"/*": {"origins": origins}}, supports_credentials=True)
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(user_bp)
@@ -28,14 +27,12 @@ def create_app(config_class=DevelopmentConfig):
 
     @app.route('/')
     def index():
-        return "Backend is running!"
+        return render_template('index.html')
+
     return app
 
-if os.getenv('VERCEL_ENV') == 'production':
-    app = create_app(ProductionConfig)
-else:
-    app = create_app(DevelopmentConfig)
+config_class = ProductionConfig if os.getenv('VERCEL_ENV') == 'production' else DevelopmentConfig
+app = create_app(config_class)
 
 if __name__ == '__main__':
-    local_app = create_app(DevelopmentConfig)
-    local_app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5050)), debug=True)
+    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5050)), debug=True)
