@@ -7,6 +7,10 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import LoadingPage from './loading';
 import { TypeAnimation } from 'react-type-animation'; // Import TypeAnimation
+import { analytics, app } from "../analytics/firebaseAnalyze.js";
+import { logEvent } from "firebase/analytics";
+import { useLocation } from "react-router-dom";
+import handleButtonClick from "../analytics/ButtonClickAnalytics.js"; 
 
 // Navbar Component
 const Navbar = ({ isAuthenticated, scrollToFooter, scrollToProductSection }) => {
@@ -37,42 +41,42 @@ const Navbar = ({ isAuthenticated, scrollToFooter, scrollToProductSection }) => 
                     className="navbar-item"
                     onMouseEnter={() => handleMouseEnter('product')}
                     onMouseLeave={handleMouseLeave}
-                    onClick={scrollToProductSection} // Added onClick handler for Product
+                    onClick={() => {
+                        handleButtonClick("Product Button", "User Clicked Product Button", "Navbar");
+                        scrollToProductSection();
+                    }} // Combined onClick handlers
                 >
                     Product
-
                 </li>
                 <li
                     className="navbar-item"
                     onMouseEnter={() => handleMouseEnter('about')}
                     onMouseLeave={handleMouseLeave}
-                    onClick={scrollToFooter}
+                    onClick={() => {
+                        handleButtonClick("About Button", "User Clicked About Button", "Navbar");
+                        scrollToFooter();
+                    }} 
                 >
                     About
-
                 </li>
-                {/* <li
-                    className="navbar-item"
-                    onMouseEnter={() => handleMouseEnter('community')}
-                    onMouseLeave={handleMouseLeave}
-                >
-                    Community
-
-                </li>
-                <li
-                    className="navbar-item"
-                    onMouseEnter={() => handleMouseEnter('resources')}
-                    onMouseLeave={handleMouseLeave}
-                >
-                    Resources
-
-                </li> */}
                 {!isAuthenticated && (
-                    <li className="navbar-item navbar-login-button" onClick={() => navigate('/login')}>
+                    <li
+                        className="navbar-item navbar-login-button"
+                        onClick={() => {
+                            handleButtonClick("Login Button", "User Clicked Login Button", "Welcome Page");
+                            navigate('/login');
+                        }} 
+                    >
                         Log In
                     </li>
                 )}
-                <li className="navbar-item navbar-get-started-button" onClick={() => navigate('/home')}>
+                <li
+                    className="navbar-item navbar-get-started-button"
+                    onClick={() => {
+                        handleButtonClick("Get Started Button", "User Clicked Get Started Button", "Navbar");
+                        navigate('/home');
+                    }} 
+                >
                     Get Started
                 </li>
             </ul>
@@ -123,6 +127,19 @@ const WelcomePage = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const footerRef = useRef(null);
     const productSectionRef = useRef(null); // Ref for Quantum Computing Section
+    const location = useLocation();
+
+    // Get the current location and analytics instance
+    useEffect(() => {
+        if (analytics) {
+        logEvent(analytics, "Welcome Page View", {
+            page_location: location.pathname,
+            page_title: document.title 
+        });
+        } else {
+        console.warn("Analytics not initialized, page view event not logged.");
+        }
+    }, [location, analytics]); 
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -147,7 +164,9 @@ const WelcomePage = () => {
         if (isAuthenticated) {
             navigate('/home');
         } else {
+            handleButtonClick("Login Button", "User Clicked Login Button", "Welcome Page"); 
             navigate('/login');
+            
         }
     };
 

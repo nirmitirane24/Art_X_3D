@@ -268,10 +268,10 @@ const Import = ({ onImportScene }) => {
             <div className="import-options">
               <button
                 className="modal-buttons"
-                onClick={() => handleFileSelection(".gltf,.glb,.obj,.fbx,.stl")}
+                onClick={() => handleFileSelection(".glb,.obj,.fbx")}
                 disabled={isLoading}
               >
-                3D Model (GLTF, OBJ, FBX, STL)
+                3D Model (.GLB, .OBJ, .FBX)
               </button>
             </div>
           )}

@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FaEnvelope, FaLock, FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import LoadingPage from './loading';
+import { analytics, app } from "../analytics/firebaseAnalyze.js";
+import { logEvent } from "firebase/analytics";
+import { useLocation } from "react-router-dom";
+import handleButtonClick from "../analytics/ButtonClickAnalytics.js"; 
+
 
 function Login() {
   const navigate = useNavigate();
@@ -13,18 +18,34 @@ function Login() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const API_BASE_URL = import.meta.env.VITE_API_URL
-//   console.log(API_BASE_URL)
+  const location = useLocation();
+
+
+  //   console.log(API_BASE_URL)
+  useEffect(() => {
+    if (analytics) {
+      logEvent(analytics, "Login_page_view", {
+        page_location: location.pathname,
+        page_title: document.title // Or get it from a route config
+      });
+    } else {
+      console.warn("Analytics not initialized, page view event not logged.");
+    }
+  }, [location, analytics]); 
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     let loginSuccess = false;
     try {
+    handleButtonClick("Login Button", "login_button_click", location.pathname); // Log button click event
       await axios.post(`${API_BASE_URL}/auth/signin`, { username: username, password }, { withCredentials: true });
       localStorage.setItem('username', username);
       loginSuccess = true;
       if (loginSuccess) {
         navigate('/home');
+        handleButtonClick("Login Success", "login_success", location.pathname); // Log successful login event
      }
 
     } catch (error) {
@@ -38,6 +59,7 @@ function Login() {
             setIsLoading(false);
             if (loginSuccess) {
                navigate('/home');
+
             }
           }, 2000);
     }
@@ -55,11 +77,11 @@ function Login() {
     return <LoadingPage />;
   }
 
-  return (
-    // ... (rest of your login JSX) ...
-     <div style={styles.body}>
-            <div style={styles.formContainer}>
-                {/* Navigation Arrow to Home */}
+return (
+    <div style={styles.body}>
+        <div style={styles.formContainer}>
+            {/* Navigation Arrow to Home */}
+            <Link to="/" style={styles.backLink}></Link>
                 <Link to="/" style={styles.backLink}>
                     <FaArrowLeft style={styles.backIcon} />
                 </Link>
@@ -93,7 +115,7 @@ function Login() {
                     </div>
                     <button type="submit" style={styles.loginButton}>Login</button>
                     <p style={styles.registerLink}>
-                        Not a user? <a href="/register" style={styles.link}>Register here</a>
+                        Not a user? <button onClick={() => navigate('/register')} style={{ ...styles.link, background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>Register here</button>
                     </p>
                 </form>
             </div>

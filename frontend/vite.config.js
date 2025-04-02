@@ -7,4 +7,7 @@ export default defineConfig({
   optimizeDeps: {
     include: ['three-fbx-exporter'],
   },
+  define: {
+    'process.env': process.env
+  }
 })

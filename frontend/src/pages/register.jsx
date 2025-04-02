@@ -1,25 +1,24 @@
 // register.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaArrowLeft } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import LoadingPage from './loading';
 
 function Register() {
     const navigate = useNavigate();
-    const [username, setUsername] = useState('');  // Corrected state variable name
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [email, setEmail] = useState(''); // Add email state
+    const [email, setEmail] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState('');
     const [passwordMatch, setPasswordMatch] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
-    const API_BASE_URL = import.meta.env.VITE_API_URL
+    const API_BASE_URL = import.meta.env.VITE_API_URL;
+
     const togglePasswordVisibility = () => {
         setShowPassword((prevState) => !prevState);
     };
@@ -50,35 +49,33 @@ function Register() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!passwordMatch) {
-            toast.error("Passwords don't match!", { position: toast.POSITION.TOP_CENTER });
+            navigate('/register'); // Redirect to register if passwords don't match
             return;
         }
 
         setIsLoading(true);
-        let registrationSuccess = false;
         try {
-            // Include email in the request body
             const response = await axios.post(`${API_BASE_URL}/auth/register`, { username, password, email }, { withCredentials: true });
             if (response.status === 201) {
-                toast.success('Registration Successful!  Please log in.', { position: toast.POSITION.TOP_CENTER });
-                localStorage.setItem('username', username); // Store the username
-                registrationSuccess = true;
+                // alert('Registration Successful! Please log in.'); // Simple alert
+                localStorage.setItem('username', username);
+                navigate('/login'); // Navigate immediately on success
             }
+
         } catch (error) {
+            let errorMessage = 'Registration failed';
             if (error.response) {
-                toast.error(error.response.data.message || 'Registration failed', { position: toast.POSITION.TOP_CENTER });
+                errorMessage = error.response.data.message || 'Registration failed';
             } else if (error.request) {
-                toast.error('No response from server. Please try again later.', { position: toast.POSITION.TOP_CENTER });
+                errorMessage = 'No response from server. Please try again later.';
             } else {
-                toast.error('An unexpected error occurred.', { position: toast.POSITION.TOP_CENTER });
+                errorMessage = 'An unexpected error occurred.';
             }
+
+            navigate('/');
+
         } finally {
-            setTimeout(() => {
-                setIsLoading(false);
-                if (registrationSuccess) {
-                    navigate('/login');
-                }
-            }, 2000);
+            setIsLoading(false);
         }
     };
 
@@ -100,11 +97,11 @@ function Register() {
                     <div style={styles.formGroup}>
                         <FaEnvelope style={styles.icon} />
                         <input
-                            type="text"  
+                            type="text"
                             style={styles.input}
                             placeholder="Username"
                             value={username}
-                            onChange={(e) => setUsername(e.target.value)}  
+                            onChange={(e) => setUsername(e.target.value)}
                             required
                         />
                     </div>
@@ -173,8 +170,6 @@ function Register() {
                         Already a user? <Link to="/login" style={styles.link}>Login here</Link>
                     </p>
                 </form>
-
-                <ToastContainer />
             </div>
         </div>
     );

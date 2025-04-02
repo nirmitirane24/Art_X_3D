@@ -11,12 +11,12 @@ function RoutingManager() {
   return (
     <Router>
       <Routes>
-        <Route exact path="/" element={<WelcomePage />} />
-        <Route exact path="/welcome" element={<WelcomePage />} />
-        <Route exact path="/register" element={<Register />} />
-        <Route exact path="/login" element={<Login />} />
-        <Route exact path="/home" element={<Home />} />
-        <Route exact path="/editor" element={<EditorManager />} />
+        <Route  path="/" element={<WelcomePage />} />
+        <Route  path="/welcome" element={<WelcomePage />} />
+        <Route  path="/login" element={<Login />} />
+        <Route  path="/register" element={<Register />} />
+        <Route  path="/home" element={<Home />} />
+        <Route  path="/editor" element={<EditorManager />} />
         <Route path="/error" element={<ErrorPage />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
