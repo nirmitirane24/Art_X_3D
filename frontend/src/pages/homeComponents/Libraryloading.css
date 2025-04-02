@@ -1,0 +1,36 @@
+.library-home-item{
+    text-align: center;
+    background-color: rgba(240, 248, 255, 0.126);
+    border-radius: 10px;
+}
+.library-home-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.search-bar-container input{
+    outline: none;
+    width: 99%;
+    padding: 10px;
+    border-radius: 12px;
+    border: 0px solid #ccc;
+    background-color: rgba(240, 248, 255, 0.126);
+    color: #fff;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+.category-home-buttons{
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.category-home-buttons button:hover{
+    background-color: #4f4d86;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}

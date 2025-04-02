@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { logoutUser } from "../utils/authUtils";
 import LoadingPage from "./loading";
+import LibraryShowcase from "./homeComponents/LibraryShowcase.jsx"; 
 
 const Home = () => {
   const navigate = useNavigate();
@@ -287,10 +288,10 @@ const Home = () => {
           <Link to className={`menu-item ${activeMenu === "Community" ? "active" : ""}`} onClick={() => handleMenuClick("Community")}>
             Community
           </Link>
-          <Link to="/tutorials" className={`menu-item ${activeMenu === "Tutorials" ? "active" : ""}`} onClick={() => handleMenuClick("Tutorials")}>
+          <Link to className={`menu-item ${activeMenu === "Tutorials" ? "active" : ""}`} onClick={() => handleMenuClick("Tutorials")}>
             Tutorials
           </Link>
-          <Link to="/library" className={`menu-item ${activeMenu === "Library" ? "active" : ""}`} onClick={() => handleMenuClick("Library")}>
+          <Link to className={`menu-item ${activeMenu === "Library" ? "active" : ""}`} onClick={() => handleMenuClick("Library")}>
             Library
           </Link>
           <Link to="/inbox" className={`menu-item ${activeMenu === "Inbox" ? "active" : ""}`} onClick={() => handleMenuClick("Inbox")}>
@@ -470,6 +471,12 @@ const Home = () => {
             </div>
           </section>
         )}
+        {activeMenu === "Library" && (
+          <section className="library-section">
+            <LibraryShowcase />
+          </section>
+        )}
+
       </main>
     </div>
   );
