@@ -1,0 +1,83 @@
+.privacy-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #fff;
+    min-height: 100vh;
+  }
+  
+  .privacy-title {
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .privacy-last-updated {
+      text-align: center;
+      font-style: italic;
+      color: #fff;
+      margin-bottom: 20px;
+  }
+  
+  .privacy-section-title {
+    font-size: 1.6em;
+    font-weight: bold;
+    margin-bottom: 15px;
+    margin-top: 30px;
+  }
+  
+  .privacy-subsection-title {
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    margin-top: 20px;
+  }
+  
+  .privacy-subsubsection-title {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-bottom: 5px;
+      margin-top: 15px;
+  }
+  
+  .privacy-paragraph {
+    font-size: 1em;
+    margin-bottom: 10px;
+  }
+  
+  .privacy-list {
+    list-style-type: disc; /* Use disc for standard bullet points */
+    padding-left: 25px; /* Indent the list */
+    margin-bottom: 15px;
+  }
+  
+  .privacy-list li {
+    margin-bottom: 5px; /* Add spacing between list items */
+  }
+  
+  .privacy-link {
+    color: #f1f1f1;
+    text-decoration: none;
+  }
+  
+  .privacy-link:hover {
+      text-decoration: underline;
+  }
+  .backbutton{
+    border: #33333300 solid 2px; /* Border color */
+    background-color: #d1d1d1; /* Green background */
+    color: rgb(47, 47, 47); /* White text */
+    padding: 10px 20px; /* Padding for the button */
+    border-radius: 10px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 1em; /* Font size */
+    transition: background-color 0.2s ease; /* Smooth transition for hover effect */
+  }
+  .backbutton:hover {
+    border: #e0e0e0 solid 2px;
+    background-color: #333;
+    color: #d1d1d1;
+  }

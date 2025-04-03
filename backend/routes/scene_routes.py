@@ -1,5 +1,5 @@
-# --- scene_routes.py --- (Revised)
-from flask import Blueprint, request, jsonify, session
+# --- scene_routes.py --- (Revised with Subscription Checks, Caching, and Thumbnail Fix)
+from flask import Blueprint, request, jsonify, session, current_app
 import boto3
 import json
 from botocore.exceptions import ClientError
@@ -13,8 +13,7 @@ from urllib.parse import urlparse
 from datetime import datetime, timezone
 import timeago
 import pytz
-import base64
-import tempfile  # Import tempfile
+import logging
 
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / '.env')
 
@@ -40,6 +39,9 @@ CLOUDFLARE_TOKEN = os.environ.get('CLOUDFLARE_TOKEN')
 CLOUDFLARE_ENDPOINT = os.environ.get('CLOUDFLARE_ENDPOINT')
 CLOUDFLARE_R2_REGION = "auto"
 CLOUDFLARE_BUCKET_NAME = os.environ.get('CLOUDFLARE_BUCKET_NAME')
+
+# --- Logging Configuration ---
+logging.basicConfig(level=logging.INFO)
 
 
 if not AWS_REGION:
@@ -72,8 +74,58 @@ cloudflare_r2_client = boto3.client(
 @scene_bp.route('/save', methods=['POST'])
 @login_required
 def save_scene():
+    username = session.get('username')
+    if not username:
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    user = User.get_user_by_username(username)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    user_id = user.id
+
+    # --- SUBSCRIPTION CHECK (with Redis caching) ---
+    if current_app.redis:
+        try:
+            subscription_key = f"subscription:{user_id}"
+            subscription_level = current_app.redis.get(subscription_key)
+            if subscription_level:
+                subscription_level = subscription_level.decode('utf-8')
+                logging.info(f"Subscription level retrieved from cache for user {username}")
+                if subscription_level == 'free':
+                    return jsonify({'error': 'Saving scenes requires a Pro subscription'}), 403
+        except Exception as e:
+            logging.error(f"Error checking subscription from Redis: {e}")
+
     conn = None
     try:
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({'error': 'Database connection failed'}), 500
+
+        if not current_app.redis or not subscription_level: # Only query if not cached
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT subscription_level FROM users WHERE id = %s", (user_id,))
+                user_subscription = cursor.fetchone()
+
+            if not user_subscription or user_subscription[0] == 'free':
+                if current_app.redis:
+                    try:
+                        current_app.redis.setex(subscription_key, 3600, 'free')  # Cache for 1 hour
+                        logging.info(f"Cached subscription level 'free' for user {username}")
+                    except Exception as e:
+                        logging.error(f"Error caching subscription level: {e}")
+
+                return jsonify({'error': 'Saving scenes requires a Pro subscription'}), 403
+            else:
+                if current_app.redis:
+                    try:
+                        current_app.redis.setex(subscription_key, 3600, user_subscription[0])
+                        logging.info(f"Cached subscription level '{user_subscription[0]}' for user {username}")
+                        subscription_level = user_subscription[0] #set subscription to user subscription to prevent name error
+                    except Exception as e:
+                        logging.error(f"Error caching subscription level: {e}")
+
+
         scene_data_json = request.form.get('sceneData')
         scene_name = request.form.get('sceneName')
         if not scene_data_json or not scene_name:
@@ -83,19 +135,6 @@ def save_scene():
         objects = scene_data.get('objects')
         scene_settings = scene_data.get('sceneSettings')
         scene_id = scene_data.get('sceneId')
-
-        username = session.get('username')
-        if not username:
-            return jsonify({'error': 'Unauthorized'}), 403
-
-        user = User.get_user_by_username(username)
-        if not user:
-            return jsonify({'error': 'User not found'}), 404
-        user_id = user.id
-
-        conn = get_db_connection()
-        if conn is None:
-            return jsonify({'error': 'Database connection failed'}), 500
 
         with conn.cursor() as cursor:
             if scene_id:
@@ -123,17 +162,18 @@ def save_scene():
             if thumbnail_file:
                 thumbnail_path = f"Thumbnails/{user_id}/{scene_id}.png"
                 try:
-                    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                        thumbnail_file.save(temp_file.name)
-                        temp_file_path = temp_file.name
+                    # Use BytesIO to avoid writing to disk
+                    from io import BytesIO
+                    thumbnail_data = BytesIO()
+                    thumbnail_file.save(thumbnail_data)
+                    thumbnail_data.seek(0)  # Reset pointer to beginning of the stream
 
-                    with open(temp_file_path, 'rb') as f:
-                        cloudflare_r2_client.put_object(
-                            Bucket=CLOUDFLARE_BUCKET_NAME,
-                            Key=thumbnail_path,
-                            Body=f,
-                            ContentType='image/png'
-                        )
+                    cloudflare_r2_client.put_object(
+                        Bucket=CLOUDFLARE_BUCKET_NAME,
+                        Key=thumbnail_path,
+                        Body=thumbnail_data,
+                        ContentType='image/png'
+                    )
                     print(f"Uploaded thumbnail to Cloudflare R2: {thumbnail_path}")
 
                 except ClientError as e:
@@ -144,9 +184,6 @@ def save_scene():
                     print(f"General Error uploading thumbnail: {e}")
                     conn.rollback()
                     return jsonify({'error': 'Failed to upload thumbnail'}), 500
-                finally:
-                    if 'temp_file_path' in locals() and os.path.exists(temp_file_path):
-                        os.remove(temp_file_path)
 
                 cursor.execute("SELECT id FROM scene_thumbnails WHERE scene_id = %s", (scene_id,))
                 existing_thumbnail = cursor.fetchone()
@@ -162,8 +199,18 @@ def save_scene():
                         (scene_id, thumbnail_path)
                     )
 
+            conn.commit()
 
-            conn.commit()  # Commit *before* generating the signed URL
+            # --- Invalidate the cache when a scene is saved ---
+            if current_app.redis:
+                try:
+                    scene_list_key = f"scenes:{user_id}"
+                    current_app.redis.delete(scene_list_key)  # Invalidate scenes list
+                    scene_key = f"scene:{scene_id}"
+                    current_app.redis.delete(scene_key)       # Invalidate scene details
+                    logging.info(f"Invalidated scene cache for user {username}, scene {scene_id}")
+                except Exception as e:
+                    logging.error(f"Error invalidating cache: {e}")
 
             return jsonify({'message': 'Scene saved successfully', 'sceneId': scene_id}), 200 if scene_id else 201
 
@@ -178,7 +225,7 @@ def save_scene():
         print(f"Error saving scene: {e}")
         return jsonify({'error': 'An unexpected error occurred'}), 500
     finally:
-        if conn:
+        if conn and not conn.closed:
             conn.close()
 
 @scene_bp.route('/get-scene-url', methods=['GET'])
@@ -235,7 +282,9 @@ def get_scene():
         response = s3_client.get_object(Bucket=S3_BUCKET_NAME, Key=s3_key)
         file_content = response['Body'].read()
 
-        return jsonify(json.loads(file_content.decode('utf-8')))
+        scene_data = json.loads(file_content.decode('utf-8'))  # Parse JSON data
+
+        return jsonify(scene_data), 200
 
     except ClientError as e:
         print(f"S3 Error: {e}")
@@ -320,7 +369,6 @@ def get_community_example():
 
         s3_key = example_data[0]
 
-        # --- Supabase Storage using Boto3 (Custom Endpoint) ---
         s3_client = boto3.client(
             's3',
             region_name=os.environ.get('SUPABASE_S3_REGION'),
@@ -354,6 +402,19 @@ def get_user_scenes():
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
+    user_id = user.id
+    cache_key = f"scenes:{user_id}"  # Unique cache key for the user's scenes
+
+    if current_app.redis:
+        try:
+            cached_scenes = current_app.redis.get(cache_key)
+            if cached_scenes:
+                logging.info(f"Returning scene list from cache for user {user_id}")
+                return jsonify(json.loads(cached_scenes.decode('utf-8'))), 200  # Return cached scene list
+        except Exception as e:
+            logging.error(f"Error retrieving scene list from cache: {e}")
+
+    conn = None
     try:
         conn = get_db_connection()
         if conn is None:
@@ -361,10 +422,10 @@ def get_user_scenes():
 
         with conn.cursor() as cursor:
             cursor.execute("""
-                SELECT s.scene_id, s.scene_name, s.updated_at, st.image_url 
-                FROM Scenes s 
-                LEFT JOIN scene_thumbnails st ON s.scene_id = st.scene_id 
-                WHERE s.user_id = %s 
+                SELECT s.scene_id, s.scene_name, s.updated_at, st.image_url
+                FROM Scenes s
+                LEFT JOIN scene_thumbnails st ON s.scene_id = st.scene_id
+                WHERE s.user_id = %s
                 ORDER BY s.updated_at DESC
             """, (user.id,))
             scenes = cursor.fetchall()
@@ -378,7 +439,7 @@ def get_user_scenes():
                 last_updated = ist.localize(last_updated)
 
             thumbnail_url = None  # Default None if no thumbnail exists
-            if scene[3]:  
+            if scene[3]:
                 try:
                     thumbnail_url = cloudflare_r2_client.generate_presigned_url(
                         'get_object',
@@ -392,8 +453,15 @@ def get_user_scenes():
                 "scene_id": scene[0],
                 "scene_name": scene[1],
                 "last_updated": timeago.format(last_updated, datetime.now(ist)),
-                "thumbnail_url": thumbnail_url  
+                "thumbnail_url": thumbnail_url
             })
+
+        if current_app.redis:
+            try:
+                current_app.redis.setex(cache_key, 3600, json.dumps(scene_list))
+                logging.info(f"Cached scene list for user {user_id}")
+            except Exception as e:
+                logging.error(f"Error caching scene list: {e}")
 
         return jsonify(scene_list), 200
 

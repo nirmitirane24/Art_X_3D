@@ -24,6 +24,7 @@ const HierarchyPanel = ({
   setCurrentSceneId,
   canvasRef,
   onImportScene,
+  SubscriptionLevel,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -231,14 +232,17 @@ const HierarchyPanel = ({
         <Export scene={scene} sceneObjects={sceneObjects} />
 
 
-        {/*     
-        <button onClick={handleSave} className="custom-button" disabled={isSaving}>
-          {showTick ? <FaCheck /> : <FaSave />} Save
-        </button> 
-        */}
-
-
-
+        {SubscriptionLevel === "free" ? (
+          <button className="custom-button" disabled>
+            Subscribe to Save
+          </button>
+        ) : (
+          <button className="custom-button" onClick={handleSave}>
+            {isSaving ? "Saving..." : showTick ? <FaCheck /> : <FaSave />} Save
+          </button>
+        )}
+ 
+    
 
         {showFileNameModal && (
           <div className="file-name-modal">

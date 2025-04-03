@@ -523,3 +523,14 @@ body {
 .email-button:hover {
   background-color: rgba(255, 255, 255, 0.3); /* Slightly more opaque on hover */
 }
+.footer-buttons{
+  cursor: pointer;
+  background-color: #1a192d00;
+  border: none;
+  color: white;
+}
+.footer-buttons:hover{
+  background-color: #1a192d00;
+  color: rgb(172, 204, 255);
+  transition: all 0.3s ease;
+}

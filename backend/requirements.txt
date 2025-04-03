@@ -12,3 +12,6 @@ Flask-Caching
 psycopg2-binary
 werkzeug
 gunicorn
+razorpay
+setuptools
+redis

@@ -29,6 +29,8 @@ const EditorManager = () => {
   const [currentSceneName, setCurrentSceneName] = useState("");
   const canvasRef = useRef();
   const API_BASE_URL = import.meta.env.VITE_API_URL;
+ const [SubscriptionLevel, setSubscriptionLevel] = useState("free");
+
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -43,6 +45,7 @@ const EditorManager = () => {
           navigate("/");
         }
         setUsername(response.data.username);
+        setSubscriptionLevel(response.data.subscription_level);
       } catch (error) {
         if (error.response && error.response.status === 401) {
           navigate("/");
@@ -473,6 +476,7 @@ const EditorManager = () => {
             canvasRef={canvasRef}
             onImportScene={handleImportScene}
             saveToUndoStack={saveToUndoStack}
+            SubscriptionLevel={SubscriptionLevel}
           />
           <PropertiesPanel
             selectedObjects={selectedObjects ?? []}

@@ -1,0 +1,50 @@
+.shipping-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #f4f4f4;
+    min-height: 100vh;
+  }
+  
+  .shipping-title {
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .shipping-paragraph {
+    font-size: 1em;
+    margin-bottom: 15px;
+  }
+  
+  .shipping-contact {
+    font-size: 1em;
+    margin-top: 20px;
+  }
+  
+  .shipping-link {
+    color: #ebebeb;
+    text-decoration: none;
+  }
+  
+  .shipping-link:hover {
+    text-decoration: underline;
+  }
+  .backbutton{
+    border: #33333300 solid 2px; /* Border color */
+    background-color: #d1d1d1; /* Green background */
+    color: rgb(47, 47, 47); /* White text */
+    padding: 10px 20px; /* Padding for the button */
+    border-radius: 10px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 1em; /* Font size */
+    transition: background-color 0.2s ease; /* Smooth transition for hover effect */
+  }
+  .backbutton:hover {
+    border: #e0e0e0 solid 2px;
+    background-color: #333;
+    color: #d1d1d1;
+  }

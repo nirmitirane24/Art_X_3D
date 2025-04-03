@@ -1,12 +1,13 @@
-# routes/library_routes.py (Revised for psycopg2 + Cloudflare R2)
 from flask import Blueprint, jsonify, request, current_app
 import boto3
 from botocore.exceptions import ClientError
-import psycopg2  # Import psycopg2
+import psycopg2  
 import os
 from utils.decorators import login_required
 from datetime import datetime, timedelta
 from utils.db import get_db_connection
+import logging
+import json  
 
 library_bp = Blueprint('library', __name__, url_prefix='/library')
 
@@ -28,18 +29,30 @@ def get_r2_client():
         aws_secret_access_key=CLOUDFLARE_SECRET_KEY
     )
 
-
+# --- Logging Configuration ---
+logging.basicConfig(level=logging.INFO)
 
 @library_bp.route('/models', methods=['GET'])
 def get_library_models():
-    conn = None 
+    category = request.args.get('category')
+    cache_key = f"library_models:{category}" if category and category != "All" else "library_models:all"  # More specific key
+
+    if current_app.redis:
+        try:
+            cached_models_json = current_app.redis.get(cache_key)
+            if cached_models_json:
+                logging.info(f"Returning library models from cache (key: {cache_key})")
+                return jsonify(json.loads(cached_models_json.decode('utf-8'))), 200
+        except Exception as e:
+            logging.error(f"Error retrieving models from cache: {e}")
+
+    conn = None
     try:
-        conn = get_db_connection()  
+        conn = get_db_connection()
         if conn is None:
             return jsonify({'message': 'Database connection failed'}), 500
 
         with conn.cursor() as cursor:
-            category = request.args.get('category')
             if category and category != "All":
                 cursor.execute("SELECT * FROM library_models WHERE model_category = %s", (category,))
             else:
@@ -63,25 +76,44 @@ def get_library_models():
                         model_dict['model_image'] = presigned_thumbnail_url
                     except Exception as e:
                         print(f"Error generating thumbnail URL: {e}")
-                        model_dict['model_image'] = None 
+                        model_dict['model_image'] = None
 
                 model_list.append(model_dict)
 
+            # --- Cache the model list ---
+            if current_app.redis:
+                try:
+                    current_app.redis.setex(cache_key, 3600, json.dumps(model_list))  # Cache for 1 hour
+                    logging.info(f"Cached library models (key: {cache_key})")
+                except Exception as e:
+                    logging.error(f"Error caching models: {e}")
+
             return jsonify(model_list), 200
 
-    except psycopg2.Error as e: 
+    except psycopg2.Error as e:
         print(f"Database error: {e}")
         return jsonify({'message': 'Database error'}), 500
     except Exception as e:
         print(f"Error fetching models: {e}")
         return jsonify({'message': 'Failed to fetch library models'}), 500
     finally:
-        if conn: 
+        if conn:
             conn.close()
 
 
-@library_bp.route('/models/<int:model_id>/signed_url', methods=['GET']) 
+@library_bp.route('/models/<int:model_id>/signed_url', methods=['GET'])
 def get_signed_url(model_id):
+    cache_key = f"signed_url:{model_id}"
+
+    if current_app.redis:
+        try:
+            cached_url = current_app.redis.get(cache_key)
+            if cached_url:
+                logging.info(f"Returning signed URL from cache (key: {cache_key})")
+                return jsonify({'signed_url': cached_url.decode('utf-8')}), 200
+        except Exception as e:
+            logging.error(f"Error retrieving signed URL from cache: {e}")
+
     conn = None
     try:
         conn = get_db_connection()
@@ -95,7 +127,7 @@ def get_signed_url(model_id):
             if not result:
                 return jsonify({'message': 'Model not found'}), 404
 
-            model_url = result[0] 
+            model_url = result[0]
 
             r2 = get_r2_client()
             presigned_url = r2.generate_presigned_url(
@@ -103,6 +135,15 @@ def get_signed_url(model_id):
                 Params={'Bucket': CLOUDFLARE_BUCKET_NAME, 'Key': model_url},
                 ExpiresIn=3600
             )
+
+            # --- Cache the signed URL ---
+            if current_app.redis:
+                try:
+                    current_app.redis.setex(cache_key, 3600, presigned_url)  # Cache for 1 hour
+                    logging.info(f"Cached signed URL (key: {cache_key})")
+                except Exception as e:
+                    logging.error(f"Error caching signed URL: {e}")
+
             return jsonify({'signed_url': presigned_url}), 200
 
     except psycopg2.Error as e:
@@ -142,14 +183,24 @@ def add_library_model():
             )
             inserted_model = cursor.fetchone()
             conn.commit()
-            column_names = [desc[0] for desc in cursor.description] 
-            model_dict = dict(zip(column_names, inserted_model))   
+            column_names = [desc[0] for desc in cursor.description]
+            model_dict = dict(zip(column_names, inserted_model))
 
-        return jsonify({'message': 'Model added successfully', 'model': model_dict}), 201 
+        # --- Invalidate the cache when a model is added ---
+        if current_app.redis:
+            try:
+                current_app.redis.delete("library_models:all")  # Invalidate the 'all' cache
+                if model_category:
+                    current_app.redis.delete(f"library_models:{model_category}")  # Invalidate category-specific cache
+                logging.info("Invalidated library model cache after adding new model")
+            except Exception as e:
+                logging.error(f"Error invalidating cache: {e}")
+
+        return jsonify({'message': 'Model added successfully', 'model': model_dict}), 201
 
     except psycopg2.Error as e:
         if conn:
-            conn.rollback() 
+            conn.rollback()
         print(f"Database error: {e}")
         return jsonify({'message': 'Database error'}), 500
     except Exception as e:

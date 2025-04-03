@@ -2,8 +2,8 @@
 import React from 'react';
 import { Canvas } from '@react-three/fiber';
 import GroundPlane from './GroundPlane';
-import CameraControls from './CameraControls.jsx';
-import Model from './Model.jsx';
+import CameraControls from './cameraControls.jsx';
+import Model from './model.jsx';
 
 const Scene = ({ models, setCameraEnabled }) => {
     return (

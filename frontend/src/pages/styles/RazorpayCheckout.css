@@ -1,0 +1,164 @@
+:root {
+    --primary-color: #3f51b5;
+    --primary-light: #5c6bc0;
+    --background-dark: #1a192d;
+    --card-background: #212121;
+    --text-primary: #fff;
+    --text-secondary: #bdbdbd;
+    --success-color: #4caf50;
+    --danger-color: #f44336;
+    --discount-color: #8bc34a;
+}
+
+.upgrade-page {
+    padding: clamp(1rem, 5vw, 2rem);
+    font-family: 'Futura', system-ui, -apple-system, sans-serif;
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    background-color: var(--background-dark);
+    color: var(--text-primary);
+}
+
+.upgrade-page h2 {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    margin-block: 1rem;
+    color: #e0e0e0;
+}
+
+.billing-toggle {
+    display: flex;
+    background-color: #333;
+    border-radius: 0.5rem;
+    
+    margin-bottom: 1rem;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.billing-toggle span {
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.billing-toggle span.active {
+    background-color: var(--primary-light);
+    color: var(--text-primary);
+}
+
+.plans-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    width: min(50%, 1200px);
+    margin-inline: auto;
+}
+
+.plan-card {
+    background-color: var(--card-background);
+    border-radius: 1.5rem;
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    isolation: isolate;
+    border: #bdbdbd 2px solid;
+}
+
+.plan-card:hover, 
+.plan-card.selected {
+    transform: translateY(-0.375rem);
+}
+
+.plan-card h3 {
+    font-size: 1.25rem;
+    color: #ecf6ff;
+}
+
+.features {
+    align-items: start;
+   text-align: left;
+    margin: 0px;
+    padding: 0px;
+    list-style: none;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.features li {
+    text-align: left;
+    gap: 0.1rem;
+    color: var(--text-secondary);
+}
+
+.features li svg {
+    color: var(--success-color);
+    flex-shrink: 0;
+}
+
+.pricing {
+    margin-top: auto;
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    font-size: 1.125rem;
+}
+
+.select-button {
+    background-color: var(--primary-color);
+    color: var(--text-primary);
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 0.750rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-weight: 500;
+    width: 100%;
+    bottom: 0;
+}
+
+.select-button:hover {
+    background-color: #0048b5;
+}
+
+.payment-status {
+    position: fixed;
+    inset: 50% auto auto 50%;
+    transform: translate(-50%, -50%);
+    background: #1a1a1a;
+    padding: 2rem;
+    border-radius: 0.75rem;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 0 2rem rgba(0, 0, 0, 0.5);
+}
+
+.home-button {
+    background-color: var(--success-color) !important;
+}
+
+.try-again-button {
+    background-color: var(--danger-color) !important;
+}
+
+@media (max-width: 768px) {
+    .plans-container {
+        grid-template-columns: 1fr;
+        width: 95%;
+    }
+}
+.existing-subscription{
+    background-color: var(--card-background);
+    border-radius: 1.5rem;
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    isolation: isolate;
+    margin-block: 1rem;
+    border: #bdbdbd 2px solid;
+}

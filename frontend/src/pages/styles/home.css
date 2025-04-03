@@ -107,6 +107,7 @@ body::-webkit-scrollbar-corner {
 
 /* Main Content */
 .main-content {
+    overflow-y: auto;
     flex-grow: 1;
     padding: 20px;
 }

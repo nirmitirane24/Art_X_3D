@@ -1,0 +1,66 @@
+.terms-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #ffffff;
+    min-height: 100vh;
+  }
+  
+  .terms-title {
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .terms-section {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+  }
+  
+  .terms-section-title {
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .terms-paragraph {
+    font-size: 1em;
+    margin-bottom: 10px;
+  }
+  
+  .terms-link {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .terms-list {
+    list-style-type: none;
+    padding-left: 0;
+  }
+  
+  .terms-footer {
+    margin-top: 30px;
+    font-size: 0.9em;
+    text-align: center;
+    color: #efefef;
+  }
+  .backbutton{
+    border: #33333300 solid 2px; /* Border color */
+    background-color: #d1d1d1; /* Green background */
+    color: rgb(47, 47, 47); /* White text */
+    padding: 10px 20px; /* Padding for the button */
+    border-radius: 10px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 1em; /* Font size */
+    transition: background-color 0.2s ease; /* Smooth transition for hover effect */
+  }
+  .backbutton:hover {
+    border: #e0e0e0 solid 2px;
+    background-color: #333;
+    color: #d1d1d1;
+  }
+  

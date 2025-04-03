@@ -2,11 +2,11 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { FBXLoader } from 'three-stdlib';
-import './styles/welcomepage.css'; // Import the CSS
+import './styles/welcomepage.css'; 
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import LoadingPage from './loading';
-import { TypeAnimation } from 'react-type-animation'; // Import TypeAnimation
+import { TypeAnimation } from 'react-type-animation';
 import { analytics, app } from "../analytics/firebaseAnalyze.js";
 import { logEvent } from "firebase/analytics";
 import { useLocation } from "react-router-dom";
@@ -303,11 +303,11 @@ const WelcomePage = () => {
                 <p>ArtX3d, a place to design and generate 3D models.</p>
 
                 <div className="email-buttons">
-                    <button className="email-button" onClick={() => window.location = 'mailto:patilpranav616@gmail.com'}>
+                    {/* <button className="email-button" onClick={() => window.location = 'mailto:patilpranav616@gmail.com'}>
                         <span className="quantum-number">
                             <img src="./3d/email-removebg-preview.png" className="email-icon" alt="Email Icon" />
                         </span>
-                    </button>
+                    </button> */}
                     {/* <button className="email-button" onClick={() => window.location = 'mailto:ranenirmiti24@gmail.com'}>
                         <span className="quantum-number">
                             <img src="./3d/email-removebg-preview.png" className="email-icon" alt="Email Icon" />
@@ -318,6 +318,12 @@ const WelcomePage = () => {
                             <img src="./3d/email-removebg-preview.png" className="email-icon" alt="Email Icon" />
                         </span>
                     </button> */}
+                    <button className="footer-buttons" onClick={() => navigate('/contact-us')}>Contact Us</button>
+                    <button className="footer-buttons" onClick={() => navigate('/terms-and-conditions')}>terms and Conditions</button>
+                    <button className="footer-buttons" onClick={() => navigate('/privacy-policy')}>Privacy Policy</button>
+                    <button className="footer-buttons" onClick={() => navigate('/shipping-and-delivery')}>Shipping and Delivery</button>
+                    <button className="footer-buttons" onClick={() => navigate('/cancellation-and-refund')}>Cancellation and Refund</button>
+                    
                 </div>
             </div>
         </div>
