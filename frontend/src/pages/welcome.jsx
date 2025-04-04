@@ -11,6 +11,7 @@ import { analytics, app } from "../analytics/firebaseAnalyze.js";
 import { logEvent } from "firebase/analytics";
 import { useLocation } from "react-router-dom";
 import handleButtonClick from "../analytics/ButtonClickAnalytics.js"; 
+import SEO from "../utils/SEO.jsx";
 
 // Navbar Component
 const Navbar = ({ isAuthenticated, scrollToFooter, scrollToProductSection }) => {
@@ -194,7 +195,23 @@ const WelcomePage = () => {
     }
 
     return (
+
         <div className="main-container">
+            
+        <SEO
+        title="ArtX3D"
+        description="Manage your 3D creations, explore the ArtX3D community, and access your account settings." 
+        keywords="3D projects, user dashboard, 3D art management, ArtX3D Welcome Page" 
+        image="/site/preview.png"
+        urlPath="/" 
+      />
+        <SEO
+        title="ArtX3D"
+        description="Manage your 3D creations, explore the ArtX3D community, and access your account settings." 
+        keywords="3D projects, user dashboard, 3D art management, ArtX3D Welcome Page" 
+        image="/site/preview.png"
+        urlPath="/welcome" 
+      />
             <Navbar
                 isAuthenticated={isAuthenticated}
                 scrollToFooter={scrollToFooter}

@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaArrowLeft } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import LoadingPage from './loading';
+import SEO from '../utils/SEO';
 
 function Register() {
     const navigate = useNavigate();
@@ -86,6 +87,14 @@ function Register() {
 
     return (
         <div style={styles.body}>
+
+        <SEO
+        title="ArtX3D - Register"
+        description="Manage your 3D creations, explore the ArtX3D community, and access your account settings." 
+        keywords="3D projects, user dashboard, 3D art management, ArtX3D Register, Free to use, Freemium" 
+        image="/site/regsiter.png"
+        urlPath="/register" 
+      />
             <div style={styles.formContainer}>
                 <Link to="/" style={styles.backLink}>
                     <FaArrowLeft style={styles.backIcon} />

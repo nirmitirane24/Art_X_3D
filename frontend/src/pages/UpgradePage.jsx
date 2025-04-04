@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./styles/RazorpayCheckout.css";
 import { useNavigate } from "react-router-dom";
+import { FaCheck } from "react-icons/fa";
 
 const UpgradePage = ({ API_BASE_URL, subscriptionLevel, setSubscriptionLevel }) => {
     const [selectedPlan, setSelectedPlan] = useState("monthly");
@@ -183,7 +184,7 @@ const UpgradePage = ({ API_BASE_URL, subscriptionLevel, setSubscriptionLevel }) 
                             {plan.price && (
                                 <div className="pricing">
                                     <span className="current-price">
-                                        {plan.price} {currency}
+                                        ${plan.price} 
                                     </span>
                                     {plan.period && <span>/{plan.period}</span>}
                                 </div>
@@ -192,7 +193,7 @@ const UpgradePage = ({ API_BASE_URL, subscriptionLevel, setSubscriptionLevel }) 
                             <ul className="features">
                                 {plan.features.map((feature, i) => (
                                     <li key={i}>
-                                        {feature}
+                                    <FaCheck style={{color: 'white', fontSize: '12px'}}/>    {feature}
                                     </li>
                                 ))}
                             </ul>
@@ -221,7 +222,7 @@ const UpgradePage = ({ API_BASE_URL, subscriptionLevel, setSubscriptionLevel }) 
                                 <ul className="features">
                                     {plan.features.map((feature, i) => (
                                         <li key={i}>
-                                            {feature}
+                                        <FaCheck style={{color: 'white', fontSize: '12px'}}/>    {feature}
                                         </li>
                                     ))}
                                 </ul>

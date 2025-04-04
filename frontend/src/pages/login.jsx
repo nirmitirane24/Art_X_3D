@@ -8,7 +8,7 @@ import { analytics, app } from "../analytics/firebaseAnalyze.js";
 import { logEvent } from "firebase/analytics";
 import { useLocation } from "react-router-dom";
 import handleButtonClick from "../analytics/ButtonClickAnalytics.js"; 
-
+import SEO from "../utils/SEO.jsx";
 
 function Login() {
   const navigate = useNavigate();
@@ -79,6 +79,15 @@ function Login() {
 
 return (
     <div style={styles.body}>
+        
+      <SEO
+        title="ArtX3D - Login"
+        description="Manage your 3D creations, explore the ArtX3D community, and access your account settings." 
+        keywords="3D projects, user dashboard, 3D art management, ArtX3D Login" 
+        image="/site/login.png"
+        urlPath="/login" 
+      />
+            
         <div style={styles.formContainer}>
             {/* Navigation Arrow to Home */}
             <Link to="/" style={styles.backLink}></Link>

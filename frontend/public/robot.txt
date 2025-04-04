@@ -1,0 +1,6 @@
+# robots.txt for artx3d.vercel.app
+
+User-agent: *
+Allow: /
+
+Sitemap: https://artx3d.vercel.app/sitemap.xml

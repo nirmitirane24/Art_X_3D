@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Main Application Pages -->
+  <url>
+    <loc>https://artx3d.vercel.app/</loc> <!-- Corresponds to WelcomePage via path="/" -->
+    <lastmod>2024-04-05</lastmod>  <!-- Adjust date as needed -->
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://artx3d.vercel.app/upgrade</loc>
+    <lastmod>2024-04-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://artx3d.vercel.app/login</loc>
+    <lastmod>2024-04-05</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://artx3d.vercel.app/register</loc>
+    <lastmod>2024-04-05</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://artx3d.vercel.app/home</loc>
+    <lastmod>2024-04-05</lastmod>
+    <changefreq>weekly</changefreq> 
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://artx3d.vercel.app/editor</loc> 
+    <lastmod>2024-04-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Footer Pages -->
+  <url>
+    <loc>https://artx3d.vercel.app/contact-us</loc>
+    <lastmod>2024-04-05</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://artx3d.vercel.app/privacy-policy</loc>
+    <lastmod>2024-04-05</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://artx3d.vercel.app/shipping-and-delivery</loc>
+    <lastmod>2024-04-05</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+   <url>
+    <loc>https://artx3d.vercel.app/cancellation-and-refund</loc>
+    <lastmod>2024-04-05</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+   <url>
+    <loc>https://artx3d.vercel.app/terms-and-conditions</loc>
+    <lastmod>2024-04-05</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- Add any other publicly accessible, important pages here -->
+
+</urlset>
