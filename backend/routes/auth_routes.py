@@ -1,5 +1,5 @@
 # auth_routes.py
-from flask import Blueprint, request, jsonify, session, current_app
+from flask import Blueprint, make_response, request, jsonify, session, current_app
 from werkzeug.security import check_password_hash
 from models import User  # Assuming you have a User model
 from utils.decorators import login_required  # Assuming you have a login_required decorator
@@ -62,18 +62,49 @@ def signin():
 @login_required
 def logout():
     username = session.get('username')
-    session.pop('username', None)
+    session.pop('username', None) # Remove user from session
 
-    if current_app.redis:
+    # --- Redis cleanup (Keep this) ---
+    if current_app.redis and username: # Check if username exists
         try:
             current_app.redis.delete(f"last_login:{username}")
-            current_app.redis.delete(f"subscription_level:{username}") 
-
-            logging.info(f"User {username} logged out.  Login info removed from Redis.")
+            current_app.redis.delete(f"subscription_level:{username}")
+            logging.info(f"User {username} logged out. Login info removed from Redis.")
         except Exception as e:
-            logging.error(f"Error deleting login info from Redis: {e}")
+            logging.error(f"Error deleting login info for {username} from Redis: {e}")
+    elif not username:
+         logging.warning("Logout attempt for user not found in session.")
 
-    return jsonify({'message': 'Logged out successfully'}), 200
+
+    # --- Explicit Cookie Clearing ---
+    response = make_response(jsonify({'message': 'Logged out successfully'}), 200)
+
+    # Get config values safely using .get() with defaults
+    cookie_name = current_app.config.get('SESSION_COOKIE_NAME', 'session') # Default Flask session cookie name
+    cookie_path = current_app.config.get('SESSION_COOKIE_PATH', '/')
+    domain_config = current_app.config.get('SESSION_COOKIE_DOMAIN') # Get potential domain config
+    cookie_secure = current_app.config.get('SESSION_COOKIE_SECURE', False) # Default to False if not set
+    cookie_httponly = current_app.config.get('SESSION_COOKIE_HTTPONLY', True) # Default to True if not set
+    cookie_samesite = current_app.config.get('SESSION_COOKIE_SAMESITE', 'Lax') # Default to Lax if not set
+
+    # *** CRITICAL FIX: Ensure domain is None or a string ***
+    cookie_domain = domain_config if isinstance(domain_config, str) else None
+    if domain_config is not None and not isinstance(domain_config, str):
+         logging.warning(f"SESSION_COOKIE_DOMAIN was type {type(domain_config)}, expected str or None. Using None for cookie domain.")
+
+
+    # Set cookie expiry to the past to instruct browser to delete it
+    response.set_cookie(
+        key=cookie_name,
+        value='', # Set value to empty
+        expires=0, # Expire immediately
+        path=cookie_path,
+        domain=cookie_domain, # Use the validated/corrected domain
+        secure=cookie_secure,
+        httponly=cookie_httponly,
+        samesite=cookie_samesite
+    )
+    return response 
 
 
 @auth_bp.route('/check', methods=['GET'])

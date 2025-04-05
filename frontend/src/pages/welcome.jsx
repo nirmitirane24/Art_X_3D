@@ -129,7 +129,9 @@ const WelcomePage = () => {
     const footerRef = useRef(null);
     const productSectionRef = useRef(null); // Ref for Quantum Computing Section
     const location = useLocation();
+    const API_BASE_URL = import.meta.env.VITE_API_URL;
 
+    
     // Get the current location and analytics instance
     useEffect(() => {
         if (analytics) {
@@ -144,22 +146,23 @@ const WelcomePage = () => {
 
     useEffect(() => {
         const checkAuth = async () => {
-            if (isAuthenticated === false) {
-                try {
-                    await axios.get(`${API_BASE_URL}/user/logs`, { withCredentials: true });
-                    setIsAuthenticated(true);
-                } catch (error) {
-                    setIsAuthenticated(false);
-                } finally {
-                    setLoading(false)
+            setLoading(true); 
+            try {
+                await axios.get(`${API_BASE_URL}/auth/check`, { withCredentials: true });
+                console.log("User is authenticated");
+                setIsAuthenticated(true);
+            } catch (error) {
+                setIsAuthenticated(false);
+                console.log("User is not authenticated", error);
+                if (error.response?.status !== 401) {
+                    console.error("Error checking authentication:", error);
                 }
-            } else {
-                setLoading(false)
+            } finally {
+                setLoading(false);
             }
-
         };
         checkAuth();
-    }, [isAuthenticated]);
+    }, []); 
 
     const handleGetStarted = () => {
         if (isAuthenticated) {

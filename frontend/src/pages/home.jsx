@@ -265,14 +265,14 @@ const Home = ({ subscriptionLevel, setSubscriptionLevel }) => {
 
   const handleLogout = async () => {
     try {
-      await axios.post(`${API_BASE_URL}/auth/logout`, {}, { withCredentials: true });
-      handleButtonClick("Logout Button Clicked", "Logout", location.pathname);
-      logoutUser();
-      navigate("/");
+        await axios.post(`${API_BASE_URL}/auth/logout`, {}, { withCredentials: true });
+        handleButtonClick("Logout Button Clicked", "Logout", location.pathname);
+        logoutUser();
+        navigate("/")
     } catch (error) {
-      console.error("Logout failed:", error);
+        console.error("Logout failed:", error);
     }
-  };
+};
 
   const handleLoadExample = (exampleId) => {
     navigate(`/editor?exampleId=${exampleId}`);
