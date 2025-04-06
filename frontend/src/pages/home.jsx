@@ -12,7 +12,6 @@ import { useLocation } from "react-router-dom";
 import handleButtonClick from "../analytics/ButtonClickAnalytics.js";
 import SEO from "../utils/SEO.jsx";
 
-
 const Home = ({ subscriptionLevel, setSubscriptionLevel }) => {
   const navigate = useNavigate();
   const [isImportPanelOpen, setImportPanelOpen] = useState(false);
@@ -39,6 +38,7 @@ const Home = ({ subscriptionLevel, setSubscriptionLevel }) => {
   const [tutorialsVideoGridHeight, setTutorialsVideoGridHeight] = useState(0);
   const [activeMenu, setActiveMenu] = useState("Home");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [sceneToDelete, setSceneToDelete] = useState(null);
   const API_BASE_URL = import.meta.env.VITE_API_URL;
   const location = useLocation();
 
@@ -248,16 +248,16 @@ const Home = ({ subscriptionLevel, setSubscriptionLevel }) => {
 
       if (response.status === 200) {
         console.log("File uploaded:", response.data);
-        alert("File uploaded and scene created.");
-        fetchProjects();
+        // alert("File uploaded and scene created.");
+        // fetchProjects();  <--  No need to fetch all projects, just update state
         navigate(`/editor?sceneId=${response.data.sceneId}`);
       } else {
         console.error("File upload failed:", response);
-        alert("File upload failed.");
+        // alert("File upload failed.");
       }
     } catch (error) {
       console.error("Error uploading file:", error);
-      alert(`Error: ${error.message}`);
+      // alert(`Error: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -341,6 +341,42 @@ const Home = ({ subscriptionLevel, setSubscriptionLevel }) => {
 
   const gotoMain = () => {
     navigate("/welcome");
+  };
+
+  const confirmDeleteScene = (sceneId) => {
+    setSceneToDelete(sceneId);
+    setShowDeleteModal(true);
+  };
+
+  const cancelDeleteScene = () => {
+    setSceneToDelete(null);
+    setShowDeleteModal(false);
+  };
+
+  const handleDeleteScene = async () => {
+    setShowDeleteModal(false);
+    setLoading(true);  // Start loading
+
+    try {
+      const response = await axios.delete(`${API_BASE_URL}/delete-scene?sceneId=${sceneToDelete}`, {
+        withCredentials: true,
+      });
+
+      if (response.status === 200) {
+        console.log("Scene deleted successfully:", response.data);
+        //  fetchProjects(); // Refresh the projects list
+         setProjects(prevProjects => prevProjects.filter(project => project.scene_id !== sceneToDelete)); // Update state
+      } else {
+        console.error("Failed to delete scene:", response);
+        // alert("Failed to delete scene.");
+      }
+    } catch (error) {
+      console.error("Error deleting scene:", error);
+      // alert(`Error: ${error.message}`);
+    } finally {
+      setLoading(false);  // End loading
+      setSceneToDelete(null);
+    }
   };
 
 
@@ -454,13 +490,39 @@ const Home = ({ subscriptionLevel, setSubscriptionLevel }) => {
           className="top-bar"
           style={{ display: activeMenu === "Home" ? "flex" : "none", justifyContent: "space-between", alignItems: "center" }}
         >
-          <h1>
+          <div style={{ display: "flex", alignItems: "center", color: "white" }}>
             <button
               onClick={gotoMain}
-              style={{ marginLeft: "-60px", backgroundColor: "transparent", border: "none", color: "white", cursor: "pointer" }}
+              style={{
+                background: "none",
+                border: "none",
+                padding: "8px",
+                cursor: "pointer",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                marginTop:"40px"
+              }}
             >
-              ←
-            </button>Welcome to the 3D space</h1>
+              <svg
+              
+                xmlns="http://www.w3.org/2000/svg"
+                width="50"
+                height="60"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="feather feather-arrow-left"
+              >
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+            </button>
+            <h1 >Welcome to the 3D space</h1>
+          </div>
+
           <div className="logbtn">
             <button
               className="upgrade-button"
@@ -603,7 +665,11 @@ const Home = ({ subscriptionLevel, setSubscriptionLevel }) => {
                         color: "rgba(255, 255, 255, 0.93)",
                         cursor: "pointer",
                       }}
-                      onClick={() => handleButtonClick("Delete Project Clicked", project.scene_name, location.pathname)}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent navigating to editor
+                        handleButtonClick("Delete Project Clicked", project.scene_name, location.pathname);
+                        confirmDeleteScene(project.scene_id); // Call function to show modal
+                      }}
                     />
                     <p className="lastupdated">Last updated {project.last_updated}</p>
                   </div>
@@ -686,6 +752,24 @@ const Home = ({ subscriptionLevel, setSubscriptionLevel }) => {
           <section className="library-section">
             <LibraryShowcase />
           </section>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && (
+          <div className="delete-modal">
+            <div className="delete-modal-content">
+              <h2>Confirm Delete</h2>
+              <p>Are you sure you want to delete this scene?</p>
+              <div className="delete-modal-buttons">
+                <button className="delete-confirm-button" onClick={handleDeleteScene}>
+                  Yes, Delete
+                </button>
+                <button className="delete-cancel-button" onClick={cancelDeleteScene}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </main>
     </div>

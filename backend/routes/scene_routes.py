@@ -15,9 +15,10 @@ import timeago
 import pytz
 import logging
 
-load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / '.env')
 
+load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / '.env')
 scene_bp = Blueprint('scene', __name__, url_prefix='/')
+
 
 # --- Configuration ---
 AWS_REGION = os.environ.get('AWS_REGION')
@@ -471,3 +472,126 @@ def get_user_scenes():
     finally:
         if conn is not None and not conn.closed:
             conn.close()
+            
+            
+# --- Delete Scene Route ---
+# This route deletes a scene and its associated thumbnail from S3 and R2, respectively.
+@scene_bp.route('/delete-scene', methods=['DELETE'])
+@login_required
+def delete_scene():
+    username = session.get('username')
+    if not username:
+        # This check is technically redundant due to @login_required,
+        # but good for clarity if the decorator were removed.
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    scene_id = request.args.get('sceneId')
+    if not scene_id:
+        return jsonify({'error': 'Missing sceneId parameter'}), 400
+
+    conn = None
+    try:
+        user = User.get_user_by_username(username)
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        user_id = user.id
+
+        logging.info(f"Attempting to delete scene {scene_id} for user {username} (ID: {user_id})")
+
+        conn = get_db_connection()
+        if conn is None:
+            logging.error("Database connection failed during scene deletion.")
+            return jsonify({'error': 'Database connection failed'}), 500
+
+        # --- 1. Verify Scene Ownership and Get S3/Thumbnail Keys ---
+        s3_key_to_delete = None
+        thumbnail_key_to_delete = None
+        with conn.cursor() as cursor:
+            # Check if scene exists AND belongs to the user, get S3 key
+            cursor.execute(
+                "SELECT s3_key FROM Scenes WHERE scene_id = %s AND user_id = %s",
+                (scene_id, user_id)
+            )
+            scene_result = cursor.fetchone()
+            if not scene_result:
+                logging.warning(f"Scene {scene_id} not found or user {user_id} does not own it.")
+                return jsonify({'error': 'Scene not found or you do not have permission to delete it'}), 404
+            s3_key_to_delete = scene_result[0]
+            logging.info(f"Found scene {scene_id} owned by user {user_id}. S3 key: {s3_key_to_delete}")
+
+            # Check if a thumbnail exists for this scene, get its key (image_url)
+            cursor.execute(
+                "SELECT image_url FROM scene_thumbnails WHERE scene_id = %s",
+                (scene_id,)
+            )
+            thumbnail_result = cursor.fetchone()
+            if thumbnail_result:
+                thumbnail_key_to_delete = thumbnail_result[0]
+                logging.info(f"Found thumbnail for scene {scene_id}. R2 key: {thumbnail_key_to_delete}")
+
+        # --- 2. Delete from External Storage (S3 and R2) ---
+        # Delete Scene Data from AWS S3
+        if s3_key_to_delete:
+            try:
+                logging.info(f"Deleting S3 object: Bucket={S3_BUCKET_NAME}, Key={s3_key_to_delete}")
+                s3_client.delete_object(Bucket=S3_BUCKET_NAME, Key=s3_key_to_delete)
+                logging.info(f"Successfully deleted S3 object: {s3_key_to_delete}")
+            except ClientError as e:
+                logging.error(f"Failed to delete S3 object {s3_key_to_delete}: {e}")
+                # Decide if this is fatal. For now, log and continue, but the DB record will remain.
+                # Could return 500 here if S3 deletion is critical before DB deletion.
+                # Let's proceed but log the inconsistency.
+                pass # Logged the error, continue to attempt other deletions
+
+        # Delete Thumbnail from Cloudflare R2
+        if thumbnail_key_to_delete:
+            try:
+                logging.info(f"Deleting R2 object: Bucket={CLOUDFLARE_BUCKET_NAME}, Key={thumbnail_key_to_delete}")
+                cloudflare_r2_client.delete_object(Bucket=CLOUDFLARE_BUCKET_NAME, Key=thumbnail_key_to_delete)
+                logging.info(f"Successfully deleted R2 object: {thumbnail_key_to_delete}")
+            except ClientError as e:
+                logging.error(f"Failed to delete R2 object {thumbnail_key_to_delete}: {e}")
+                # Log and continue
+                pass
+
+        # --- 3. Delete from Database (PostgreSQL) ---
+        with conn.cursor() as cursor:
+            # Delete thumbnail record first (if it exists)
+            if thumbnail_key_to_delete:
+                 logging.info(f"Deleting thumbnail record for scene_id {scene_id} from database.")
+                 cursor.execute("DELETE FROM scene_thumbnails WHERE scene_id = %s", (scene_id,))
+                 logging.info(f"Deleted thumbnail record for scene_id {scene_id} (Rows affected: {cursor.rowcount})")
+
+
+            # Delete scene record (ensuring user_id match again for safety)
+            logging.info(f"Deleting scene record for scene_id {scene_id} and user_id {user_id} from database.")
+            cursor.execute("DELETE FROM Scenes WHERE scene_id = %s AND user_id = %s", (scene_id, user_id))
+            logging.info(f"Deleted scene record for scene_id {scene_id} (Rows affected: {cursor.rowcount})")
+
+
+        conn.commit() # Commit transaction after successful deletions
+        logging.info(f"Database transaction committed for scene {scene_id} deletion.")
+
+        # --- 4. Invalidate Cache ---
+        if current_app.redis:
+            try:
+                scene_list_key = f"scenes:{user_id}"
+                scene_key = f"scene:{scene_id}" # If you cache individual scenes
+                deleted_count = current_app.redis.delete(scene_list_key, scene_key)
+                logging.info(f"Invalidated Redis cache keys: {scene_list_key}, {scene_key}. Keys deleted: {deleted_count}")
+            except Exception as e:
+                logging.error(f"Error invalidating Redis cache for user {user_id}, scene {scene_id}: {e}")
+                # Cache invalidation failure is usually not critical enough to fail the request
+
+        return jsonify({'message': 'Scene deleted successfully'}), 200
+
+    except Exception as e:
+        if conn:
+            conn.rollback() # Rollback DB changes if any error occurred before commit
+            logging.error(f"Database transaction rolled back due to error during scene {scene_id} deletion.")
+        logging.exception(f"Error deleting scene {scene_id} for user {username}: {e}") # Use logging.exception to include stack trace
+        return jsonify({'error': 'An unexpected error occurred during scene deletion'}), 500
+    finally:
+        if conn and not conn.closed:
+            conn.close()
+            logging.debug(f"Database connection closed for scene {scene_id} deletion request.")

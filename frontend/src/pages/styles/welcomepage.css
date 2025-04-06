@@ -94,10 +94,11 @@ body {
 
 /* Navbar Styles */
 .navbar {
-  position: relative;
+  position: sticky;
   /* Keep the navbar fixed at the top */
-  top: 7%;
+  top: 4%;
   left: 32%;
+  z-index:  9999;
   border-radius: 30px;
   width: 37%;
   color: white;
@@ -106,6 +107,7 @@ body {
   justify-content: center;
   box-shadow: 0px 0px 2000px rgb(89, 91, 136);
   margin-top: 30px;
+  /* background-color: #2d2d4376; */
   font-family: Futura, "Trebuchet MS", Arial, sans-serif;}
 
 .navbar-logo {

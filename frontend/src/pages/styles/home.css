@@ -354,3 +354,70 @@ body::-webkit-scrollbar-corner {
     margin-top: -17px;
     align-self: flex-start;
   }
+
+  .delete-modal {
+    position: fixed;
+
+    width: 100%;
+    height: 100%;
+    background-color: #23232376 ;
+
+ backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Ensure it's on top of everything */
+  }
+  
+  .delete-modal-content {
+    backdrop-filter: blur(0px);
+    background-color: #2a293d;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    width: 350px;
+    z-index: 10000;
+  }
+  
+  .delete-modal h2 {
+    margin-bottom: 10px;
+    color: #fff;
+  }
+  
+  .delete-modal p {
+    margin-bottom: 20px;
+    color: #ddd;
+  }
+  
+  .delete-modal-buttons {
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .delete-confirm-button,
+  .delete-cancel-button {
+    width: 40%;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .delete-confirm-button {
+    background-color: #e74c3c; /* Red */
+    color: #fff;
+  }
+  
+  .delete-confirm-button:hover {
+    background-color: #c0392b;
+  }
+  
+  .delete-cancel-button {
+    background-color: #3498db; /* Blue */
+    color: #fff;
+  }
+  
+  .delete-cancel-button:hover {
+    background-color: #2980b9;
+  }
