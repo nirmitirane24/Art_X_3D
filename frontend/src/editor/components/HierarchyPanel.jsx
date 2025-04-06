@@ -44,8 +44,8 @@ const HierarchyPanel = ({
 
   const filteredObjects = sceneObjects
     ? sceneObjects.filter((obj) =>
-        obj.type.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      obj.type.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     : [];
 
   const handleDelete = (obj) => {
@@ -79,29 +79,29 @@ const HierarchyPanel = ({
     }
 
     try {
-        const response = await saveScene(
-          sceneObjects,
-          sceneSettings,
-          currentSceneName,
-          currentSceneId,
-          thumbnailBlob
-        );
-        if (response && response.sceneId) {
-          setCurrentSceneId(response.sceneId); // Update scene ID
-          localStorage.setItem("currentSceneId", response.sceneId);
-          onSceneNameChange(currentSceneName); //Keep the UI updated
-          localStorage.setItem("currentSceneName", currentSceneName);
-          setShowTick(true); // Show success tick
-          setTimeout(() => {
-            setShowTick(false);
-            setIsSaving(false); // Reset loading state after delay
-          }, 1000);
-        }
-      } catch (error) {
-        console.error("Save failed:", error);
-        setIsSaving(false);  // Make sure to reset loading if it fails.
-        alert(`Save failed: ${error.message}`);
+      const response = await saveScene(
+        sceneObjects,
+        sceneSettings,
+        currentSceneName,
+        currentSceneId,
+        thumbnailBlob
+      );
+      if (response && response.sceneId) {
+        setCurrentSceneId(response.sceneId); // Update scene ID
+        localStorage.setItem("currentSceneId", response.sceneId);
+        onSceneNameChange(currentSceneName); //Keep the UI updated
+        localStorage.setItem("currentSceneName", currentSceneName);
+        setShowTick(true); // Show success tick
+        setTimeout(() => {
+          setShowTick(false);
+          setIsSaving(false); // Reset loading state after delay
+        }, 1000);
       }
+    } catch (error) {
+      console.error("Save failed:", error);
+      setIsSaving(false);  // Make sure to reset loading if it fails.
+      alert(`Save failed: ${error.message}`);
+    }
   };
 
   const handleSceneSelect = (sceneId) => {
@@ -128,6 +128,24 @@ const HierarchyPanel = ({
       .catch((error) => console.error("Error fetching scene name:", error));
   };
 
+  const generateDynamicIds = (objects) => {
+    const shapeCount = {};
+    return objects.map((obj) => {
+      const { type } = obj;
+      if (!shapeCount[type]) {
+        shapeCount[type] = 1;
+      } else {
+        shapeCount[type] += 1;
+      }
+      return {
+        ...obj,
+        displayId: `${type} ${shapeCount[type]}`,
+      };
+    });
+  };
+
+  const objectsWithDynamicIds = generateDynamicIds(filteredObjects);
+
   const goBack = () => {
     navigate("/home");
   };
@@ -146,7 +164,7 @@ const HierarchyPanel = ({
           type="text"
           id="sceneName"
           value={currentSceneName}
-          onChange={(e) => onSceneNameChange(e.target.value)} 
+          onChange={(e) => onSceneNameChange(e.target.value)}
           className="scene-name-input"
           placeholder="Scene Name"
         />
@@ -154,12 +172,11 @@ const HierarchyPanel = ({
       <h3>Objects</h3>
       <div></div>
       <ul className="objects-list">
-        {/* ... (object list rendering - no changes needed) ... */}
-        {filteredObjects.length === 0 ? (
+        {objectsWithDynamicIds.length === 0 ? (
           <p className="no-objects">No models added</p>
         ) : (
-          filteredObjects.map((obj, index) => (
-            <React.Fragment key={`${obj.type}-${obj.id}`}>
+          objectsWithDynamicIds.map((obj, index) => (
+            <React.Fragment key={`${obj.type}-${obj.displayId}`}>
               <li
                 key={obj.id}
                 style={{
@@ -230,19 +247,7 @@ const HierarchyPanel = ({
         <Import onImportScene={onImportScene} />
         <Library onImportScene={onImportScene} />
         <Export scene={scene} sceneObjects={sceneObjects} />
-
-
-        {SubscriptionLevel === "free" ? (
-          <button className="custom-button" disabled>
-            Subscribe to Save
-          </button>
-        ) : (
-          <button className="custom-button" onClick={handleSave}>
-            {isSaving ? "Saving..." : showTick ? <FaCheck /> : <FaSave />} Save
-          </button>
-        )}
- 
-    
+        
 
         {showFileNameModal && (
           <div className="file-name-modal">

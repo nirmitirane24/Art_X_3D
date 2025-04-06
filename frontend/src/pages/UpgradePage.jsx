@@ -25,20 +25,20 @@ const UpgradePage = ({ API_BASE_URL, subscriptionLevel, setSubscriptionLevel }) 
                     free: {
                         name: "Free",
                         description: "Basic access",
-                        features: ["Free to use","Import Models","Export Models", "Model Editing"],
+                        features: ["Free to use", "Import Models", "Export Models", "Model Editing"],
                         price: null,
                         plan_id: null,
                         type: 'free',
                     },
-                    pro_yearly: {  
-                      name: "Pro Yearly",
-                      description: "Best value for professionals",
-                      features: ["Value for money", "All pro features", "Priority support", "Cloud Saving", "All pro features", "No ads", "Exports", "3D Printing"],
-                      price: 90,
-                      plan_id: 'pro_yearly',
-                      period: "yearly",
-                      type: 'pro',
-                  },
+                    pro_yearly: {
+                        name: "Pro Yearly",
+                        description: "Best value for professionals",
+                        features: ["Value for money", "All pro features", "Priority support", "Cloud Saving", "All pro features", "No ads", "Exports", "3D Printing"],
+                        price: 90,
+                        plan_id: 'pro_yearly',
+                        period: "yearly",
+                        type: 'pro',
+                    },
                     pro_monthly: {  // Simplified plan IDs
                         name: "Pro Monthly",
                         description: "For serious creators",
@@ -163,9 +163,19 @@ const UpgradePage = ({ API_BASE_URL, subscriptionLevel, setSubscriptionLevel }) 
         }
     };
 
+    const goHome = () => {
+        navigate("/home");
+    };
+
     return (
         <div className="upgrade-page">
-            <h2 style={{ color: 'white' }}>Choose Your Plan</h2>
+            <h2 style={{ color: 'white' }}
+            >        <button
+                onClick={goHome}
+                style={{ marginLeft: "-120px", marginTop: "-2px", backgroundColor: "transparent", border: "none", color: "white", cursor: "pointer" }}
+            >
+                    ←
+                </button>Choose Your Plan</h2>
 
             <div className="billing-toggle">
                 <span className={`toggle-option ${yearlyBilling ? 'active' : ''}`} onClick={() => setYearlyBilling(true)}>Monthly</span>
@@ -184,7 +194,7 @@ const UpgradePage = ({ API_BASE_URL, subscriptionLevel, setSubscriptionLevel }) 
                             {plan.price && (
                                 <div className="pricing">
                                     <span className="current-price">
-                                        ${plan.price} 
+                                        ${plan.price}
                                     </span>
                                     {plan.period && <span>/{plan.period}</span>}
                                 </div>
@@ -193,7 +203,7 @@ const UpgradePage = ({ API_BASE_URL, subscriptionLevel, setSubscriptionLevel }) 
                             <ul className="features">
                                 {plan.features.map((feature, i) => (
                                     <li key={i}>
-                                    <FaCheck style={{color: 'white', fontSize: '12px'}}/>    {feature}
+                                        <FaCheck style={{ color: 'white', fontSize: '12px' }} />    {feature}
                                     </li>
                                 ))}
                             </ul>
@@ -218,11 +228,11 @@ const UpgradePage = ({ API_BASE_URL, subscriptionLevel, setSubscriptionLevel }) 
                             <div key={index} className={`plan-card ${selectedPlan === plan ? 'selected' : ''}`} onClick={() => setSelectedPlan(plan)}>
                                 <h3>{plan.name} Plan</h3>
                                 {/* {!plan.price && <p>Free</p>} */}
-                                <p style={{ margin:'0px'}}>{plan.description}</p>
+                                <p style={{ margin: '0px' }}>{plan.description}</p>
                                 <ul className="features">
                                     {plan.features.map((feature, i) => (
                                         <li key={i}>
-                                        <FaCheck style={{color: 'white', fontSize: '12px'}}/>    {feature}
+                                            <FaCheck style={{ color: 'white', fontSize: '12px' }} />    {feature}
                                         </li>
                                     ))}
                                 </ul>
@@ -274,7 +284,7 @@ const UpgradePage = ({ API_BASE_URL, subscriptionLevel, setSubscriptionLevel }) 
                 </div>
             )}
 
-          {subscriptionData?.has_subscription && !paymentSuccess && (
+            {subscriptionData?.has_subscription && !paymentSuccess && (
                 <div className="existing-subscription">
                     <h3>You currently have a {subscriptionData.current_level} subscription</h3>
                     <p>Valid until: {new Date(subscriptionData.end_date).toLocaleDateString()}</p>

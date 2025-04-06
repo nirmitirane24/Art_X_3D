@@ -21,7 +21,7 @@ const Home = ({ subscriptionLevel, setSubscriptionLevel }) => {
   const [tutorials, setTutorials] = useState([
     {
       id: 1,
-      title: "Solar system tutorial",
+      title: "Room Model Tutorial",
       videoUrl: "https://artx3dbuild.s3.us-east-1.amazonaws.com/Tutorial/solar.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAWOOXUFFO6CDOXBR4%2F20250402%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250402T113647Z&X-Amz-Expires=518400&X-Amz-SignedHeaders=host&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEGwaCXVzLWVhc3QtMSJHMEUCIQDDeDMF4V6PMUMj1qwJEZ1vqmkfU14V%2Bcp0niJdkYkcXAIgHJSklAChxc4kz5o64qtmzcKJHab8jn5N7e1j34pufGkq%2FwII1f%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw0NDMzNzA3MTEzODkiDLKylWq4np7rd3KfGyrTAu7iDw%2F%2BXUHuNTiGQcOLBZ1vX0tDhXmHCzyNXNrg1kcsBO4L56CoDeLNrooVY5wJAhQNaSnyPjolZdCXdXXU7whdzzE2UeBch3Leo9BFNNPxcE4DABDJDGzytUqxZx8I%2FqNeCp1VJn57xnhdehMmrUxL5dh6SzzEY6fh%2F%2FWqyac1nvPZ7m6%2FglOt2nfZq7D5oIYMcRnR8ARTxw1ufqAbn5eQq1k2hZ4rSIdvf6i015F3IxGTmxNRNgruTXWWRUkg0HG%2FPpBguncRS5WhK0tIlAOE7zVnqskOra21N9uIb6kwLT7%2B45AHB%2B%2FHkK9S7XiSaQortBclzYEpZxBU4kV9w6dFSWxES1nSkmwap696GCiZkljHMOPGDfURq%2B9OgJnnDbb%2B56tetukGCyP3CHYT5Yg468MR5aPxqIGkBsZL%2FM17KG6NnTXJglHi4mr2K5j1PzjcGTCqvrO%2FBjqzAmSsRTcg14o1Kp%2F60WeecKtQ3gcXv28L54jCZdZRVsJKAfBLCn7bpnVpJopSN8uSyZ7gi61sGI%2FM97JQ0gyMMmnJOz69OouHWxHRAraSIW3RKTOSKoTGfsjc%2FSxdKYdgq0I%2BmCEYwtYjAaCkfwE%2BMFB7eIWQy8%2BVIcp29DAPcllW7%2BujDWIw3aFjLk1TjU%2FxFAibd%2Fm3OcFirgBo%2FnIaMhkaz5q96KtNWwP3J5YDWZwiIcC3tBSP%2BoKGJvRq893Hji4SIwPTE5L%2FJbsHvBbSx4eigPgkGVK%2FrOIg1T08hhTJTG8lXVdBCnN14nhHpzokQkcmSHdwO7Q2bbqn05Usp%2FgBHz%2BQG6m3SzOYIxKen24A%2B1Qj6eOZlMtHqj8aWiKbD4WGcZWWUvkGRezlkPaZBUW6mtA%3D&X-Amz-Signature=fc8f361f7f6fdd3eebfb3777fd9e50144e856d2687eb63b7197a40ba5c293edc",
     },
   ]);
@@ -265,14 +265,14 @@ const Home = ({ subscriptionLevel, setSubscriptionLevel }) => {
 
   const handleLogout = async () => {
     try {
-        await axios.post(`${API_BASE_URL}/auth/logout`, {}, { withCredentials: true });
-        handleButtonClick("Logout Button Clicked", "Logout", location.pathname);
-        logoutUser();
-        navigate("/")
+      await axios.post(`${API_BASE_URL}/auth/logout`, {}, { withCredentials: true });
+      handleButtonClick("Logout Button Clicked", "Logout", location.pathname);
+      logoutUser();
+      navigate("/")
     } catch (error) {
-        console.error("Logout failed:", error);
+      console.error("Logout failed:", error);
     }
-};
+  };
 
   const handleLoadExample = (exampleId) => {
     navigate(`/editor?exampleId=${exampleId}`);
@@ -339,15 +339,20 @@ const Home = ({ subscriptionLevel, setSubscriptionLevel }) => {
     return subscriptionLevel === "pro" || subscriptionLevel === "pro+";
   };
 
+  const gotoMain = () => {
+    navigate("/welcome");
+  };
+
+
   return (
     <div className="home-container">
 
       <SEO
         title="ArtX3D- Your 3D Projects"
-        description="Manage your 3D creations, explore the ArtX3D community, and access your account settings." 
-        keywords="3D projects, user dashboard, 3D art management, ArtX3D home" 
+        description="Manage your 3D creations, explore the ArtX3D community, and access your account settings."
+        keywords="3D projects, user dashboard, 3D art management, ArtX3D home"
         image="/site/home_preview.png"
-        urlPath="/home" 
+        urlPath="/home"
       />
 
       <aside className="sidebar-home">
@@ -364,7 +369,7 @@ const Home = ({ subscriptionLevel, setSubscriptionLevel }) => {
             />
           </div>
           <span>
-          {isProUser() && <FaCrown style={{ color: "gold", marginLeft: "5px" }} />} {username} 
+            {isProUser() && <FaCrown style={{ color: "gold", marginLeft: "5px" }} />} {username}
           </span>
         </div>
         <nav className="menu">
@@ -449,7 +454,13 @@ const Home = ({ subscriptionLevel, setSubscriptionLevel }) => {
           className="top-bar"
           style={{ display: activeMenu === "Home" ? "flex" : "none", justifyContent: "space-between", alignItems: "center" }}
         >
-          <h1>Welcome to the 3D space</h1>
+          <h1>
+            <button
+              onClick={gotoMain}
+              style={{ marginLeft: "-60px", backgroundColor: "transparent", border: "none", color: "white", cursor: "pointer" }}
+            >
+              ←
+            </button>Welcome to the 3D space</h1>
           <div className="logbtn">
             <button
               className="upgrade-button"
