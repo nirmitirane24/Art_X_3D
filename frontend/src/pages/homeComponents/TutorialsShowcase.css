@@ -1,0 +1,274 @@
+
+  
+  /* Target h2 within the renamed container */
+  .video-tutorial-showcase-container h2 {
+    margin-bottom: 20px; /* Added margin back */
+    font-size: 1.8em;
+    color: white;
+  }
+  
+  /* Renamed grid class */
+  .video-tutorial-grid {
+    display: grid;
+    grid-template-columns: repeat(400px, minmax(200px, 1fr)); /* Responsive columns */
+    gap: 10px; /* Space between cards */
+  }
+  
+  @media (min-width: 768px) {
+    /* Target renamed grid class */
+    .video-tutorial-grid {
+      grid-template-columns: repeat(2, 1fr); /* Explicit 2 columns on larger screens */
+    }
+  }
+  
+  /* Renamed card class */
+
+  .video-tutorial-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 95%;
+    background-color: #33333346;
+    border-radius: 20px;
+    /* overflow: hidden; */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    /* display: flex;
+    flex-direction: column; */
+    color: #e0e0e0;
+  }
+  
+  /* Renamed card class for hover/focus */
+  .video-tutorial-card:hover,
+  .video-tutorial-card:focus-within {
+    background-color: #141222;
+  }
+
+  /* Renamed outer aspect ratio box */
+  .video-tutorial-aspect-outer {
+    border-radius: 15px;
+    margin-top: 15px;
+    width: 95%;
+    aspect-ratio: 19 / 10;
+    position: relative;
+    background-color: #1e1e1e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  
+  /* Renamed inner aspect ratio box */
+  .video-tutorial-aspect-inner {
+    width: 100%; /* Kept user's 70% width */
+    aspect-ratio: 19 / 10;
+    background-color: #333;
+    overflow: hidden; /* Changed back from auto to hidden to prevent scrollbars */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Renamed thumbnail container */
+  .video-tutorial-thumbnail-container {
+      /* width: 100%;
+      height: 100%; */
+      display: flex; /* Added to help center/contain image if needed */
+      align-items: center;
+      justify-content: center;
+  }
+  
+  /* Target img within the renamed inner box/container */
+.video-tutorial-aspect-inner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* display: block; */
+    transition: ease-in-out 0.5s;
+}
+
+  .video-tutorial-aspect-inner img:hover{
+    transform: scale(1.025);
+    transition: ease-in-out 0.5s;
+  }
+  
+  /* Renamed placeholder class */
+  .video-tutorial-thumbnail-placeholder {
+      color: #888;
+      font-size: 0.9em;
+      text-align: center; /* Center text */
+  }
+  
+  /* Renamed info section class */
+  .video-tutorial-info {
+    padding: 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Target h3 within renamed info section */
+  .video-tutorial-info h3 {
+    text-align: left;
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+    color: #ffffff;
+  }
+  
+  /* Target p within renamed info section */
+  .video-tutorial-info p {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 0.9em;
+    line-height: 1.4;
+    flex-grow: 1;
+  }
+  
+  /* Wrapper for the video player and close button */
+  .video-player-wrapper {
+      position: relative; /* Needed for absolute positioning of the close button */
+      width: 100%;
+      height: 100%;
+      background-color: #000000; /* Black background behind video */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+  
+  .video-player-wrapper video {
+      display: block; /* Remove extra space below video */
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain; /* Fit video within the container, maintaining aspect ratio */
+  }
+  
+  /* Close Button Styling */
+  .video-close-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      z-index: 10; /* Ensure it's above the video */
+      font-size: 16px;
+      padding: 0;
+      line-height: 1;
+      transition: background-color 0.2s ease;
+  }
+  
+  .video-close-button:hover,
+  .video-close-button:focus {
+      background-color: rgba(255, 0, 0, 0.7); /* Red on hover/focus */
+      outline: none;
+  }
+  
+  /* Loading indicator styling */
+  .video-thumbnail-loading {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      color: #ccc;
+      background-color: rgba(0, 0, 0, 0.3); /* Slight overlay */
+  }
+  
+  .video-thumbnail-loading p {
+      margin-top: 10px;
+      font-size: 0.9em;
+  }
+  
+  /* Simple CSS Spinner */
+  .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 4px solid #fff;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+  }
+  
+  /* Renamed error message class */
+  .video-tutorial-error-message {
+    color: #ff4d4f;
+    text-align: center;
+    padding: 10px;
+    background-color: rgba(255, 77, 79, 0.1);
+    border: 1px solid rgba(255, 77, 79, 0.3);
+    border-radius: 4px;
+    margin: 10px 0;
+  }
+  
+  /* --- Renamed Skeleton Loading Styles --- */
+  
+  /* Renamed skeleton loading modifier class (applied to the card) */
+  .video-tutorial-card.video-tutorial-skeleton-loading {
+    position: relative;
+    overflow: hidden;
+    background-color: #3a3a3c;
+  }
+  
+  .video-tutorial-card.video-tutorial-skeleton-loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%; /* Adjusted for potentially wider shine */
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent); /* Subtler shine */
+    animation: video-tutorial-skeleton-shine 1.6s infinite linear;
+  }
+  
+  /* Renamed skeleton inner box class */
+  .video-tutorial-skeleton-inner {
+      background-color: #4a4a4c;
+      width: 100%;
+      height: 100%;
+  }
+  
+  /* Renamed skeleton info section class */
+  .video-tutorial-skeleton-info {
+      padding: 15px;
+  }
+  
+  /* Renamed skeleton text base class */
+  .video-tutorial-skeleton-text {
+      height: 1em;
+      background-color: #4a4a4c;
+      border-radius: 4px;
+      margin-bottom: 8px;
+  }
+  /* Renamed skeleton text modifier classes */
+  .video-tutorial-skeleton-text--short { width: 60%; }
+  .video-tutorial-skeleton-text--long { width: 90%; margin-bottom: 12px; }
+  
+  /* Renamed skeleton badge class */
+  .video-tutorial-skeleton-badge {
+      width: 70px;
+      height: 20px;
+      background-color: #4a4a4c;
+      border-radius: 12px;
+      margin-top: auto; /* Pushes to bottom within flex container */
+  }
+  
+  /* Renamed keyframes animation */
+  @keyframes video-tutorial-skeleton-shine {
+    0% { left: -150%; }
+    100% { left: 150%; }
+  }

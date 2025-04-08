@@ -1,7 +1,8 @@
 {
   "name": "artx3d",
   "private": true,
-  "version": "1.1.2a",
+  "version": "1.2.2alpha",
+  "description": "ArtX3D is a web-based platform for creating and sharing 3D art using React Three Fiber and Firebase.",
   "type": "module",
   "scripts": {
     "dev": "vite",

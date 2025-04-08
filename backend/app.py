@@ -7,6 +7,7 @@ from routes.user_routes import user_bp
 from routes.scene_routes import scene_bp
 from routes.library_routes import library_bp
 from routes.payment_routes import payment_bp
+from routes.tutorial_routes import tutorial_bp
 import redis
 
 def create_app(config_class):
@@ -30,6 +31,7 @@ def create_app(config_class):
     app.register_blueprint(scene_bp)
     app.register_blueprint(library_bp)
     app.register_blueprint(payment_bp)
+    app.register_blueprint(tutorial_bp)
 
     @app.route('/')
     def index():

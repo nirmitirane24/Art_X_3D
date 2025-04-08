@@ -10,20 +10,11 @@ import { analytics, app } from "../analytics/firebaseAnalyze.js";
 import { logEvent } from "firebase/analytics";
 import { useLocation } from "react-router-dom";
 import handleButtonClick from "../analytics/ButtonClickAnalytics.js";
+import TutorialsShowcase from "./homeComponents/TutorialsShowcase";
 import SEO from "../utils/SEO.jsx";
 
 const Home = ({ subscriptionLevel, setSubscriptionLevel }) => {
   const navigate = useNavigate();
-  const [isImportPanelOpen, setImportPanelOpen] = useState(false);
-  const [isGeneratePanelOpen, setGeneratePanelOpen] = useState(false);
-  const [dragOver, setDragOver] = useState(false);
-  const [tutorials, setTutorials] = useState([
-    {
-      id: 1,
-      title: "Room Model Tutorial",
-      videoUrl: "https://artx3dbuild.s3.us-east-1.amazonaws.com/Tutorial/solar.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAWOOXUFFO6CDOXBR4%2F20250402%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250402T113647Z&X-Amz-Expires=518400&X-Amz-SignedHeaders=host&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEGwaCXVzLWVhc3QtMSJHMEUCIQDDeDMF4V6PMUMj1qwJEZ1vqmkfU14V%2Bcp0niJdkYkcXAIgHJSklAChxc4kz5o64qtmzcKJHab8jn5N7e1j34pufGkq%2FwII1f%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw0NDMzNzA3MTEzODkiDLKylWq4np7rd3KfGyrTAu7iDw%2F%2BXUHuNTiGQcOLBZ1vX0tDhXmHCzyNXNrg1kcsBO4L56CoDeLNrooVY5wJAhQNaSnyPjolZdCXdXXU7whdzzE2UeBch3Leo9BFNNPxcE4DABDJDGzytUqxZx8I%2FqNeCp1VJn57xnhdehMmrUxL5dh6SzzEY6fh%2F%2FWqyac1nvPZ7m6%2FglOt2nfZq7D5oIYMcRnR8ARTxw1ufqAbn5eQq1k2hZ4rSIdvf6i015F3IxGTmxNRNgruTXWWRUkg0HG%2FPpBguncRS5WhK0tIlAOE7zVnqskOra21N9uIb6kwLT7%2B45AHB%2B%2FHkK9S7XiSaQortBclzYEpZxBU4kV9w6dFSWxES1nSkmwap696GCiZkljHMOPGDfURq%2B9OgJnnDbb%2B56tetukGCyP3CHYT5Yg468MR5aPxqIGkBsZL%2FM17KG6NnTXJglHi4mr2K5j1PzjcGTCqvrO%2FBjqzAmSsRTcg14o1Kp%2F60WeecKtQ3gcXv28L54jCZdZRVsJKAfBLCn7bpnVpJopSN8uSyZ7gi61sGI%2FM97JQ0gyMMmnJOz69OouHWxHRAraSIW3RKTOSKoTGfsjc%2FSxdKYdgq0I%2BmCEYwtYjAaCkfwE%2BMFB7eIWQy8%2BVIcp29DAPcllW7%2BujDWIw3aFjLk1TjU%2FxFAibd%2Fm3OcFirgBo%2FnIaMhkaz5q96KtNWwP3J5YDWZwiIcC3tBSP%2BoKGJvRq893Hji4SIwPTE5L%2FJbsHvBbSx4eigPgkGVK%2FrOIg1T08hhTJTG8lXVdBCnN14nhHpzokQkcmSHdwO7Q2bbqn05Usp%2FgBHz%2BQG6m3SzOYIxKen24A%2B1Qj6eOZlMtHqj8aWiKbD4WGcZWWUvkGRezlkPaZBUW6mtA%3D&X-Amz-Signature=fc8f361f7f6fdd3eebfb3777fd9e50144e856d2687eb63b7197a40ba5c293edc",
-    },
-  ]);
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
   const [projects, setProjects] = useState([]);
@@ -200,38 +191,6 @@ const Home = ({ subscriptionLevel, setSubscriptionLevel }) => {
     input.click();
   };
 
-  const handleImportButtonClick = () => {
-    setImportPanelOpen(!isImportPanelOpen);
-    setGeneratePanelOpen(false);
-  };
-
-  const handleGenerateButtonClick = () => {
-    setGeneratePanelOpen(!isGeneratePanelOpen);
-    setImportPanelOpen(false);
-  };
-
-  const handleClosePanel = () => {
-    setImportPanelOpen(false);
-    setGeneratePanelOpen(false);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setDragOver(true);
-  };
-
-  const handleDragLeave = () => {
-    setDragOver(false);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setDragOver(false);
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleFileUpload(files[0]);
-    }
-  };
 
   const handleFileUpload = async (file) => {
     setLoading(true);
@@ -355,7 +314,7 @@ const Home = ({ subscriptionLevel, setSubscriptionLevel }) => {
 
   const handleDeleteScene = async () => {
     setShowDeleteModal(false);
-    setLoading(true);  // Start loading
+    setLoading(false);  // Start loading
 
     try {
       const response = await axios.delete(`${API_BASE_URL}/delete-scene?sceneId=${sceneToDelete}`, {
@@ -537,74 +496,6 @@ const Home = ({ subscriptionLevel, setSubscriptionLevel }) => {
           </div>
         </header>
 
-        {isImportPanelOpen && activeMenu === "Home" && (
-          <div className="import-home">
-            <div className="import-panel-header">
-              <h2>Import or Drag & Drop</h2>
-              <FaTimes
-                className="close-icon"
-                onClick={() => {
-                  handleButtonClick("Close Panel Clicked", "Close Import Panel", location.pathname);
-                  handleClosePanel();
-                }}
-              />
-            </div>
-            <div
-              className={`drag-drop-area ${dragOver ? "drag-over" : ""}`}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-            >
-              <p>Drag & Drop files here or choose an option below</p>
-            </div>
-            <div className="import-options">
-              <button
-                className="import-option"
-                onClick={() => {
-                  handleButtonClick("Import Option Clicked", "3D Model Import", location.pathname);
-                  handleFileInput(".gltf,.glb,.stl,.fbx,.obj");
-                }}
-              >
-                3D Model (GLTF, STL, FBX, OBJ)
-              </button>
-            </div>
-          </div>
-        )}
-
-        {isGeneratePanelOpen && activeMenu === "Home" && (
-          <div className="import-panel">
-            <div className="import-panel-header">
-              <h2>Generate</h2>
-              <FaTimes
-                className="close-icon"
-                onClick={() => {
-                  handleButtonClick("Close Panel Clicked", "Close Generate Panel", location.pathname);
-                  handleClosePanel();
-                }}
-              />
-            </div>
-            <div className="import-options">
-              <button
-                className="import-option"
-                onClick={() => {
-                  handleButtonClick("Generate Option Clicked", "2D to 3D", location.pathname);
-                  navigate("/2dimageto3dmodel");
-                }}
-              >
-                2D Image to 3D Model
-              </button>
-              <button
-                className="import-option"
-                onClick={() => {
-                  handleButtonClick("Generate Option Clicked", "Polymodel Conversion", location.pathname);
-                  navigate("/polymodel");
-                }}
-              >
-                Polymodel Conversion
-              </button>
-            </div>
-          </div>
-        )}
 
         {(activeMenu === "Home" || activeMenu === "My Files") && (
           <section className="projects">
@@ -728,25 +619,12 @@ const Home = ({ subscriptionLevel, setSubscriptionLevel }) => {
           </section>
         )}
 
-        {(activeMenu === "Home" || activeMenu === "Tutorials") && (
-          <section className="tutorials-video">
-            <h2>Tutorials</h2>
-            <div className="tutorials-grid" ref={tutorialsVideoGridRef} style={{ minHeight: tutorialsVideoGridHeight }}>
-              {tutorials.map((tutorial) => (
-                <div key={tutorial.id} className="tutorial-card">
-                  <video width="100%" height="200" controls>
-                    <div className="video-container">
-                      <source src={tutorial.videoUrl} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </div>
-                  </video>
-                  <p className="project-title">{tutorial.title}</p>
-                  <p>{tutorial.description}</p>
-                </div>
-              ))}
-            </div>
+        {activeMenu === "Tutorials" && (
+          <section>
+            <TutorialsShowcase />
           </section>
         )}
+
 
         {activeMenu === "Library" && (
           <section className="library-section">
